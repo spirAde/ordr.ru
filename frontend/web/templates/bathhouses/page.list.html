@@ -1,0 +1,15 @@
+<div class="main not-front">
+    <div ui-view="header"></div>
+
+    <div ui-view="review"></div>
+
+    <div class="wrapper">
+        <div ui-view="filter"></div>
+
+        <div ui-view="bathhouses" ng-show="listMode"></div>
+    </div>
+
+    <div ui-view="map"></div>
+</div>
+
+<div ui-view="detail" />

@@ -1,0 +1,24 @@
+<div class="md-title clear">
+    <h2>Данные заказа №{{currOrder.id}}</h2>
+</div>
+<!--<div class="messages done">
+    <p>Done</p>
+</div>
+<div class="messages error">
+    <p>Error</p>
+</div>-->
+<div class="form">
+    <p>Время: {{currOrder.date_from}} {{currOrder.time_from | periodToTime}} - {{currOrder.date_to}} {{currOrder.time_to | periodToTime}}</p>
+    <!--<div class="field">
+        <input labeltext="Имя" />
+    </div>
+    <div class="field">
+        <input labeltext="Email" />
+    </div>
+    <div class="field">
+        <input labeltext="Телефон" />
+    </div>-->
+</div>
+<div class="buttons clear">
+    <a ng-click="cancelOrder();">Закрыть</a>
+</div>

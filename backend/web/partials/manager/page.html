@@ -1,0 +1,100 @@
+<div ng-class="{true: 'body-overlay', false: ''}[overlay]">
+    <div class="menu">
+        <div class="logo">
+            <img src="/images/logo.png" alt=""/>
+        </div>
+        <div class="links">
+            <a ng-click="openRecords();" ng-class="{true: 'item-history icons new', false: 'item-history icons'}[newRecords]">История</a>
+            <a ng-click="openMessages();" ng-class="{true: 'item-noty icons new', false: 'item-noty icons'}[newMessages]">Сообщения</a>
+        </div>
+        <div class="user">
+            <a href="#" class="username">{{::managerName.lastName}} {{::managerName.firstName}}</a>
+            <a href="#" class="logout icons"></a>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="content">
+            <div class="title clear">
+                <h1>{{::bathhouse.name}}</h1>
+            </div>
+
+            <datepaginator></datepaginator>
+
+            <div class="wrapper">
+                <div class="room" ng-repeat="room in bathhouse.rooms track by $index">
+                    <div class="clear">
+                        <h2>{{::room.room_name}}</h2>
+                        <div class="help">
+                            <span class="item-1 past">Занято</span>
+                            <span class="item-2 reserve">Занято</span>
+                            <span class="item-3 reserve2">Занято</span>
+                            <span class="item-4 reserve3">Занято</span>
+                        </div>
+                    </div>
+                    <div class="wrap">
+
+                        <time-calendar-carousel
+                            room-id="room.room_id"
+                            orders="room.orders"
+                            min-duration="room.min_duration"
+                            change-position="slideData"
+
+                            show-order="showOrder(roomId, orderId, callback);"
+                            new-order="newOrder(order, callback);"
+                            get-orders="getOrders(roomId, startDate, endDate);">
+                        </time-calendar-carousel>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-class="{true: 'history left-block active', false: 'history left-block'}[activateRecords]">
+        <h2>История <span class="icons close" ng-click="activateRecords = false;"></span></h2>
+        <div class="content">
+            <perfect-scrollbar class="scroll" refresh-on-change="records" wheel-propagation="true" suppress-scroll-x="true">
+                <div class="item"
+                     ng-repeat="record in records track by $index"
+                     ng-click="showRecord($index);">
+                    <h3 class="reserve">22.08.2015 Бронирование</h3>
+                    <p>На Украине предложили лишать гражданства за посягательство на целостность Украины и государственную измену</p>
+                </div>
+            </perfect-scrollbar>
+        </div>
+    </div>
+
+    <!--<div order-modal modal-data="modalData"></div>-->
+
+    <div class="md-overlay" ng-show="overlay"></div>
+</div>
+
+<script>
+
+    $(document).ready(function() {
+
+        /*$('.scroll').perfectScrollbar({
+            suppressScrollX: true
+        });*/
+
+
+        /*$('.md-close').click(function(){
+            $('.md-modal').removeClass('md-show');
+            $('body').removeClass('body-overlay');
+            $('.md-overlay').hide();
+        });
+
+        $('.md-overlay').click(function(){
+            $('.md-close').click();
+        });*/
+
+        $('body').delegate('.time .item', 'click', function(){
+            $('body').addClass('body-overlay');
+            $('#modal-1').addClass('md-show');
+            $('.md-overlay').show();
+            return false;
+        });
+    });
+
+</script>
