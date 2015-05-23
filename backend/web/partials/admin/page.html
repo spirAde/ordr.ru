@@ -1,0 +1,34 @@
+<div ng-switch on="currentUser.role">
+    <div ng-switch-when="userRoles.admin">You're admin.</div>
+    <div ng-switch-when="userRoles.manager">You're manager.</div>
+    <div ng-switch-default>You're something else.</div>
+</div>
+
+<div
+    id="app"
+    class="app app-header-fixed app-aside-fixed app-aside-dock">
+
+    <div
+        class="app-header navbar"
+        ng-controller="header"
+        ng-include="headerTemplateUrl">
+    </div>
+
+    <div
+        class="app-aside hidden-xs bg-black"
+        ng-controller="aside"
+        ng-include="asideTemplateUrl"></div>
+
+    <div class="app-content">
+        <div
+            class="app-content-body app-content-full fade-in-up"
+            ng-controller="content"
+            ng-include="contentTemplateUrl">
+        </div>
+    </div>
+
+    <div class="app-footer navbar navbar-fixed-bottom bg-light lt b-t"
+         ng-controller="footer"
+         ng-include="footerTemplateUrl">
+    </div>
+</div>

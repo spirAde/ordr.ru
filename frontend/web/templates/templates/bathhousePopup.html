@@ -1,0 +1,18 @@
+<perfect-scrollbar class="scroll">
+    <div class="for-map" ng-style="popupHeightStyle">
+        <div class="wrap">
+            <h2>{{::bathhouse.name}}</h2>
+            <p class="address">{{::bathhouse.address}}</p>
+            <div class="rooms">
+                <div class="room" ng-repeat="room in bathhouse.rooms track by room.id" ng-if="room.available">
+                    <h3>{{::room.name}}</h3>
+                    <p>
+                        <span>Цена от {{::room.min_price}}р/час</span><br/>
+                        <span>до {{::room.guest_limit}} человек</span>
+                    </p>
+                    <a href ng-click="activateRoom(room.id)">Подробнее</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</perfect-scrollbar>

@@ -1,0 +1,123 @@
+<div class="main front">
+    <div class="video" overflowbg>
+        <div class="inner">
+            <div class="front-header clear">
+                <div class="logo">
+                    <a href="#"><img src="/images/logo.png" alt="" width="130" height="40" /></a>
+                </div>
+                <div class="services-types">
+                    <a href="#" class="active icons">Сауны и бани</a>
+                    <a href="#" class="icons">Автомойки</a>
+                </div>
+            </div>
+            <div class="front-info">
+                <h1>Банный отдых</h1>
+                <p>Планируйте свое время правильно! Бронируйте бани,<br />автомойки и другие уникальные услуги. </p>
+                <a ng-click="nextPage()" class="icons">Подобрать</a>
+            </div>
+            <div class="select-city">
+                <div class="current-city">
+                    <div class="field field-select icons">
+                        <single-select
+                            list="cities"
+                            type="'city'"
+                            on-change="changeSelectedCity(idx)">
+                        </single-select>
+                    </div>
+                </div>
+                <div class="total-offers">Всего <span>{{::offers}}</span> {{::offers | declination: ['предложение', 'предложения', 'предложений']}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="front-block how">
+        <div class="inner">
+            <h2>Как это работает</h2>
+            <div class="clear">
+                <div class="item item-1 icons">
+                    <h3>Выбираете <br />место</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod </p>
+                </div>
+                <div class="item item-2 icons">
+                    <h3>Заполняете <br />форму</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod </p>
+                </div>
+                <div class="item item-3 icons">
+                    <h3>Подтверждаете <br />номер</h3>
+                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="front-block testimonials">
+        <div class="inner">
+            <div class="tabs">
+                <a href="#" class="icons active">Комментарии</a>
+                <a href="#" class="icons">Пресса о нас</a>
+            </div>
+            <div class="items">
+                <div class="item">
+                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation </p>
+                    <div class="people">
+                        <div class="name">Василий Пупкин</div>
+                        <div class="position">Студент</div>
+                    </div>
+                </div>
+            </div>
+            <div class="items-navigation">
+                <a href="#"><img src="/images/people/1.png" alt="" width="80" height="80" /></a>
+                <a href="#" class="active"><img src="/images/people/1.png" alt="" width="80" height="80" /></a>
+                <a href="#"><img src="/images/people/1.png" alt="" width="80" height="80" /></a>
+            </div>
+        </div>
+    </div>
+    <div class="front-block interesting">
+        <div class="inner">
+            <h2>Интересно?</h2>
+            <div class="clear">
+                <div class="field field-select">
+                    <single-select list="cities" on-change="changeSelectedCity(idx)"></single-select>
+                </div>
+                <div class="field field-select">
+                    <single-select list="types" on-change="changeSelectedType(idx)"></single-select>
+                </div>
+                <div class="buttons">
+                    <a ng-click="nextPage()">Перейти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="front-block footer">
+        <div class="inner">
+            <div class="clear">
+                <div class="item item-left">
+                    <a href="#"><img src="/images/logo-2.png" alt="" width="130" height="40" /></a>
+                </div>
+                <div class="item item-right">
+                    <ul>
+                        <li><a href="#">Пригласить друзей</a></li>
+                        <li><a href="#">Мобильная версия</a></li>
+                        <li><a href="#">Карта сайта</a></li>
+                    </ul>
+                </div>
+                <div class="item item-right">
+                    <ul>
+                        <li><a href="#">Мы в Вконтакте</a></li>
+                        <li><a href="#">Мы в Фейсбуке</a></li>
+                        <li><a href="#">Мы в Гугл+</a></li>
+                    </ul>
+                </div>
+                <div class="item item-right">
+                    <ul>
+                        <li><a href="#">О проекте</a></li>
+                        <li><a href="#">Правила</a></li>
+                        <li><a href="#">Вопросы и ответы</a></li>
+                        <li><a href="#">Конфиденциальность</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copy">
+                © 2012—2014 «Ordr.ru». Дизайн и верстка — <a href="#">Websapiens</a>.
+            </div>
+        </div>
+    </div>
+</div>
