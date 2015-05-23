@@ -11,16 +11,13 @@
 
     <?php $this->head() ?>
 
-    <!--<link rel="apple-touch-icon-precomposed" sizes="144x144" href="<?php /*echo \Yii::$app->request->baseUrl; */?>/images/icons/apple-touch-icon-144-precomposed.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="<?php /*echo \Yii::$app->request->baseUrl; */?>/images/icons/apple-touch-icon-114-precomposed.png" />
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="<?php /*echo \Yii::$app->request->baseUrl; */?>/images/icons/apple-touch-icon-72-precomposed.png" />
-    <link rel="apple-touch-icon-precomposed" href="<?php /*echo \Yii::$app->request->baseUrl; */?>/images/icons/apple-touch-icon-57-precomposed.png" />
-    <link rel="icon" type="image/png" href="<?php /*echo \Yii::$app->request->baseUrl; */?>/images/icons/favicon.png">-->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/images/icons/apple-touch-icon-144-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/images/icons/apple-touch-icon-114-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/images/icons/apple-touch-icon-72-precomposed.png" />
+    <link rel="apple-touch-icon-precomposed" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/images/icons/apple-touch-icon-57-precomposed.png" />
+    <link rel="icon" type="image/png" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/images/icons/favicon.png">
 
-    <!--<link rel="stylesheet" type="text/css" href="/build/bundle.css" />-->
-
-    <!--<title><?php /*echo \yii\helpers\Html::encode($this->pageTitle); */?></title>-->
-    <!--<script>var _PRELOAD = <?php /*echo $preload*/?>;</script>-->
+    <link rel="stylesheet" type="text/css" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle.css" />
 </head>
 
 <body>
@@ -30,6 +27,10 @@
     <div ui-view></div>
 
     <script>var _PRELOAD = <?php echo $content?>;</script>
+
+    <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle-libs.js"></script>
+    <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle.js"></script>
+    <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/templates.js"></script>
 
     <?php $this->endBody() ?>
 

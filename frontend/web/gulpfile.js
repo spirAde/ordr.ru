@@ -55,34 +55,34 @@ var tasks = {
 	},
 
 	styles: function() {
-		return gulp.src('./frontend/web/styles/*.css')
+		return gulp.src('./styles/*.css')
 			.pipe(concat('bundle.css'))
 			.pipe(gulpif(production, minifyCSS()))
-			.pipe(gulp.dest('build/'));
+			.pipe(gulp.dest('./build'));
 	},
 
 	template: function() {
-		return gulp.src('./frontend/web/templates/**/*.html')
+		return gulp.src('./templates/**/*.html')
 			.pipe(minifyHtml({
 				empty: true,
 				spare: true,
 				quotes: true
 			}))
 			.pipe(templateCache('templates.js', {
-				root: 'frontend/web/web/templates/'
+				root: './templates/'
 			}))
 			.pipe(uglify())
 			.pipe(gulp.dest('./build'));
 	},
 
 	fonts: function() {
-		return gulp.src('./frontend/web/fonts/**/*')
+		return gulp.src('./fonts/**/*')
 			.pipe(changed('./build/fonts'))
 			.pipe(gulp.dest('./build/fonts'));
 	},
 
 	images: function() {
-		return gulp.src('./frontend/web/images/**/*')
+		return gulp.src('./images/**/*')
 			.pipe(changed('./build/images'))
 			.pipe(gulp.dest('./build/images'));
 	},
@@ -91,7 +91,7 @@ var tasks = {
 
 		var debug = !production;
 
-		var bundler = browserify('./frontend/web/scripts/app.js', {
+		var bundler = browserify('./scripts/app.js', {
 			debug: debug
 		});
 
