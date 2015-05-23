@@ -3,11 +3,11 @@
 /* ordr-icons */
 @font-face {
     font-family: "ordr-icons";
-    src:url("../fonts/ordr-icons.eot");
-    src:url("../fonts/ordr-icons.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/ordr-icons.woff") format("woff"),
-    url("../fonts/ordr-icons.ttf") format("truetype"),
-    url("../fonts/ordr-icons.svg") format("svg");
+    src:url("fonts/ordr-icons.eot");
+    src:url("fonts/ordr-icons.eot?#iefix") format("embedded-opentype"),
+    url("fonts/ordr-icons.woff") format("woff"),
+    url("fonts/ordr-icons.ttf") format("truetype"),
+    url("fonts/ordr-icons.svg") format("svg");
     font-weight: normal;
     font-style: normal;
 }
