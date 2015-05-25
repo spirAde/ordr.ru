@@ -13,7 +13,7 @@
             <div class="front-info">
                 <h1>Банный отдых</h1>
                 <p>Планируйте свое время правильно! Бронируйте бани,<br />автомойки и другие уникальные услуги. </p>
-                <a ng-click="nextPage()" class="icons">Подобрать</a>
+                <a ng-click="vm.nextPage()" class="icons">Подобрать</a>
             </div>
             <div class="select-city">
                 <div class="current-city">
@@ -85,7 +85,7 @@
                     <select-single list="vm.types" on-change="vm.selectType(id)"></select-single>
                 </div>
                 <div class="buttons">
-                    <a ng-click="nextPage()">Перейти</a>
+                    <a ng-click="vm.nextPage()">Перейти</a>
                 </div>
             </div>
         </div>

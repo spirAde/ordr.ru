@@ -12,15 +12,15 @@ function appRoute($stateProvider, $urlRouterProvider, $locationProvider, $httpPr
 	$stateProvider
 		.state('home', {
 			url: '/',
-			templateUrl: 'templates/home/page.html',
+			templateUrl: 'templates/home/index.html',
 			controller: 'HomeController',
 			controllerAs: 'vm'
-		});
+		})
 
-		/*.state('bathhouses', {
+		.state('bathhouses', {
 			abstract: true,
 			url: '/bathhouses',
-			templateUrl: '/templates/bathhouses/page.list.html'
+			template: '<ui-view />'
 		})
 		.state('bathhouses.list', {
 			url: '/?city&mode',
@@ -29,47 +29,13 @@ function appRoute($stateProvider, $urlRouterProvider, $locationProvider, $httpPr
 				city: null,
 				mode: 'list'
 			},
-			onEnter: ['$stateParams', 'socketservice', function($stateParams, socketservice) {
-				socketservice.emit('user:init', {city: $stateParams.city});
-			}],
-			views: {
-				'header': {
-					controller: 'header',
-					templateUrl: '/templates/bathhouses/header.html'
-				},
-				'filter': {
-					controller: 'filter',
-					templateUrl: '/templates/bathhouses/filter.html'
-				},
-				'bathhouses': {
-					controller: 'bathhousesList',
-					templateUrl: '/templates/bathhouses/bathhouses.list.html'
-				},
-				'map': {
-					controller: 'map',
-					templateUrl: '/templates/bathhouses/map.html'
-				},
-				'review': {
-					controller: 'review',
-					templateUrl: '/templates/bathhouses/review.html'
-				}
-			}
+			templateUrl: 'templates/bathhouse-list/index.html'
 		})
-		.state('bathhouses.detail', {
+		.state('bathhouses.item', {
 			url: '/:bathhouseId',
 			reloadOnSearch: false,
-			views: {
-				'detail': {
-					controller: 'bathhousesDetail',
-					templateUrl: '/templates/bathhouses/bathhouses.detail.html'
-				}
-			},
-			onEnter: ['$stateParams', 'socketservice', function($stateParams, socketservice) {
-				socketservice.emit('user:init', {bathhouseId: $stateParams.bathhouseId});
-			}]
-		})
-
-		.state('carwashes', {});*/
+			templateUrl: 'templates/bathhouse-item/index.html'
+		});
 
 	$urlRouterProvider.otherwise('/');
 }

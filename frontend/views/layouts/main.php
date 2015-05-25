@@ -25,7 +25,7 @@
 
     <?php $this->beginBody() ?>
 
-    <div ui-view ng-class="front"></div>
+    <div ui-view></div>
 
     <script>var _PRELOAD = <?php echo $content?>;</script>
 

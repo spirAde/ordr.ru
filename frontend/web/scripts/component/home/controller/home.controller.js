@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-HomeController.$inject = ['CONSTANTS', '$timeout'];
+HomeController.$inject = ['CONSTANTS', '$timeout', '$state'];
 
-function HomeController(CONSTANTS, $timeout) {
+function HomeController(CONSTANTS, $timeout, $state) {
 
 	console.log(CONSTANTS);
 
@@ -26,6 +26,7 @@ function HomeController(CONSTANTS, $timeout) {
 
 	vm.selectCity = selectCity;
 	vm.selectType = selectType;
+	vm.nextPage = nextPage;
 
 	function selectCity(id) {
 
@@ -38,6 +39,15 @@ function HomeController(CONSTANTS, $timeout) {
 
 	function selectType(id) {
 		console.log(id);
+	}
+
+	function nextPage() {
+
+		$state.transitionTo(
+			'bathhouses.list',
+			{city: 'mgn', mode: 'list'},
+			{reload: false, inherit: true, notify: true}
+		);
 	}
 }
 
