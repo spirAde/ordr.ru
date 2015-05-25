@@ -69,13 +69,13 @@ class SiteController extends Controller
                 'city'                  => $cities,
                 'periods'               => $periods,
                 'invert'                => array_flip($periods),
-                'organizations_type'    => yii::$app->params['organization_type'],
-                'bathhouse_type'        => yii::$app->params['bathhouse_type'],
+                'organizationsType'     => yii::$app->params['organization_type'],
+                'bathhouseType'         => yii::$app->params['bathhouse_type'],
                 'options'               => [
-                    'bathhouse_options'         => yii::$app->params['bathhouse_options'],
-                    'bathhouse_room_options'    => yii::$app->params['bathhouse_room_options'],
+                    'bathhouseOptions'      => yii::$app->params['bathhouse_options'],
+                    'roomOptions'           => yii::$app->params['bathhouse_room_options'],
                 ],
-                'rooms_count'           => $rooms_count,
+                'offers'                => $rooms_count,
                 'filters'               => $filters
             ];
 

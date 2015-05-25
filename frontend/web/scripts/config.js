@@ -14,13 +14,9 @@ function appConfig($compileProvider, $httpProvider, $provide) {
 
 		return function(exception, cause) {
 
-			setTimeout(
-				function() {
-					console.error(exception.stack);
-					//throw exception;
-				},
-				0
-			);
+			setTimeout(function() {
+				console.error(exception.stack);
+			}, 0);
 		};
 	});
 }

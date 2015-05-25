@@ -1,10 +1,11 @@
 <?php $this->beginPage() ?>
 
 <!doctype html>
-<html lang="ru">
+<html lang="ru" ng-app="app">
 <head>
+
     <base href="/" />
-    <meta name="fragment" content="!" />
+
     <meta charset="utf-8" />
 
     <title>ordr.ru</title>
@@ -24,7 +25,7 @@
 
     <?php $this->beginBody() ?>
 
-    <div ui-view></div>
+    <div ui-view ng-class="front"></div>
 
     <script>var _PRELOAD = <?php echo $content?>;</script>
 

@@ -3,7 +3,7 @@
         <div class="inner">
             <div class="front-header clear">
                 <div class="logo">
-                    <a href="#"><img src="/images/logo.png" alt="" width="130" height="40" /></a>
+                    <a href="#"><img src="build/images/logo.png" alt="" width="130" height="40" /></a>
                 </div>
                 <div class="services-types">
                     <a href="#" class="active icons">Сауны и бани</a>
@@ -18,14 +18,18 @@
             <div class="select-city">
                 <div class="current-city">
                     <div class="field field-select icons">
-                        <single-select
-                            list="cities"
-                            type="'city'"
-                            on-change="changeSelectedCity(idx)">
-                        </single-select>
+
+                        <select-single
+                            list="vm.cities"
+                            on-change="vm.selectCity(id)">
+                        </select-single>
+
                     </div>
                 </div>
-                <div class="total-offers">Всего <span>{{::offers}}</span> {{::offers | declination: ['предложение', 'предложения', 'предложений']}}</div>
+                <div class="total-offers">
+                    Всего <span>{{vm.offers}}</span>
+                    {{vm.offers | declination: ['предложение', 'предложения', 'предложений']}}
+                </div>
             </div>
         </div>
     </div>
@@ -64,21 +68,21 @@
                 </div>
             </div>
             <div class="items-navigation">
-                <a href="#"><img src="/images/people/1.png" alt="" width="80" height="80" /></a>
-                <a href="#" class="active"><img src="/images/people/1.png" alt="" width="80" height="80" /></a>
-                <a href="#"><img src="/images/people/1.png" alt="" width="80" height="80" /></a>
+                <a href="#"><img src="build/images/people/1.png" alt="" width="80" height="80" /></a>
+                <a href="#" class="active"><img src="build/images/people/1.png" alt="" width="80" height="80" /></a>
+                <a href="#"><img src="build/images/people/1.png" alt="" width="80" height="80" /></a>
             </div>
         </div>
     </div>
     <div class="front-block interesting">
         <div class="inner">
-            <h2>Интересно?</h2>
+            <h2>Интересно?    {{::vm.smth}}</h2>
             <div class="clear">
                 <div class="field field-select">
-                    <single-select list="cities" on-change="changeSelectedCity(idx)"></single-select>
+                    <select-single list="vm.cities" on-change="vm.selectCity(id)"></select-single>
                 </div>
                 <div class="field field-select">
-                    <single-select list="types" on-change="changeSelectedType(idx)"></single-select>
+                    <select-single list="vm.types" on-change="vm.selectType(id)"></select-single>
                 </div>
                 <div class="buttons">
                     <a ng-click="nextPage()">Перейти</a>
@@ -90,7 +94,7 @@
         <div class="inner">
             <div class="clear">
                 <div class="item item-left">
-                    <a href="#"><img src="/images/logo-2.png" alt="" width="130" height="40" /></a>
+                    <a href="#"><img src="build/images/logo-2.png" alt="" width="130" height="40" /></a>
                 </div>
                 <div class="item item-right">
                     <ul>

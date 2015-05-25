@@ -421,7 +421,7 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
 .front-block.interesting {background-color: #18B2AE;color: #fff;text-align: center;font-size: 20px;}
 .front-block.interesting h2 {color: #fff;}
 .front-block.interesting h2:after {background-color: rgba(255,255,255,.03)}
-.front-block.interesting .clear > div {display: inline-block;width: 25%;}
+.front-block.interesting .clear > div {display: inline-block;width: 25%; margin-right: 7px;}
 .front-block.interesting .field {text-align: left;}
 .front-block.interesting .caption-select-box {padding: 20px;background-color: #5EC9C6;border-radius: 4px;cursor: pointer;transition: all 0.3s ease 0s;}
 .front-block.interesting .caption-select-box:hover {background-color: #76D1CE;}

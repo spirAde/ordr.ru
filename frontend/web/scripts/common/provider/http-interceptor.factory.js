@@ -1,8 +1,8 @@
 'use strict';
 
-httpInterceptor.$inject = ['authToken'];
+httpInterceptor.$inject = [];
 
-function httpInterceptor(authToken) {
+function httpInterceptor() {
 
 	return {
 		request: setHeaders
@@ -13,17 +13,9 @@ function httpInterceptor(authToken) {
 
 		config.headers = config.headers || {};
 
-		// Api Version
 		var apiVersion = '1.0';
 
-		config.headers.Accept = 'application/json; version='+apiVersion;
-
-		// JWT Token
-		var token = authToken.getToken();
-
-		if (token) {
-			config.headers.Token = 'Bearer ' + token;
-		}
+		config.headers.Accept = 'application/json; version=' + apiVersion;
 
 		return config;
 	}

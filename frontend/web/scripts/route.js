@@ -12,11 +12,12 @@ function appRoute($stateProvider, $urlRouterProvider, $locationProvider, $httpPr
 	$stateProvider
 		.state('home', {
 			url: '/',
-			templateUrl: '/templates/home/page.html',
-			controller: 'homePage'
-		})
+			templateUrl: 'templates/home/page.html',
+			controller: 'HomeController',
+			controllerAs: 'vm'
+		});
 
-		.state('bathhouses', {
+		/*.state('bathhouses', {
 			abstract: true,
 			url: '/bathhouses',
 			templateUrl: '/templates/bathhouses/page.list.html'
@@ -68,9 +69,9 @@ function appRoute($stateProvider, $urlRouterProvider, $locationProvider, $httpPr
 			}]
 		})
 
-		.state('carwashes', {});
+		.state('carwashes', {});*/
 
-	$urlRouterProvider.otherwise('/stream/all/top');
+	$urlRouterProvider.otherwise('/');
 }
 
 module.exports = appRoute;
