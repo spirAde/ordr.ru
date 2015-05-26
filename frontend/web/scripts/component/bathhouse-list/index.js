@@ -2,6 +2,8 @@
 
 var angular = require('angular');
 
+require('angular-leaflet-directive');
+
 var HeaderController = require('./controller/header.controller');
 var FilterController = require('./controller/filter.controller');
 var ListController = require('./controller/list.controller');
@@ -12,7 +14,9 @@ var RusifyFilter = require('../../common/filter/rusify.filter');
 
 var data = require('./provider/data.factory');
 
-var BathhouseListModule = angular.module('BathhouseListModule', []);
+var BathhouseListModule = angular.module('BathhouseListModule', [
+	'leaflet-directive'
+]);
 
 BathhouseListModule.controller('HeaderController', HeaderController);
 BathhouseListModule.controller('FilterController', FilterController);

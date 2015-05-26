@@ -1,15 +1,14 @@
 <div class="map" ng-controller="MapController as vm">
 
-    {{::vm.smth}}
-    <!--<leaflet
-            defaults="map.defaults"
-            layers="map.layers"
-            markers="map.markers"
-            center="map.center"
-            event-broadcast="events">
+    <leaflet
+            defaults="vm.map.defaults"
+            layers="vm.map.layers"
+            markers="vm.map.markers"
+            center="vm.map.center"
+            event-broadcast="vm.events">
     </leaflet>
 
-    <div class="content" ng-if="showRoom">
+    <!--<div class="content" ng-if="showRoom">
         <div class="item">
             <div class="wrap">
                 <div class="preview">

@@ -19,6 +19,7 @@
     <link rel="icon" type="image/png" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/images/icons/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle.css" />
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
 </head>
 
 <body>
@@ -32,6 +33,8 @@
     <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle-libs.js"></script>
     <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle.js"></script>
     <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/templates.js"></script>
+
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
 
     <?php $this->endBody() ?>
 
