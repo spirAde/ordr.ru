@@ -56,16 +56,16 @@ return [
         3 => 'hammam'
     ],
     'bathhouse_options' => [
-        1 => 'Интернет',
-        2 => 'Парковка',
-        3 => 'Бар/Ресторан',
-        4 => 'Кухня',
-        5 => 'Прорубь',
+        1 => 'internet',
+        2 => 'parking',
+        3 => 'icehole',
+        4 => 'bar',
+        5 => 'kitchen',
     ],
     'bathhouse_room_options' => [
-        1 => 'Бассейн',
-        2 => 'Бильярд',
-        3 => 'Джакузи'
+        1 => 'pool',
+        2 => 'billiards',
+        3 => 'jacuzzi'
     ],
     'order_status' => [
         1 => 'delete',

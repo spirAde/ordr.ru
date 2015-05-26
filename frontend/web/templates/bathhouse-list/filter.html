@@ -1,1 +1,171 @@
-Filter
+<div ng-controller="FilterController as vm"
+    ng-class="{true: 'filter opened', false: 'filter'}[openedTopAndBottom]">
+
+    <div class="wrap scroll" filter-scroll>
+        <div ng-class="{true: 'filter-top opened', false: 'filter-top'}[openedTop]">
+            <div class="block-filter block-filter-time">
+                <div class="wrap clear">
+                    <h3>Дата и время</h3>
+                    <br/>
+                </div>
+            </div>
+            <div class="block-filter block-filter-options">
+                <div class="wrap clear">
+                    <h3>Услуги и удобства</h3>
+
+                    <div ng-class="'field field-checkbox'"
+                         ng-repeat="(key, value) in vm.filters.options">
+
+                        <input
+                            id="service-{{key}}"
+                            type="checkbox"
+                            ng-model="vm.filters.options[key]"
+                            ng-change="vm.changeOptions(key)" />
+
+                        <label for="service-{{key}}">{{key | rusify}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="block-filter block-filter-type">
+                <div class="wrap clear">
+                    <h3>Тип</h3>
+                    <div class="field field-checkbox item-1">
+                        <input id="type-1" type="checkbox" ng-model="vm.filters.types.bathhouse"
+                               ng-change="vm.changeType('bathhouse')">
+                        <label for="type-1">Баня</label>
+                    </div>
+                    <div class="field field-checkbox item-2">
+                        <input id="type-2" type="checkbox" ng-model="vm.filters.types.sauna"
+                               ng-change="vm.changeType('sauna')">
+                        <label for="type-2">Сауна</label>
+                    </div>
+                    <div class="field field-checkbox item-3">
+                        <input id="type-3" type="checkbox" ng-model="vm.filters.types.hammam"
+                               ng-change="vm.changeType('hammam')">
+                        <label for="type-3">Хаммам</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div ng-class="{true: 'filter-bottom opened', false: 'filter-bottom'}[openedBottom]">
+            <div class="block-filter block-filter-prepaid">
+                <div class="wrap clear">
+                    <h3>Предоплата</h3>
+                    <ul>
+                        <li>
+                            <input type="radio" id="radio-1" name="selector"
+                                   ng-model="filters.prepayment"
+                                   ng-checked="filters.prepayment === true"
+                                   value="true"
+                                   ng-click="changePrepayment(true)">
+                            <label for="radio-1">Да</label>
+
+                            <div class="check"><div class="inside"></div></div>
+                        </li>
+
+                        <li>
+                            <input type="radio" id="radio-2" name="selector"
+                                   ng-model="filters.prepayment"
+                                   ng-checked="filters.prepayment === false"
+                                   value="false"
+                                   ng-click="changePrepayment(false)"/>
+                            <label for="radio-2">Нет</label>
+
+                            <div class="check"><div class="inside"></div></div>
+                        </li>
+
+                        <li>
+                            <input type="radio" id="radio-3" name="selector"
+                                   ng-model="filters.prepayment"
+                                   ng-checked="filters.prepayment === undefined"
+                                   value="undefined"
+                                   ng-click="changePrepayment(undefined)"/>
+                            <label for="radio-3">Неважно</label>
+
+                            <div class="check"><div class="inside"></div></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="block-filter block-filter-price">
+                <div class="wrap clear">
+                    <h3>Цена, руб</h3>
+                    <div class="field field-range field-range-double">
+
+                        <slider
+                                class="slider"
+                                floor="filters.price.floor"
+                                ceil="filters.price.ceil"
+                                model="filters.price.min"
+                                high="filters.price.max"
+                                step="50"
+                                type="'price'">
+                        </slider>
+
+                    </div>
+                </div>
+            </div>
+            <div class="block-filter block-filter-center">
+                <div class="wrap clear">
+                    <h3>До центра, км</h3>
+                    <div class="field field-range">
+
+                        <slider
+                                class="slider"
+                                ceil="filters.distance.ceil"
+                                model="filters.distance.max"
+                                translate="translate"
+                                step="1"
+                                type="'distance'">
+                        </slider>
+
+                    </div>
+                </div>
+            </div>
+            <div class="block-filter block-filter-guest">
+                <div class="wrap clear">
+                    <h3>Кол-во гостей, чел</h3>
+                    <div class="field field-range">
+
+                        <slider
+                                class="slider"
+                                ceil="filters.guest.ceil"
+                                model="filters.guest.max"
+                                translate="translate"
+                                step="1"
+                                type="'guest'">
+                        </slider>
+
+                    </div>
+                </div>
+            </div>
+            <div class="block-filter block-filter-name">
+                <div class="wrap clear">
+                    <h3>Поиск по названию</h3>
+                    <div class="field field-input">
+
+                        <input type="text"
+                               ng-model="typedName"
+                               ng-model-options="{debounce: {'default': 500}}"
+                               ng-change="searchByName(typedName)"
+                               placeholder="Название">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="filter-options clear" sticky>
+            <div class="filter-more">
+                <a ng-click="openFilters()">{{attached || (mode === 'map' && !openedTopAndBottom) ? 'Показать фильтры' : 'Еще фильтры'}}</a>
+            </div>
+            <div class="tag-it">
+                <a ng-repeat="tag in tags" ng-click="cancelFilter(tag)">{{tag | rusify}}</a>
+            </div>
+            <div class="total-offers">Всего <span>{{offers}}</span> {{::offers | declination: ['предложение', 'предложения', 'предложений']}}</div>
+        </div>
+    </div>
+    <div class="show-content">
+        <a ng-click="closeFilters()">Показать предложения</a>
+        <div>Показать предложения</div>
+    </div>
+</div>

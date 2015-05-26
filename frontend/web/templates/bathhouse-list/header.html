@@ -1,33 +1,45 @@
-<div class="header">
+<div class="header" ng-controller="HeaderController as vm">
     <div class="wrap clear">
         <div class="logo">
             <a ui-sref="/"><img src="build/images/logo.png" alt="" width="130" height="40" /></a>
         </div>
+
         <div class="select-city">
             <div class="current-city">
                 <div class="field field-select">
-                    <!--<single-select
-                        list="cities"
-                        type="'city'">
-                    </single-select>-->
+                    <select-single list="vm.cities"></select-single>
                 </div>
             </div>
         </div>
-        <!--<div class="content-filters sorting">
-            <a ng-class="{'icons active down': order === 'popularity' && reverse, 'icons active up': order === 'popularity' && !reverse, 'icons': order !== 'popularity'}"
-               ng-click="sortList('popularity')">Популярность</a>
-            <a ng-class="{'icons active down': order === 'distance' && reverse, 'icons active up': order === 'distance' && !reverse, 'icons': order !== 'distance'}"
-               ng-click="sortList('distance')">Удаленность</a>
-            <a ng-class="{'icons active down': order === 'price' && reverse, 'icons active up': order === 'price' && !reverse, 'icons': order !== 'price'}"
-               ng-click="sortList('price')">Цена</a>
+
+        <div class="content-filters sorting">
+            <a ng-class="{
+                'icons active down': vm.order === 'popularity' && vm.reverse,
+                'icons active up': vm.order === 'popularity' && !vm.reverse,
+                'icons': vm.order !== 'popularity'}"
+               ng-click="vm.sortList('popularity')">Популярность</a>
+
+            <a ng-class="{
+                'icons active down': vm.order === 'distance' && vm.reverse,
+                'icons active up': vm.order === 'distance' && !vm.reverse,
+                'icons': vm.order !== 'distance'}"
+               ng-click="vm.sortList('distance')">Удаленность</a>
+
+            <a ng-class="{
+                'icons active down': vm.order === 'price' && vm.reverse,
+                'icons active up': vm.order === 'price' && !vm.reverse,
+                'icons': vm.order !== 'price'}"
+               ng-click="vm.sortList('price')">Цена</a>
+
         </div>
+
         <div class="content-filters list-map">
-            <a ng-class="{'item-list icons active': mode === 'list', 'item-list icons': mode === 'map'}"
+            <a ng-class="{'item-list icons active': vm.mode === 'list', 'item-list icons': vm.mode === 'map'}"
                ng-click="toggleMode('list')">Список</a>
 
-            <a ng-class="{'item-map icons active': mode === 'map', 'item-map icons': mode === 'list'}"
-               ng-click="toggleMode('map')">Карта</a>
-        </div>-->
+            <a ng-class="{'item-map icons active': vm.mode === 'map', 'item-map icons': vm.mode === 'list'}"
+               ng-click="vm.toggleMode('map')">Карта</a>
+        </div>
     </div>
-    <!--<div class="header-filter" ng-click="openFilters()">Показать фильтр</div>-->
+    <div class="header-filter" ng-click="vm.openFilters()">Показать фильтр</div>
 </div>
