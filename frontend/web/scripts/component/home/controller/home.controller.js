@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-HomeController.$inject = ['$scope', '$timeout', '$state', 'CONSTANTS'];
+HomeController.$inject = ['$scope', '$timeout', '$state', 'user', 'CONSTANTS'];
 
-function HomeController($scope, $timeout, $state, CONSTANTS) {
+function HomeController($scope, $timeout, $state, user, CONSTANTS) {
 
 	console.log(CONSTANTS);
 
@@ -28,6 +28,8 @@ function HomeController($scope, $timeout, $state, CONSTANTS) {
 
 	function selectCity(id) {
 
+		user.data.cityId = id;
+
 		$scope.selectedCityId = id;
 
 		$timeout(function() {
@@ -41,9 +43,11 @@ function HomeController($scope, $timeout, $state, CONSTANTS) {
 
 	function nextPage() {
 
+		var citySlug = _.find(CONSTANTS.city, {id: $scope.selectedCityId}).slug;
+
 		$state.transitionTo(
 			'bathhouses.list',
-			{city: 'mgn', mode: 'list'},
+			{city: citySlug, mode: 'list'},
 			{reload: false, inherit: true, notify: true}
 		);
 	}

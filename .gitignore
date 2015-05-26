@@ -1,4 +1,5 @@
 .idea
 frontend/web/build
 node_modules
+frontend/config/main-local.php
 **/.DS_Store

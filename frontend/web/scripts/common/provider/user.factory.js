@@ -9,7 +9,9 @@ function user($window) {
 		resolution: {
 			width: $window.innerWidth,
 			height: $window.innerHeight
-		}
+		},
+		cityId: null,
+		organizationTypeId: 1
 	};
 
 	return {

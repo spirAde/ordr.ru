@@ -272,20 +272,23 @@ function FilterController($scope, $rootScope, data, CONSTANTS) {
 	});
 
 	$rootScope.$on('header:toggleMode', function(event, mode) {
-		/*if (mode === 'map') {
+
+		if (mode === 'map') {
+
 			$scope.openedTop = false;
 			$scope.openedBottom = false;
 
 			$scope.mode = 'map';
 		}
 		else if (mode === 'list') {
+
 			$scope.openedTop = true;
 			$scope.openedBottom = false;
 
 			$scope.mode = 'list';
 		}
 
-		if ($scope.openedTopAndBottom) $scope.$emit('$destroy'); // ->filterScroll-directive*/
+		if ($scope.openedTopAndBottom) $scope.$emit('$destroy'); // ->filterScroll-directive
 	});
 
 	$rootScope.$on('header:openFilters', function(event) {

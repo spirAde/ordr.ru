@@ -13,6 +13,7 @@ var MapController = require('./controller/map.controller');
 var RusifyFilter = require('../../common/filter/rusify.filter');
 
 var data = require('./provider/data.factory');
+var user = require('../../common/provider/user.factory');
 
 var BathhouseListModule = angular.module('BathhouseListModule', [
 	'leaflet-directive'
@@ -27,5 +28,6 @@ BathhouseListModule.controller('MapController', MapController);
 BathhouseListModule.filter('rusify', RusifyFilter);
 
 BathhouseListModule.factory('data', data);
+BathhouseListModule.factory('user', user);
 
 module.exports = BathhouseListModule;

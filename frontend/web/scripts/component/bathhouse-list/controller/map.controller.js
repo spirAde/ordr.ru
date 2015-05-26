@@ -2,11 +2,11 @@
 
 var _ = require('lodash');
 
-MapController.$inject = ['CONSTANTS', '$scope', '$rootScope', '$stateParams', 'leafletData'];
+MapController.$inject = ['$scope', '$rootScope', '$stateParams', 'leafletData', 'CONSTANTS'];
 
-function MapController(CONSTANTS, $scope, $rootScope, $stateParams, leafletData) {
+function MapController($scope, $rootScope, $stateParams, leafletData, CONSTANTS) {
 
-	var city = CONSTANTS.city[0];
+	var city = _.find(CONSTANTS.city, {slug: $stateParams.city});
 
 	L.mapbox.accessToken = 'pk.eyJ1Ijoic3BpcmFkZSIsImEiOiJMV1ZvLU04In0.j6dZfUFsE9JyctT4kiOq4g';
 
