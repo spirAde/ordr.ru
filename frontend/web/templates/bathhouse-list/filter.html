@@ -1,8 +1,8 @@
 <div ng-controller="FilterController as vm"
-    ng-class="{true: 'filter opened', false: 'filter'}[vm.openedTopAndBottom]">
+    ng-class="{true: 'filter opened', false: 'filter'}[openedTopAndBottom]">
 
     <div class="wrap scroll">
-        <div ng-class="{true: 'filter-top opened', false: 'filter-top'}[vm.openedTop]">
+        <div ng-class="{true: 'filter-top opened', false: 'filter-top'}[openedTop]">
             <div class="block-filter block-filter-time">
                 <div class="wrap clear">
                     <h3>Дата и время</h3>
@@ -14,13 +14,13 @@
                     <h3>Услуги и удобства</h3>
 
                     <div ng-class="'field field-checkbox'"
-                         ng-repeat="(key, value) in vm.filters.options">
+                         ng-repeat="(key, value) in filters.options">
 
                         <input
                             id="service-{{key}}"
                             type="checkbox"
-                            ng-model="vm.filters.options[key]"
-                            ng-change="vm.changeOptions(key)" />
+                            ng-model="filters.options[key]"
+                            ng-change="changeOptions(key)" />
 
                         <label for="service-{{key}}">{{key | rusify}}</label>
                     </div>
@@ -30,34 +30,34 @@
                 <div class="wrap clear">
                     <h3>Тип</h3>
                     <div class="field field-checkbox item-1">
-                        <input id="type-1" type="checkbox" ng-model="vm.filters.types.bathhouse"
-                               ng-change="vm.changeType('bathhouse')">
+                        <input id="type-1" type="checkbox" ng-model="filters.types.bathhouse"
+                               ng-change="changeType('bathhouse')">
                         <label for="type-1">Баня</label>
                     </div>
                     <div class="field field-checkbox item-2">
-                        <input id="type-2" type="checkbox" ng-model="vm.filters.types.sauna"
-                               ng-change="vm.changeType('sauna')">
+                        <input id="type-2" type="checkbox" ng-model="filters.types.sauna"
+                               ng-change="changeType('sauna')">
                         <label for="type-2">Сауна</label>
                     </div>
                     <div class="field field-checkbox item-3">
-                        <input id="type-3" type="checkbox" ng-model="vm.filters.types.hammam"
-                               ng-change="vm.changeType('hammam')">
+                        <input id="type-3" type="checkbox" ng-model="filters.types.hammam"
+                               ng-change="changeType('hammam')">
                         <label for="type-3">Хаммам</label>
                     </div>
                 </div>
             </div>
         </div>
-        <div ng-class="{true: 'filter-bottom opened', false: 'filter-bottom'}[vm.openedBottom]">
+        <div ng-class="{true: 'filter-bottom opened', false: 'filter-bottom'}[openedBottom]">
             <div class="block-filter block-filter-prepaid">
                 <div class="wrap clear">
                     <h3>Предоплата</h3>
                     <ul>
                         <li>
                             <input type="radio" id="radio-1" name="selector"
-                                   ng-model="vm.filters.prepayment"
-                                   ng-checked="vm.filters.prepayment === true"
+                                   ng-model="filters.prepayment"
+                                   ng-checked="filters.prepayment === true"
                                    value="true"
-                                   ng-click="vm.changePrepayment(true)">
+                                   ng-click="changePrepayment(true)">
                             <label for="radio-1">Да</label>
 
                             <div class="check"><div class="inside"></div></div>
@@ -65,10 +65,10 @@
 
                         <li>
                             <input type="radio" id="radio-2" name="selector"
-                                   ng-model="vm.filters.prepayment"
-                                   ng-checked="vm.filters.prepayment === false"
+                                   ng-model="filters.prepayment"
+                                   ng-checked="filters.prepayment === false"
                                    value="false"
-                                   ng-click="vm.changePrepayment(false)"/>
+                                   ng-click="changePrepayment(false)"/>
                             <label for="radio-2">Нет</label>
 
                             <div class="check"><div class="inside"></div></div>
@@ -76,10 +76,10 @@
 
                         <li>
                             <input type="radio" id="radio-3" name="selector"
-                                   ng-model="vm.filters.prepayment"
-                                   ng-checked="vm.filters.prepayment === undefined"
+                                   ng-model="filters.prepayment"
+                                   ng-checked="filters.prepayment === undefined"
                                    value="undefined"
-                                   ng-click="vm.changePrepayment(undefined)"/>
+                                   ng-click="changePrepayment(undefined)"/>
                             <label for="radio-3">Неважно</label>
 
                             <div class="check"><div class="inside"></div></div>
@@ -143,9 +143,9 @@
                     <div class="field field-input">
 
                         <input type="text"
-                               ng-model="vm.typedName"
+                               ng-model="typedName"
                                ng-model-options="{debounce: {'default': 500}}"
-                               ng-change="vm.searchByName(typedName)"
+                               ng-change="searchByName(typedName)"
                                placeholder="Название">
 
                     </div>
@@ -154,18 +154,18 @@
         </div>
         <div class="filter-options clear" sticky>
             <div class="filter-more">
-                <a ng-click="vm.openFilters()">
-                    {{vm.attached || (vm.mode === 'map' && !vm.openedTopAndBottom) ? 'Показать фильтры' : 'Еще фильтры'}}
+                <a ng-click="openFilters()">
+                    {{attached || (mode === 'map' && !openedTopAndBottom) ? 'Показать фильтры' : 'Еще фильтры'}}
                 </a>
             </div>
             <div class="tag-it">
-                <a ng-repeat="tag in vm.tags" ng-click="vm.cancelFilter(tag)">{{tag | rusify}}</a>
+                <a ng-repeat="tag in tags" ng-click="cancelFilter(tag)">{{tag | rusify}}</a>
             </div>
-            <div class="total-offers">Всего <span>{{vm.offers}}</span> {{::vm.offers | declination: ['предложение', 'предложения', 'предложений']}}</div>
+            <div class="total-offers">Всего <span>{{offers}}</span> {{::offers | declination: ['предложение', 'предложения', 'предложений']}}</div>
         </div>
     </div>
     <div class="show-content">
-        <a ng-click="vm.closeFilters()">Показать предложения</a>
+        <a ng-click="closeFilters()">Показать предложения</a>
         <div>Показать предложения</div>
     </div>
 </div>

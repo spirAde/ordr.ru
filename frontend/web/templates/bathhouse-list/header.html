@@ -35,7 +35,7 @@
 
         <div class="content-filters list-map">
             <a ng-class="{'item-list icons active': vm.mode === 'list', 'item-list icons': vm.mode === 'map'}"
-               ng-click="toggleMode('list')">Список</a>
+               ng-click="vm.toggleMode('list')">Список</a>
 
             <a ng-class="{'item-map icons active': vm.mode === 'map', 'item-map icons': vm.mode === 'list'}"
                ng-click="vm.toggleMode('map')">Карта</a>

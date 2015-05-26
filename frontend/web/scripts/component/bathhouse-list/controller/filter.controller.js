@@ -2,13 +2,11 @@
 
 var _ = require('lodash');
 
-FilterController.$inject = ['CONSTANTS', '$scope', '$rootScope', 'data'];
+FilterController.$inject = ['$scope', '$rootScope', 'data', 'CONSTANTS'];
 
-function FilterController(CONSTANTS, $scope, $rootScope, data) {
+function FilterController($scope, $rootScope, data, CONSTANTS) {
 
-	var vm = this;
-
-	vm.filters = {
+	$scope.filters = {
 		datetime: {
 			minDate: '2015-05-26',
 			maxDate: '2015-06-26'
@@ -21,39 +19,39 @@ function FilterController(CONSTANTS, $scope, $rootScope, data) {
 		prepayment: undefined
 	};
 
-	vm.offers = CONSTANTS.offers[1].room_count;
+	$scope.offers = CONSTANTS.offers[1].room_count;
 
 	var optionsList = _.values(CONSTANTS.options.bathhouseOptions).concat(_.values(CONSTANTS.options.roomOptions));
 
 	_.forEach(optionsList, function(option) {
-		vm.filters.options[option] = false;
+		$scope.filters.options[option] = false;
 	});
 
 	_.forEach(CONSTANTS.bathhouseType, function(type) {
-		vm.filters.types[type] = false;
+		$scope.filters.types[type] = false;
 	});
 
-	vm.openedTop = true;
-	vm.openedBottom = false;
-	vm.openedTopAndBottom = false;
+	$scope.openedTop = true;
+	$scope.openedBottom = false;
+	$scope.openedTopAndBottom = false;
 
-	$scope.$watchGroup(['vm.openedTop', 'vm.openedBottom'], function() {
-		vm.openedTopAndBottom = vm.openedTop && vm.openedBottom;
+	$scope.$watchGroup(['$scope.openedTop', '$scope.openedBottom'], function() {
+		$scope.openedTopAndBottom = $scope.openedTop && $scope.openedBottom;
 	});
 
-	vm.attached = false;
+	$scope.attached = false;
 
-	vm.openFilters = openFilters;
-	vm.closeFilters = closeFilters;
+	$scope.openFilters = openFilters;
+	$scope.closeFilters = closeFilters;
 
-	vm.cancelFilter = cancelFilter;
+	$scope.cancelFilter = cancelFilter;
 
-	vm.changeOptions = changeOptions;
-	vm.changeType = changeType;
-	vm.changePrepayment = changePrepayment;
-	vm.searchByName = searchByName;
+	$scope.changeOptions = changeOptions;
+	$scope.changeType = changeType;
+	$scope.changePrepayment = changePrepayment;
+	$scope.searchByName = searchByName;
 
-	vm.typedName = '';
+	$scope.typedName = '';
 
 	function cancelFilter(tag) {
 		/*switch (tag) {
@@ -122,9 +120,9 @@ function FilterController(CONSTANTS, $scope, $rootScope, data) {
 
 	function openFilters() {
 
-		if (vm.mode === 'map') vm.openedTop = true;
+		if ($scope.mode === 'map') $scope.openedTop = true;
 
-		vm.openedBottom = true;
+		$scope.openedBottom = true;
 
 		$scope.$emit('$activate'); // -> filterScroll-directive
 	}

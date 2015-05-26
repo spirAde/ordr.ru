@@ -2,38 +2,36 @@
 
 var _ = require('lodash');
 
-HomeController.$inject = ['CONSTANTS', '$timeout', '$state'];
+HomeController.$inject = ['$scope', '$timeout', '$state', 'CONSTANTS'];
 
-function HomeController(CONSTANTS, $timeout, $state) {
+function HomeController($scope, $timeout, $state, CONSTANTS) {
 
 	console.log(CONSTANTS);
 
-	var vm = this;
-
-	vm.cities = _.zipObject(
+	$scope.cities = _.zipObject(
 		_.pluck(CONSTANTS.city, 'id'),
 		_.pluck(CONSTANTS.city, 'city')
 	);
 
-	vm.types = {
+	$scope.types = {
 		1: 'Бани и сауны',
 		2: 'Автомойки'
 	};
 
-	vm.selectedCityId = _.keys(vm.cities)[0];
-	vm.selectedTypeId = _.keys(vm.types)[0];
-	vm.offers = CONSTANTS.offers[vm.selectedCityId].room_count;
+	$scope.selectedCityId = _.keys($scope.cities)[0];
+	$scope.selectedTypeId = _.keys($scope.types)[0];
+	$scope.offers = CONSTANTS.offers[$scope.selectedCityId].room_count;
 
-	vm.selectCity = selectCity;
-	vm.selectType = selectType;
-	vm.nextPage = nextPage;
+	$scope.selectCity = selectCity;
+	$scope.selectType = selectType;
+	$scope.nextPage = nextPage;
 
 	function selectCity(id) {
 
-		vm.selectedCityId = id;
+		$scope.selectedCityId = id;
 
 		$timeout(function() {
-			vm.offers = CONSTANTS.offers[id].room_count;
+			$scope.offers = CONSTANTS.offers[id].room_count;
 		}, 0);
 	}
 

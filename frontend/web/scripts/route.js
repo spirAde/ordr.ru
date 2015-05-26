@@ -13,8 +13,7 @@ function appRoute($stateProvider, $urlRouterProvider, $locationProvider, $httpPr
 		.state('home', {
 			url: '/',
 			templateUrl: 'templates/home/index.html',
-			controller: 'HomeController',
-			controllerAs: 'vm'
+			controller: 'HomeController'
 		})
 
 		.state('bathhouses', {

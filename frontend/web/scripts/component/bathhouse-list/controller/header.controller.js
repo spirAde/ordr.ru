@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-HeaderController.$inject = ['CONSTANTS', '$stateParams'];
+HeaderController.$inject = ['CONSTANTS', '$scope', '$stateParams', '$location'];
 
-function HeaderController(CONSTANTS, $stateParams) {
+function HeaderController(CONSTANTS, $scope, $stateParams, $location) {
 
 	var vm = this;
 
@@ -24,6 +24,11 @@ function HeaderController(CONSTANTS, $stateParams) {
 
 	function toggleMode(mode) {
 
+		vm.mode = mode;
+
+		$location.search('mode', vm.mode);
+
+		$scope.$emit('header:toggleMode', mode); // ->list && map && filter && review
 	}
 
 	function sortList(order) {

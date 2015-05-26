@@ -13,22 +13,22 @@
             <div class="front-info">
                 <h1>Банный отдых</h1>
                 <p>Планируйте свое время правильно! Бронируйте бани,<br />автомойки и другие уникальные услуги. </p>
-                <a ng-click="vm.nextPage()" class="icons">Подобрать</a>
+                <a ng-click="nextPage()" class="icons">Подобрать</a>
             </div>
             <div class="select-city">
                 <div class="current-city">
                     <div class="field field-select icons">
 
                         <select-single
-                            list="vm.cities"
-                            on-change="vm.selectCity(id)">
+                            list="cities"
+                            on-change="selectCity(id)">
                         </select-single>
 
                     </div>
                 </div>
                 <div class="total-offers">
-                    Всего <span>{{vm.offers}}</span>
-                    {{vm.offers | declination: ['предложение', 'предложения', 'предложений']}}
+                    Всего <span>{{offers}}</span>
+                    {{offers | declination: ['предложение', 'предложения', 'предложений']}}
                 </div>
             </div>
         </div>
@@ -76,16 +76,16 @@
     </div>
     <div class="front-block interesting">
         <div class="inner">
-            <h2>Интересно?    {{::vm.smth}}</h2>
+            <h2>Интересно?    {{::smth}}</h2>
             <div class="clear">
                 <div class="field field-select">
-                    <select-single list="vm.cities" on-change="vm.selectCity(id)"></select-single>
+                    <select-single list="cities" on-change="selectCity(id)"></select-single>
                 </div>
                 <div class="field field-select">
-                    <select-single list="vm.types" on-change="vm.selectType(id)"></select-single>
+                    <select-single list="types" on-change="selectType(id)"></select-single>
                 </div>
                 <div class="buttons">
-                    <a ng-click="vm.nextPage()">Перейти</a>
+                    <a ng-click="nextPage()">Перейти</a>
                 </div>
             </div>
         </div>
