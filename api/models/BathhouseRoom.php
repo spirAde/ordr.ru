@@ -21,6 +21,7 @@ class BathhouseRoom extends \yii\db\ActiveRecord
                     'roomId'                        => 'id',
                     'roomName'                      => 'name',
                     'types'                         => 'types',
+                    'cityId'                        => 'city_id',
                     'rating',
                     'popularity',
                     'description',

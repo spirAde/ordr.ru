@@ -15,7 +15,7 @@ class Bathhouse extends \yii\db\ActiveRecord
     {
         switch(yii::$app->controller->action->id)
         {
-            case 'index':
+            case 'view':
             {
                 return  [
                     'bathhouseId'=>'bathhouse.id',
@@ -44,8 +44,8 @@ class Bathhouse extends \yii\db\ActiveRecord
             )
             ->joinWith(['bathhouseRoom'], false)
             ->where([
-                'bathhouse.is_active'    => 1,
-                'bathhouse_room.bathhouse_id'           => $this->id,
+                'bathhouse.is_active'           => 1,
+                'bathhouse_room.bathhouse_id'   => $this->id,
             ])
             ->asArray()
             ->all();

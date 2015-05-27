@@ -1,5 +1,5 @@
 <?php
-namespace api\modules\v1\components;
+namespace api\components;
 
 use Yii;
 use yii\helpers\VarDumper;
