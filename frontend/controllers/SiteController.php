@@ -11,39 +11,44 @@ use yii\helpers\Json;
 
 class SiteController extends Controller
 {
+    public $layout = false;
+
     public function actionIndex()
     {
 
         $results = yii::$app->cache->get(md5('frontend_preloader'));
 
-        if (yii::$app->params['enable_cache'] && !$results) {
+        if (!yii::$app->params['enable_cache'] || !$results) {
 
             $periods = yii::$app->params['time_periods'];
             $rooms_count = [];
 
-            $cities = City::find()->asArray()->all();
+            $cities = City::find()
+                ->select('id, city, slug, latitude, longitude, time_zone as timeZone')
+                ->asArray()
+                ->all();
 
             foreach($cities as $city) {
                 $rooms_count[$city['id']] = [
-                    'room_count' => 0,
-                    'city_id' => $city['id'],
+                    'roomCount' => 0,
+                    'cityId' => $city['id'],
                 ];
             }
 
             $city_ids = array_column($cities, 'id');
 
             $rooms_count_array = BathhouseRoom::find()
-                ->select('count(*) as room_count, bathhouse_room.city_id')
+                ->select('count(*) as roomCount, bathhouse_room.city_id as cityId')
                 ->joinWith('bathhouse', false)
                 ->where(['bathhouse.is_active' => 1, 'bathhouse_room.city_id' => $city_ids])
                 ->groupBy('bathhouse_room.city_id')
-                ->indexBy('city_id')
+                ->indexBy('cityId')
                 ->asArray()
                 ->all();
 
             foreach($rooms_count_array as $rooms_count_item) {
 
-                $rooms_count[$rooms_count_item['city_id']] = $rooms_count_item;
+                $rooms_count[$rooms_count_item['cityId']] = $rooms_count_item;
             }
 
             $filters = BathhouseRoomPrice::find()
@@ -54,14 +59,14 @@ class SiteController extends Controller
                      MAX(bathhouse.distance) as maxDistance,
                      MAX(bathhouse_room_setting.guest_threshold) as maxFreeGuests,
                      MAX(bathhouse_room_setting.guest_limit) as maxExtraGuests,
-                     bathhouse_room.city_id'
+                     bathhouse_room.city_id as cityId'
                 )
                 ->joinWith(['bathhouseRoom', 'bathhouseRoom.bathhouse', 'bathhouseRoom.settings'], false)
                 ->where([
                     'bathhouse.is_active'    => 1,
                     'bathhouse_room.city_id' => $city_ids])
                 ->groupBy(['bathhouse_room.city_id'])
-                ->indexBy('city_id')
+                ->indexBy('cityId')
                 ->asArray()
                 ->all();
 
@@ -84,8 +89,8 @@ class SiteController extends Controller
             yii::$app->cache->set(md5('frontend_preloader'), $results, yii::$app->params['preloader_cache_duration']);
         }
 
-        return $this->render('index', [
-            'preload' => $results
+        return $this->render('//layouts/main', [
+            'content' => $results
         ]);
     }
 }

@@ -85,6 +85,6 @@ return [
     'check_phone_max_sms' => 3,
 
     //cache
-    'enable_cache' => true,
+    'enable_cache' => false,
     'preloader_cache_duration' => 300
 ];

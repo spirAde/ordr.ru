@@ -1,14 +1,11 @@
-<ifModule mod_headers.c>
+Options +FollowSymLinks
+IndexIgnore */*
 
-    SetEnvIf Origin "http(s)?://(www\.)?(control.ordr.ru|ordr.ru)$" AccessControlAllowOrigin=$0$1
-    Header add Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
+RewriteEngine on
 
-    Header always set Access-Control-Allow-Methods "POST, GET, PUT, DELETE, OPTIONS"
-    Header always set Access-Control-Allow-Headers "X-Requested-With, Content-Type"
+# if a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteEngine On
-
-    RewriteRule . index.php
-</ifModule>
+# otherwise forward it to index.php
+RewriteRule . index.php

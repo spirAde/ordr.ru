@@ -13,17 +13,17 @@ class BathhouseRoom extends \yii\db\ActiveRecord
     }
     public function fields()
     {
-        switch($this->scenario)
+        switch(yii::$app->controller->action->id)
         {
             case 'index':
             {
                 return [
-                    'room_id'=>'bathhouse_room.id',
-                    'room_name'=>'bathhouse_room.name',
-                    'type_id'=>'bathhouse_room.type_id',
-                    'bathhouse_room.rating',
-                    'bathhouse_room.popularity',
-                    'bathhouse_room.description',
+                    'roomId'                        => 'id',
+                    'roomName'                      => 'name',
+                    'types'                         => 'types',
+                    'rating',
+                    'popularity',
+                    'description',
                 ]; break;
             }
             default : return parent::fields();
@@ -34,30 +34,30 @@ class BathhouseRoom extends \yii\db\ActiveRecord
         return [
             'settings' => function()
                 {
-
                     $settings = $this->settings;
 
                     return [
-                        'cleaning_time'         => $settings->cleaning_time,
-                        'min_duration'          => $settings->min_duration,
-                        'guest_limit'           => $settings->guest_limit,
-                        'guest_threshold'       => $settings->guest_threshold,
-                        'guest_price'           => $settings->guest_price,
-                        'prepayment'            => $settings->prepayment,
-                        'free_span'             => $settings->free_span,
-                        'prepayment_persent'    => $settings->prepayment_persent,
+                        'cleaningTime'         => $settings->cleaning_time,
+                        'minDuration'          => $settings->min_duration,
+                        'guestLimit'           => $settings->guest_limit,
+                        'guestThreshold'       => $settings->guest_threshold,
+                        'guestPrice'           => $settings->guest_price,
+                        'prepayment'           => $settings->prepayment,
+                        'freeSpan'             => $settings->free_span,
+                        'prepaymentPersent'    => $settings->prepayment_persent,
                     ];
                 },
             'bathinfo' => function()
                 {
                     $bath = $this->bathhouse;
+
                     return [
-                        'bathhouse_id'          => $bath->id,
-                        'bathhouse_name'        => $bath->name,
-                        'bathhouse_address'     => $bath->address,
-                        'bathhouse_distance'    => $bath->distance,
-                        'bathhouse_latitude'    => $bath->latitude,
-                        'bathhouse_longitude'   => $bath->longitude,
+                        'bathhouseId'          => $bath->id,
+                        'bathhouseName'        => $bath->name,
+                        'bathhouseAddress'     => $bath->address,
+                        'bathhouseDistance'    => $bath->distance,
+                        'bathhouseLatitude'    => $bath->latitude,
+                        'bathhouseLongitude'   => $bath->longitude,
                     ];
                 }
         ];

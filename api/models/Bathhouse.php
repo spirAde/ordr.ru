@@ -13,23 +13,23 @@ class Bathhouse extends \yii\db\ActiveRecord
     }
     public function fields()
     {
-        switch($this->scenario)
+        switch(yii::$app->controller->action->id)
         {
             case 'index':
             {
                 return  [
-                    'bathhouse_id'=>'bathhouse.id',
+                    'bathhouseId'=>'bathhouse.id',
                     'name',
                     'slug',
                     'address',
                     'description',
                     'contacts',
                     'options',
-                    'city_id',
+                    'cityId'=>'city_id',
                     'distance',
                     'latitude',
                     'longitude',
-                    'rating_items'
+                    'ratingItems'=>'rating_items'
                 ];
             }
         }
@@ -37,32 +37,48 @@ class Bathhouse extends \yii\db\ActiveRecord
 
     public function extraFields()
     {
-        return [
-            'min_price'=>function()
-                {
+        $additional_data = BathhouseRoomPrice::find()
+            ->select(
+                    'MIN(bathhouse_room_price.price) as minPrice,
+                     bathhouse_room.bathhouse_id'
+            )
+            ->joinWith(['bathhouseRoom'], false)
+            ->where([
+                'bathhouse.is_active'    => 1,
+                'bathhouse_room.bathhouse_id'           => $this->id,
+            ])
+            ->asArray()
+            ->all();
 
-                },
-            'rooms' => function()
+        return [
+            'minPrice'=>$additional_data['minPrice'],
+
+            'rooms' => function($additional_data)
                 {
                     $rooms = $this->rooms;
                     $result = [];
                     foreach($rooms as $room)
+                    {
+                        $room_settings = $room->settings;
                         $result[$room->id] = [
-                            'options'=>''
-                            'types'=>''
-                            'rating'=>''
-                            'popularity'=>''
-                            'reviews'=>''
-                            'price'=>''
-                            'min_duration'=>''
-                            'prepayment'=>''
-                            'schedule'=>''
-                            'services'=>''
-                            'services'=>''
-                            'guests'=>''
-                            'show'=>''
-                            'active'=>''
+                            'roomId'            => $room->id,
+                            'roomName'          => $room->name,
+                            'roomDescription'   => $room->description,
+                            'options'           => $room->options,
+                            'types'             => $room->types,
+                            'rating'            => floatval($room->rating),
+                            'popularity'        => floatval($room->popularity),
+                            'reviews'           => $room->reviews->asArray(),
+                            'price'             => $additional_data['minPrice'],
+                            'minDuration'       => $room_settings->min_duration,
+                            'prepayment'        => $room_settings->prepayment,
+                            'schedule'          => [],
+                            'services'          => [],
+                            'guests'            => [],
+                            'show'              => true,
+                            'active'            => false,
                         ];
+                    }
                     return $result;
                 }
         ];

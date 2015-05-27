@@ -1,9 +1,9 @@
 <?php
 namespace api\controllers;
+use Yii;
 
-use yii\rest\ActiveController;
-
-class RoomController extends ActiveController
+class RoomController extends ApiController
 {
     public $modelClass = 'api\models\BathhouseRoom';
+
 }
