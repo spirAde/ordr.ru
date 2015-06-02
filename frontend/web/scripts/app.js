@@ -13,7 +13,7 @@ var BathhouseListModule = require('./component/bathhouse-list');
 var BathhouseItemModule = require('./component/bathhouse-item');
 
 var httpInterceptor = require('./common/provider/http-interceptor.factory');
-var user = require('./common/provider/user.factory');
+var userStorage = require('./common/provider/user-storage.factory');
 
 var app = angular.module('app', [
   uiRouter,
@@ -27,7 +27,7 @@ var app = angular.module('app', [
 ]);
 
 app.factory('httpInterceptor', httpInterceptor);
-app.factory('user', user);
+app.factory('userStorage', userStorage);
 
 var appConfig = require('./config.js');
 var appRoute = require('./route.js');

@@ -3,16 +3,15 @@
 namespace api\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
-
-class BathhouseRoomPrice extends \yii\db\ActiveRecord
+class BathhouseRoomPrice extends ActiveRecord
 {
 
     public static function tableName()
     {
         return 'bathhouse_room_price';
     }
-
 
     public function rules()
     {
@@ -22,7 +21,6 @@ class BathhouseRoomPrice extends \yii\db\ActiveRecord
             [['price'], 'number']
         ];
     }
-
 
     public function attributeLabels()
     {

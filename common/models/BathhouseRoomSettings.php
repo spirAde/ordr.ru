@@ -18,7 +18,7 @@ class BathhouseRoomSettings extends \yii\db\ActiveRecord
         return [
             [['room_id', 'cleaning_time', 'min_duration', 'guest_limit', 'guest_threshold', 'guest_price'], 'required'],
             [['room_id', 'cleaning_time', 'min_duration', 'guest_limit', 'guest_threshold', 'prepayment', 'free_span'], 'integer'],
-            [['guest_price', 'prepayment_persent'], 'number']
+            [['guest_price', 'prepayment_percent'], 'number']
         ];
     }
 
@@ -35,7 +35,7 @@ class BathhouseRoomSettings extends \yii\db\ActiveRecord
             'guest_price' => 'Guest Price',
             'prepayment' => 'Prepayment',
             'free_span' => 'Free Span',
-            'prepayment_persent' => 'Prepayment Persent',
+            'prepayment_percent' => 'Prepayment Percent',
         ];
     }
     public function getBathhouseRoom()

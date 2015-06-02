@@ -3,8 +3,9 @@
 namespace api\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
-class BathhouseRoomSettings extends \yii\db\ActiveRecord
+class BathhouseRoomSettings extends ActiveRecord
 {
 
     public static function tableName()
@@ -12,16 +13,14 @@ class BathhouseRoomSettings extends \yii\db\ActiveRecord
         return 'bathhouse_room_setting';
     }
 
-
     public function rules()
     {
         return [
             [['room_id', 'cleaning_time', 'min_duration', 'guest_limit', 'guest_threshold', 'guest_price'], 'required'],
             [['room_id', 'cleaning_time', 'min_duration', 'guest_limit', 'guest_threshold', 'prepayment', 'free_span'], 'integer'],
-            [['guest_price', 'prepayment_persent'], 'number']
+            [['guest_price', 'prepayment_percent'], 'number']
         ];
     }
-
 
     public function attributeLabels()
     {
@@ -35,7 +34,7 @@ class BathhouseRoomSettings extends \yii\db\ActiveRecord
             'guest_price' => 'Guest Price',
             'prepayment' => 'Prepayment',
             'free_span' => 'Free Span',
-            'prepayment_persent' => 'Prepayment Persent',
+            'prepayment_percent' => 'Prepayment Percent',
         ];
     }
 }

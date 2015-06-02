@@ -1,14 +1,12 @@
-<div class="content" ng-controller="ListController as vm">
-    {{::vm.smth}}
-    <!--<div
-            class="item"
-            ng-repeat="room in rooms | orderBy : order : reverse track by room.id"
-            ng-if="room.show">
+<div class="content" ng-controller="ListController">
+
+    <div class="item" ng-if="room.show"
+        ng-repeat="room in rooms | orderBy : order : reverse track by room.roomId">
 
         <div class="wrap">
             <div class="preview">
                 <div class="preview-top clear">
-                    <h2 class="type type-1">{{::room.room_name}}</h2>
+                    <h2 class="type type-1">{{::room.roomName}}</h2>
                     <div class="rate clear">
                         <a class="star icons active"></a>
                         <a class="star icons active"></a>
@@ -16,11 +14,11 @@
                         <a class="star icons"></a>
                         <a class="star icons"></a>
                     </div>
-                    <p class="icons address"><a ui-sref="bathhouses.detail({bathhouseId: room.bathhouse_id})">{{::room.bathhouse_name}}</a> {{::room.address}} </p>
+                    <!--<p class="icons address"><a ui-sref="bathhouses.detail({bathhouseId: room.bathhouse_id})">{{::room.bathhouse_name}}</a> {{::room.address}} </p>-->
                 </div>
                 <div class="preview-bottom clear">
                     <div class="photo">
-                        <div class="slider" room-photo>
+                        <div class="slider">
                             <a href="tmp/2.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
                             <a href="tmp/3.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
                             <a href="tmp/4.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
@@ -29,7 +27,7 @@
                     <div class="more-info">
                         <a href="#">
                             <span>от {{::room.price}} руб</span>
-                            <span ng-click="showFullDescription(room.id)">
+                            <span ng-click="showFullDescription(room.roomId)">
                                 {{room.active ? 'Скрыть' : 'Подробнее'}}
                             </span>
                         </a>
@@ -105,14 +103,14 @@
                         <timecalendar
                                 schedule="room.schedule"></timecalendar>
 
-                        &lt;!&ndash;<timecalendar
+                        <!--<timecalendar
                             roomId="room.id"
                             schedule="room.schedule"
                             type="bathhhouse"
                             new-orders="room.newOrders"
                             ng-if="!orderComplete">
 
-                        </timecalendar>&ndash;&gt;
+                        </timecalendar>-->
 
                         <div class="step-2 active" ng-if="orderComplete">
                             <div class="wrap clear">
@@ -159,7 +157,9 @@
     </div>
 
     <div ng-if="isEmptyResult" class="item messages">
-        К сожалению, нам ничего не удалось найти по Вашему запросу. Рекомендуем немного изменить критерии поиска, или <a ng-click="fullResetFilters()">сбросить</a> их полностью.
-    </div>-->
+        К сожалению, нам ничего не удалось найти по Вашему запросу.
+        Рекомендуем немного изменить критерии поиска, или
+        <a ng-click="fullResetFilters()">сбросить</a> их полностью.
+    </div>
 
 </div>

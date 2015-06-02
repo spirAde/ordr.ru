@@ -5,12 +5,12 @@ namespace api\components\actions;
 use Yii;
 use yii\rest\IndexAction;
 use yii\data\ActiveDataProvider;
-use api\components\y;
-
+use api\components\ApiHelpers;
+use yii\web\HttpException;
 
 class FilterIndexAction extends IndexAction
 {
-    private $pattern = ['page','fields','order','limit','expand'];
+    private $pattern = ['page', 'fields', 'order', 'limit', 'expand'];
 
     public function run()
     {
@@ -19,20 +19,23 @@ class FilterIndexAction extends IndexAction
             $filter = yii::$app->request->get();
             $modelClass = $this->modelClass;
             $model = new $this->modelClass();
+
             foreach ($filter as $key => $value)
             {
-                if(in_array($key,$this->pattern))
+                if(in_array($key, $this->pattern))
                 {
                     unset($filter[$key]);
                     continue;
                 }
-                if (!$model->hasAttribute(y::decamelize($key)))
+
+                if (!$model->hasAttribute(ApiHelpers::decamelize($key)))
                 {
-                    throw new \yii\web\HttpException(404, 'Invalid query param:' . $key);
+                    throw new HttpException(404, 'Invalid query param:' . $key);
                 }
-                elseif(y::decamelize($key) != $key)
+
+                elseif(ApiHelpers::decamelize($key) != $key)
                 {
-                    $filter[y::decamelize($key)] = $value;
+                    $filter[ApiHelpers::decamelize($key)] = $value;
                     unset($filter[$key]);
                 }
             }
@@ -45,7 +48,9 @@ class FilterIndexAction extends IndexAction
                         'query' => $modelClass::find()->where($filter),
                     ]);
                 }
-                else {
+
+                else
+                {
                     return new ActiveDataProvider([
                         'query' => $modelClass::find(),
                     ]);
@@ -53,11 +58,10 @@ class FilterIndexAction extends IndexAction
             }
             catch (Exception $ex)
             {
-                throw new \yii\web\HttpException(500, 'Internal server error');
+                throw new HttpException(500, 'Internal server error');
             }
 
         };
         return parent::run();
     }
-
 }

@@ -1,3 +1,6 @@
+SetEnvIf Origin "http(s)?://(www\.)?(control.ordr.ru|ordr.ru)$" AccessControlAllowOrigin=$0$1
+Header add Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
+
 Options +FollowSymLinks
 IndexIgnore */*
 

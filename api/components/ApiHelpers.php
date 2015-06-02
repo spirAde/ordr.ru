@@ -3,22 +3,21 @@ namespace api\components;
 
 use Yii;
 
-class Y
+class ApiHelpers
 {
     public static function decamelize($word) {
         return $word = preg_replace_callback(
-            "/(^|[a-z])([A-Z])/",
-            function($m) { return strtolower(strlen($m[1]) ? "$m[1]_$m[2]" : "$m[2]"); },
+            '/(^|[a-z])([A-Z])/',
+            function($match) { return strtolower(strlen($match[1]) ? '$match[1]$match[2]' : '$match[2]'); },
             $word
         );
-
     }
+
     public static function camelize($word) {
         return $word = preg_replace_callback(
-            "/(^|_)([a-z])/",
-            function($m) { return strtoupper("$m[2]"); },
+            '/(^|_)([a-z])/',
+            function($match) { return strtoupper('$match[2]'); },
             $word
         );
-
     }
 }

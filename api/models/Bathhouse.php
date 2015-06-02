@@ -3,14 +3,16 @@
 namespace api\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
-class Bathhouse extends \yii\db\ActiveRecord
+class Bathhouse extends ActiveRecord
 {
 
     public static function tableName()
     {
         return 'bathhouse';
     }
+
     public function fields()
     {
         switch(yii::$app->controller->action->id)
@@ -39,8 +41,8 @@ class Bathhouse extends \yii\db\ActiveRecord
     {
         $additional_data = BathhouseRoomPrice::find()
             ->select(
-                    'MIN(bathhouse_room_price.price) as minPrice,
-                     bathhouse_room.bathhouse_id'
+                'MIN(bathhouse_room_price.price) as minPrice,
+                 bathhouse_room.bathhouse_id'
             )
             ->joinWith(['bathhouseRoom'], false)
             ->where([
@@ -57,6 +59,7 @@ class Bathhouse extends \yii\db\ActiveRecord
                 {
                     $rooms = $this->rooms;
                     $result = [];
+
                     foreach($rooms as $room)
                     {
                         $room_settings = $room->settings;
@@ -83,6 +86,7 @@ class Bathhouse extends \yii\db\ActiveRecord
                 }
         ];
     }
+
     public function rules()
     {
         return [
@@ -115,6 +119,7 @@ class Bathhouse extends \yii\db\ActiveRecord
             'is_active' => 'Is Active',
         ];
     }
+
     public function getRooms()
     {
         return $this->hasMany(BathhouseRoom::className(), ['hotel_id' => 'id']);

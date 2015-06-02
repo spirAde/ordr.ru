@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-FilterController.$inject = ['$scope', '$rootScope', 'data', 'CONSTANTS'];
+FilterController.$inject = ['$scope', '$rootScope', 'dataStorage', 'CONSTANTS'];
 
-function FilterController($scope, $rootScope, data, CONSTANTS) {
+function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 
 	$scope.filters = {
 		datetime: {
@@ -19,7 +19,7 @@ function FilterController($scope, $rootScope, data, CONSTANTS) {
 		prepayment: undefined
 	};
 
-	$scope.offers = CONSTANTS.offers[1].room_count;
+	$scope.offers = CONSTANTS.offers[1].roomCount;
 
 	var optionsList = _.values(CONSTANTS.options.bathhouseOptions).concat(_.values(CONSTANTS.options.roomOptions));
 

@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-data.$inject = ['CONSTANTS'];
+dataStorage.$inject = ['$http', '$q', 'userStorage', 'CONSTANTS'];
 
-function data(CONSTANTS) {
+function dataStorage($http, $q, userStorage, CONSTANTS) {
 
 	return {
 		rooms: [],
@@ -20,10 +20,10 @@ function data(CONSTANTS) {
 		},
 		includedRooms: [],
 
-		/*setRooms: setRooms,
+		/*setRooms: setRooms,*/
 
-		 getRooms: getRooms,
-		 getAdditionalData: getAdditionalData,
+		getRooms: getRooms,
+		 /*getAdditionalData: getAdditionalData,
 		 getFilters: getFilters,
 		 getMarkers: getMarkers,
 		 getBathhouse: getBathhouse,
@@ -34,22 +34,43 @@ function data(CONSTANTS) {
 		resetListByTag: resetListByTag
 	};
 
+	function getRooms(cityId) {
+
+		var _this = this;
+		var pages;
+
+		return $http.get('http://api.ordr.ru/rooms?city_id=' + cityId)
+			.then(function(response) {
+
+				pages = _.range(2, response.data._meta.pageCount + 1);
+
+				_this.rooms = response.data.items;
+
+				return _.map(response.data.items, _addProperties);
+			})
+			.catch(function(response) {
+
+				return $q.reject(response);
+			})
+			.finally(function() {
+
+				_.forEach(pages, function(page) {
+
+					$http.get('http://api.ordr.ru/rooms?city_id=' + cityId + '&page=' + page)
+						.then(function(response) {
+
+							_this.rooms = _.union(_this.rooms, _.map(response.data.items, _addProperties));
+						});
+				});
+			});
+	}
+
 	/*function setRooms(rooms) {
 		var self = this;
 		self.rooms = _.union(self.rooms, rooms);
-	}
+	}*/
 
-	function getRooms(callback) {
-		_.range(initData.pages).map(function(page) {
-			$http
-				.get('http://api.ordr.ru/v1/rooms?city_id=' + userservice.cityId + '&page=' + page)
-				.then(function(response) {
-					callback(response.data);
-				});
-		});
-	}
-
-	function getAdditionalData(rooms, callback) {
+	/*function getAdditionalData(rooms, callback) {
 		_(rooms).forEach(function(room) {
 			$http
 				.get('http://api.ordr.ru/v1/rooms/' + room['id'] + '?schedule&services&guests')
@@ -353,6 +374,14 @@ function data(CONSTANTS) {
 		$rootScope.$emit('dataservice:updateRooms', self.includedRooms); // -> bathhouseList && map
 		$rootScope.$emit('dataservice:updateOffersCount', _.size(self.includedRooms)); // -> filter
 	}
+
+	function _addProperties(room) {
+
+		room.active = false;
+		room.show = true;
+
+		return room;
+	}
 }
 
-module.exports = data;
+module.exports = dataStorage;

@@ -1,8 +1,8 @@
 'use strict';
 
-user.$inject = ['$window'];
+userStorage.$inject = ['$window'];
 
-function user($window) {
+function userStorage($window) {
 
 	var data = {
 		userAgent: $window.navigator.userAgent,
@@ -19,4 +19,4 @@ function user($window) {
 	};
 }
 
-module.exports = user;
+module.exports = userStorage;

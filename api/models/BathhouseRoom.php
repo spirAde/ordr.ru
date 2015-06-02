@@ -3,14 +3,16 @@
 namespace api\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
-class BathhouseRoom extends \yii\db\ActiveRecord
+class BathhouseRoom extends ActiveRecord
 {
 
     public static function tableName()
     {
         return 'bathhouse_room';
     }
+
     public function fields()
     {
         switch(yii::$app->controller->action->id)
@@ -25,42 +27,45 @@ class BathhouseRoom extends \yii\db\ActiveRecord
                     'rating',
                     'popularity',
                     'description',
-                ]; break;
+                ];
+                break;
             }
-            default : return parent::fields();
+
+            default: return parent::fields();
         }
     }
+
     public function extraFields()
     {
         return [
-            'settings' => function()
-                {
-                    $settings = $this->settings;
+            'settings' => function() {
 
-                    return [
-                        'cleaningTime'         => $settings->cleaning_time,
-                        'minDuration'          => $settings->min_duration,
-                        'guestLimit'           => $settings->guest_limit,
-                        'guestThreshold'       => $settings->guest_threshold,
-                        'guestPrice'           => $settings->guest_price,
-                        'prepayment'           => $settings->prepayment,
-                        'freeSpan'             => $settings->free_span,
-                        'prepaymentPersent'    => $settings->prepayment_persent,
-                    ];
-                },
-            'bathinfo' => function()
-                {
-                    $bath = $this->bathhouse;
+                $settings = $this->settings;
 
-                    return [
-                        'bathhouseId'          => $bath->id,
-                        'bathhouseName'        => $bath->name,
-                        'bathhouseAddress'     => $bath->address,
-                        'bathhouseDistance'    => $bath->distance,
-                        'bathhouseLatitude'    => $bath->latitude,
-                        'bathhouseLongitude'   => $bath->longitude,
-                    ];
-                }
+                return [
+                    'cleaningTime'         => $settings->cleaning_time,
+                    'minDuration'          => $settings->min_duration,
+                    'guestLimit'           => $settings->guest_limit,
+                    'guestThreshold'       => $settings->guest_threshold,
+                    'guestPrice'           => $settings->guest_price,
+                    'prepayment'           => $settings->prepayment,
+                    'freeSpan'             => $settings->free_span,
+                    'prepaymentPercent'    => $settings->prepayment_percent,
+                ];
+            },
+            'bathinfo' => function() {
+
+                $bath = $this->bathhouse;
+
+                return [
+                    'bathhouseId'          => $bath->id,
+                    'bathhouseName'        => $bath->name,
+                    'bathhouseAddress'     => $bath->address,
+                    'bathhouseDistance'    => $bath->distance,
+                    'bathhouseLatitude'    => $bath->latitude,
+                    'bathhouseLongitude'   => $bath->longitude,
+                ];
+            }
         ];
     }
 
@@ -95,6 +100,7 @@ class BathhouseRoom extends \yii\db\ActiveRecord
     {
         return $this->hasOne(BathhouseRoomSettings::className(), ['room_id' => 'id']);
     }
+
     public function getBathhouse()
     {
         return $this->hasOne(Bathhouse::className(), ['id' => 'bathhouse_id']);

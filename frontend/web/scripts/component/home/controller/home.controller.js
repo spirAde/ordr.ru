@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-HomeController.$inject = ['$scope', '$timeout', '$state', 'user', 'CONSTANTS'];
+HomeController.$inject = ['$scope', '$timeout', '$state', 'userStorage', 'CONSTANTS'];
 
-function HomeController($scope, $timeout, $state, user, CONSTANTS) {
+function HomeController($scope, $timeout, $state, userStorage, CONSTANTS) {
 
 	console.log(CONSTANTS);
 
@@ -20,7 +20,7 @@ function HomeController($scope, $timeout, $state, user, CONSTANTS) {
 
 	$scope.selectedCityId = _.keys($scope.cities)[0];
 	$scope.selectedTypeId = _.keys($scope.types)[0];
-	$scope.offers = CONSTANTS.offers[$scope.selectedCityId].room_count;
+	$scope.offers = CONSTANTS.offers[$scope.selectedCityId].roomCount;
 
 	$scope.selectCity = selectCity;
 	$scope.selectType = selectType;
@@ -28,12 +28,12 @@ function HomeController($scope, $timeout, $state, user, CONSTANTS) {
 
 	function selectCity(id) {
 
-		user.data.cityId = id;
+		userStorage.data.cityId = id;
 
 		$scope.selectedCityId = id;
 
 		$timeout(function() {
-			$scope.offers = CONSTANTS.offers[id].room_count;
+			$scope.offers = CONSTANTS.offers[id].roomCount;
 		}, 0);
 	}
 
