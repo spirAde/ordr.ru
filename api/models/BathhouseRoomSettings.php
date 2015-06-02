@@ -37,4 +37,5 @@ class BathhouseRoomSettings extends ActiveRecord
             'prepayment_percent' => 'Prepayment Percent',
         ];
     }
+
 }

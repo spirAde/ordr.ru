@@ -37,6 +37,7 @@ class IndexAction extends Action
      */
     public function run()
     {
+
         if ($this->checkAccess) {
             call_user_func($this->checkAccess, $this->id);
         }
@@ -50,6 +51,7 @@ class IndexAction extends Action
      */
     protected function prepareDataProvider()
     {
+
         if ($this->prepareDataProvider !== null) {
             return call_user_func($this->prepareDataProvider, $this);
         }

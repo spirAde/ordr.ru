@@ -51,6 +51,7 @@ return [
         2 => 'carwash'
     ],
     'bathhouse_type' => [
+        0 => 'whorehouse',
         1 => 'bathhouse',
         2 => 'sauna',
         3 => 'hammam'

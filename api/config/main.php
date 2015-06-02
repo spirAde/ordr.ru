@@ -23,7 +23,7 @@ return [
             'class' => 'yii\web\Response',
             'format' => yii\web\Response::FORMAT_JSON,
             'charset' => 'UTF-8',
-            'on beforeSend' => function($event) {
+            /*'on beforeSend' => function($event) {
 
                 // Вынужденная мера для работы angular && cors && Yii2
                 if (\Yii::$app->request->getMethod() === 'OPTIONS') {
@@ -35,7 +35,7 @@ return [
                     }
                     exit;
                 }
-            }
+            }*/
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -76,16 +76,24 @@ return [
                     'except' => ['delete', 'update', 'create', 'options'],
                     'controller' => 'bathhouse',
                     'patterns' => [
-                        'GET <id:\d+>' => 'view',
-                        'GET geo' => 'geo'
+                        'GET'                   => 'index',
+                        'GET <id:\d+>'          => 'view',
+                        'GET geo/<city_id:\d+>' => 'geo'
                     ]
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'room',
                     'patterns' => [
-                        'GET' => 'index',
-                        'GET <room_id:\d+>' => 'view',
+                        'GET'                   => 'index',
+                        'GET <id:\d+>'          => 'view',
+                    ]
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'order',
+                    'patterns' => [
+                        'POST'                  => 'check',
                     ]
                 ],
             ],

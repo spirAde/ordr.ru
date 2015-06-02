@@ -33,4 +33,10 @@ class BathhouseRoomPrice extends ActiveRecord
             'day_id' => 'Day ID',
         ];
     }
+
+    public function getBathhouseRoom()
+    {
+        return $this->hasOne(BathhouseRoom::className(), ['id' => 'room_id'])->inverseOf('bathhouseRoomPrice');
+    }
+
 }
