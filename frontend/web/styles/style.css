@@ -212,7 +212,7 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
 .filter.opened .show-content {display: block;border-top: 1px solid #dce0e0;}
 .filter.opened .filter-options {display: none;}
 
-.filter-options {padding: 15px 20px;border-top:1px solid #DCE0E0;border-bottom: 1px solid #DCE0E0;}
+.filter-options {padding: 15px 20px;border-top:1px solid #DCE0E0;border-bottom: 1px solid #DCE0E0; z-index: 12; background-color: #FFFFFF; position: relative;}
 .filter-options .filter-more {float: left;}
 .filter-options .filter-more a, .show-content a, .add-review a {display: inline-block;border-radius: 3px;background-color: #18B2AE;color: #fff;font-size: 12px;font-family: 'proxima_bold', Arial, sans-serif;text-transform: uppercase;padding: 10px 15px;border: 1px solid #18B2AE;}
 .filter-options .filter-more a:hover, .show-content a:hover, .add-review a:hover {background-color: #138A87;border-color: #138A87;}

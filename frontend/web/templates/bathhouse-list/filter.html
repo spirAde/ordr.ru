@@ -1,7 +1,7 @@
 <div ng-controller="FilterController as vm"
-    ng-class="{true: 'filter opened', false: 'filter'}[openedTopAndBottom]">
+    ng-class="{true: 'filter opened', false: 'filter'}[openedTop && openedBottom]">
 
-    <div class="wrap scroll">
+    <div class="wrap scroll" filter-scroll>
         <div ng-class="{true: 'filter-top opened', false: 'filter-top'}[openedTop]">
             <div class="block-filter block-filter-time">
                 <div class="wrap clear">
@@ -155,7 +155,7 @@
         <div class="filter-options clear" sticky>
             <div class="filter-more">
                 <a ng-click="openFilters()">
-                    {{attached || (mode === 'map' && !openedTopAndBottom) ? 'Показать фильтры' : 'Еще фильтры'}}
+                    {{attached || mode === 'map' ? 'Показать фильтры' : 'Еще фильтры'}}
                 </a>
             </div>
             <div class="tag-it">

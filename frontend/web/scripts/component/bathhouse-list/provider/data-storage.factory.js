@@ -39,7 +39,7 @@ function dataStorage($http, $q, userStorage, CONSTANTS) {
 		var _this = this;
 		var pages;
 
-		return $http.get('http://api.ordr.ru/rooms?city_id=' + cityId)
+		return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId)
 			.then(function(response) {
 
 				pages = _.range(2, response.data._meta.pageCount + 1);
@@ -56,7 +56,7 @@ function dataStorage($http, $q, userStorage, CONSTANTS) {
 
 				_.forEach(pages, function(page) {
 
-					$http.get('http://api.ordr.ru/rooms?city_id=' + cityId + '&page=' + page)
+					$http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&page=' + page)
 						.then(function(response) {
 
 							_this.rooms = _.union(_this.rooms, _.map(response.data.items, _addProperties));

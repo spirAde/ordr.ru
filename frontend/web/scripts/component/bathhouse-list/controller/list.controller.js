@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-ListController.$inject = ['$scope', '$rootScope', '$timeout', 'dataStorage', 'userStorage', 'CONSTANTS'];
+ListController.$inject = ['$scope', '$rootScope', 'dataStorage', 'userStorage', 'CONSTANTS'];
 
-function ListController($scope, $rootScope, $timeout, dataStorage, userStorage, CONSTANTS) {
+function ListController($scope, $rootScope, dataStorage, userStorage, CONSTANTS) {
 
 	$scope.rooms = [];
 
@@ -14,7 +14,6 @@ function ListController($scope, $rootScope, $timeout, dataStorage, userStorage, 
 	$scope.isEmptyResult = false; // flag for case, when nothing to offer
 
 	$scope.showFullDescription = showFullDescription;
-	$scope.sortList = sortList;
 	$scope.checkOrder = checkOrder;
 	$scope.createOrder = createOrder;
 	$scope.fullResetFilters = fullResetFilters;
@@ -29,22 +28,33 @@ function ListController($scope, $rootScope, $timeout, dataStorage, userStorage, 
 
 		_.forEach($scope.rooms, function(room) {
 
-			if (room.roomId !== id) {
+			if (room.id !== id) {
+
 				room.active = false;
 			}
 			else {
+
 				room.active = !room.active;
 			}
 		});
 	}
-
-	function sortList() {}
 
 	function checkOrder() {}
 
 	function createOrder() {}
 
 	function fullResetFilters() {}
+
+	$rootScope.$on('header:sortList', function(event, order) {
+
+		$scope.order = order;
+		$scope.reverse = !$scope.reverse;
+
+		// After sorting close all boxes
+		_.forEach($scope.rooms, function(room) {
+			room.active = false;
+		});
+	});
 }
 
 module.exports = ListController;

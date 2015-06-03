@@ -33,11 +33,6 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 
 	$scope.openedTop = true;
 	$scope.openedBottom = false;
-	$scope.openedTopAndBottom = false;
-
-	$scope.$watchGroup(['$scope.openedTop', '$scope.openedBottom'], function() {
-		$scope.openedTopAndBottom = $scope.openedTop && $scope.openedBottom;
-	});
 
 	$scope.attached = false;
 
@@ -123,8 +118,6 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 		if ($scope.mode === 'map') $scope.openedTop = true;
 
 		$scope.openedBottom = true;
-
-		$scope.$emit('$activate'); // -> filterScroll-directive
 	}
 
 	function closeFilters() {
@@ -132,8 +125,6 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 		if ($scope.mode === 'map') $scope.openedTop = false;
 
 		$scope.openedBottom = false;
-
-		$scope.$emit('$destroy'); // ->filterScroll-directive
 	}
 
 	$scope.translate = function(value) {
@@ -287,8 +278,6 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 
 			$scope.mode = 'list';
 		}
-
-		if ($scope.openedTopAndBottom) $scope.$emit('$destroy'); // ->filterScroll-directive
 	});
 
 	$rootScope.$on('header:openFilters', function(event) {

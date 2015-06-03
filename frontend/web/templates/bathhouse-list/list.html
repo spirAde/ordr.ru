@@ -1,12 +1,12 @@
 <div class="content" ng-controller="ListController">
 
     <div class="item" ng-if="room.show"
-        ng-repeat="room in rooms | orderBy : order : reverse track by room.roomId">
+        ng-repeat="room in rooms | orderBy : order : reverse track by room.id">
 
         <div class="wrap">
             <div class="preview">
                 <div class="preview-top clear">
-                    <h2 class="type type-1">{{::room.roomName}}</h2>
+                    <h2 class="type type-1">{{::room.name}}</h2>
                     <div class="rate clear">
                         <a class="star icons active"></a>
                         <a class="star icons active"></a>
@@ -27,7 +27,7 @@
                     <div class="more-info">
                         <a href="#">
                             <span>от {{::room.price}} руб</span>
-                            <span ng-click="showFullDescription(room.roomId)">
+                            <span ng-click="showFullDescription(room.id)">
                                 {{room.active ? 'Скрыть' : 'Подробнее'}}
                             </span>
                         </a>

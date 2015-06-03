@@ -34,12 +34,16 @@ function HeaderController(CONSTANTS, $scope, $stateParams, $location) {
 	function sortList(order) {
 
 		if (vm.order === order) {
+
 			vm.reverse = !vm.reverse;
 		}
 		else {
+
 			vm.reverse = false;
 			vm.order = order;
 		}
+
+		$scope.$emit('header:sortList', order); // -> list
 	}
 }
 
