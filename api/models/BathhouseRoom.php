@@ -37,6 +37,11 @@ class BathhouseRoom extends ActiveRecord
                         return $result;
                     },
                     'cityId'                        => 'city_id',
+                    'bathhouseId'                   => 'bathhouse_id',
+                    'distance'                      => function()
+                    {
+                        return $this->bathhouse->distance;
+                    },
                     'rating',
                     'popularity',
                     'description',

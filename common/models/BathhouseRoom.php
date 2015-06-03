@@ -41,7 +41,7 @@ class BathhouseRoom extends ActiveRecord
         ];
     }
 
-    public function getSettings()
+    public function getBathhouseRoomSettings()
     {
         return $this->hasOne(BathhouseRoomSettings::className(), ['room_id' => 'id']);
     }

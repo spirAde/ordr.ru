@@ -24,13 +24,13 @@ class Bathhouse extends ActiveRecord
             case 'index':
             {
                 return  [
-                    'bathhouseId'   =>'id',
+                    'id',
                     'name',
                     'slug',
                     'address',
                     'description',
                     'contacts',
-                    'options'       =>function()
+                    'options'       => function()
                     {
                         $result = [];
                         $options = json_decode($this->options,true);
@@ -42,7 +42,7 @@ class Bathhouse extends ActiveRecord
 
                         return $result;
                     },
-                    'cityId'        =>'city_id',
+                    'cityId'        => 'city_id',
                     'distance',
                     'latitude',
                     'longitude',
@@ -51,13 +51,13 @@ class Bathhouse extends ActiveRecord
             case 'view':
             {
                 return  [
-                    'bathhouseId'   => 'id',
+                    'id',
                     'name',
                     'slug',
                     'address',
                     'description',
                     'contacts',
-                    'options'       =>function()
+                    'options'       => function()
                     {
                         $result = [];
                         $options = json_decode($this->options,true);
@@ -79,7 +79,7 @@ class Bathhouse extends ActiveRecord
             case 'geo':
             {
                 return  [
-                    'bathhouseId'   => 'id',
+                    'id',
                     'name',
                     'slug',
                     'address',

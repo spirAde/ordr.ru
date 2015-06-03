@@ -61,7 +61,7 @@ class SiteController extends Controller
                      MAX(bathhouse_room_setting.guest_limit) as maxExtraGuests,
                      bathhouse_room.city_id as cityId'
                 )
-                ->joinWith(['bathhouseRoom', 'bathhouseRoom.bathhouse', 'bathhouseRoom.BathhouseRoomSettings'], false)
+                ->joinWith(['bathhouseRoom', 'bathhouseRoom.bathhouse', 'bathhouseRoom.bathhouseRoomSettings'], false)
                 ->where([
                     'bathhouse.is_active'    => 1,
                     'bathhouse_room.city_id' => $city_ids])
