@@ -6,6 +6,14 @@ FilterController.$inject = ['$scope', '$rootScope', 'dataStorage', 'CONSTANTS'];
 
 function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 
+	console.log(CONSTANTS);
+
+	var trueOptions = [],
+		trueTypes = [];
+
+	$scope.tags = [];
+	$scope.typedName = '';
+
 	$scope.filters = {
 		datetime: {
 			minDate: '2015-05-26',
@@ -46,11 +54,9 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 	$scope.changePrepayment = changePrepayment;
 	$scope.searchByName = searchByName;
 
-	$scope.typedName = '';
-
 	function cancelFilter(tag) {
-		/*switch (tag) {
-			case 'distance':
+		switch (tag) {
+			/*case 'distance':
 				var distanceFloor = defaultData.distance[0],
 					distanceCeil = defaultData.distance[1];
 
@@ -63,7 +69,7 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 				break;
 
 			case 'options':
-				_(defaultData.options).forEach(function(option) {
+				_.forEach(defaultData.options, function(option) {
 					$scope.filters.options[option] = false;
 				});
 				break;
@@ -86,7 +92,7 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 					maxDate: defaultData.datetime.maxDate,
 					step: 30
 				};
-				break;
+				break;*/
 
 			case 'types':
 				$scope.filters.types = {
@@ -96,7 +102,7 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 				};
 				break;
 
-			case 'guests':
+			/*case 'guests':
 				break;
 
 			case 'name':
@@ -105,12 +111,12 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 
 			case 'prepayment':
 				$scope.filters.prepayment = undefined;
-				break;
+				break;*/
 		}
 
-		dataservice.resetListByTag(tag);
+		dataStorage.resetListByTag(tag);
 
-		_.pull($scope.tags, tag);*/
+		_.pull($scope.tags, tag);
 	}
 
 	function openFilters() {
@@ -210,18 +216,21 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 
 	function changeType(type) {
 
-		/*dataservice.filterList('types', [type, $scope.filters.types[type]]);
+		dataStorage.filterList('types', [type, $scope.filters.types[type]]);
 
 		$scope.filters.types[type] ? trueTypes.push(type) : _.pull(trueTypes, type);
 
 		if (trueTypes.length) {
+
 			if (!_.contains($scope.tags, 'types')) {
+
 				$scope.tags.push('types');
 			}
 		}
 		else {
+
 			_.pull($scope.tags, 'types');
-		}*/
+		}
 	}
 
 	function changePrepayment(prepayment) {
@@ -280,12 +289,8 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 		}
 	});
 
-	$rootScope.$on('header:openFilters', function(event) {
-
-	});
-
-	$rootScope.$on('closeFilters', function(event) {
-
+	$rootScope.$on('dataStorage:updateOffersCount', function(event, data) {
+		$scope.offers = data;
 	});
 }
 

@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-ListController.$inject = ['$scope', '$rootScope', 'dataStorage', 'userStorage', 'CONSTANTS'];
+ListController.$inject = ['$scope', '$rootScope', '$timeout', 'dataStorage', 'userStorage', 'CONSTANTS'];
 
-function ListController($scope, $rootScope, dataStorage, userStorage, CONSTANTS) {
+function ListController($scope, $rootScope, $timeout, dataStorage, userStorage, CONSTANTS) {
 
 	$scope.rooms = [];
 
@@ -54,6 +54,19 @@ function ListController($scope, $rootScope, dataStorage, userStorage, CONSTANTS)
 		_.forEach($scope.rooms, function(room) {
 			room.active = false;
 		});
+	});
+
+	$rootScope.$on('dataStorage:updateRooms', function(event, data) {
+
+		data.length === 0 ? $scope.isEmptyResult = true : $scope.isEmptyResult = false;
+
+		$timeout(function() {
+
+			_.forEach($scope.rooms, function(room) {
+
+				room.show = _.indexOf(data, room.id) !== -1;
+			});
+		}, 0);
 	});
 }
 

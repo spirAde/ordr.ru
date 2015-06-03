@@ -51,10 +51,9 @@ return [
         2 => 'carwash'
     ],
     'bathhouse_type' => [
-        0 => 'whorehouse',
-        1 => 'bathhouse',
-        2 => 'sauna',
-        3 => 'hammam'
+        0 => 'bathhouse',
+        1 => 'sauna',
+        2 => 'hammam'
     ],
     'bathhouse_options' => [
         1 => 'internet',
