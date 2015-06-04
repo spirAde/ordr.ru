@@ -37,14 +37,21 @@ class BathhouseRoom extends ActiveRecord
                         return $result;
                     },
                     'cityId'                        => 'city_id',
-                    'bathhouseId'                   => 'bathhouse_id',
-                    'distance'                      => function()
-                    {
-                        return $this->bathhouse->distance;
-                    },
                     'rating',
                     'popularity',
                     'description',
+                    'options'       => function()
+                    {
+                        $result = [];
+                        $options = json_decode($this->options,true);
+
+                        if(is_array($options))
+                            foreach($options as $item)
+                                if(array_key_exists((int)$item,yii::$app->params['bathhouse_room_options']))
+                                    $result[] = yii::$app->params['bathhouse_room_options'][$item];
+
+                        return $result;
+                    },
                 ];
             }
             case 'view':
@@ -78,17 +85,32 @@ class BathhouseRoom extends ActiveRecord
                             'prepaymentPersent'     => $settings->prepayment_persent,
                         ];
                     },
-                    'bathinfo'  => function ()
+                    'bathhouse'  => function ()
                     {
                         $bath = $this->bathhouse;
+                        $options_former = function($options)
+                        {
+                            $result = [];
+                            $options = json_decode($options,true);
 
+                            if(is_array($options))
+                                foreach($options as $item)
+                                    if(array_key_exists((int)$item,yii::$app->params['bathhouse_options']))
+                                        $result[] = yii::$app->params['bathhouse_options'][$item];
+
+                            return $result;
+                        };
                         return [
-                            'bathhouseId'           => $bath->id,
-                            'bathhouseName'         => $bath->name,
-                            'bathhouseAddress'      => $bath->address,
-                            'bathhouseDistance'     => $bath->distance,
-                            'bathhouseLatitude'     => $bath->latitude,
-                            'bathhouseLongitude'    => $bath->longitude,
+                            'id'           => $bath->id,
+                            'name'         => $bath->name,
+                            'address'      => $bath->address,
+                            'distance'     => $bath->distance,
+                            'options'      => $options_former($bath->options),
+                            'point'        => [
+                                'latitude'  => $bath->latitude,
+                                'longitude' => $bath->longitude
+                            ],
+
                         ];
                     }
                 ];
