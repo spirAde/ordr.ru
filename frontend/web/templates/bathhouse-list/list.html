@@ -14,7 +14,12 @@
                         <a class="star icons"></a>
                         <a class="star icons"></a>
                     </div>
-                    <!--<p class="icons address"><a ui-sref="bathhouses.detail({bathhouseId: room.bathhouse_id})">{{::room.bathhouse_name}}</a> {{::room.address}} </p>-->
+                    <p class="icons address">
+                        <a ui-sref="bathhouses.item({bathhouseId: room.bathinfo.bathhouseId})">
+                            {{::room.bathinfo.bathhouseName}}
+                        </a>
+                        {{::room.bathinfo.bathhouseAddress}}
+                    </p>
                 </div>
                 <div class="preview-bottom clear">
                     <div class="photo">
