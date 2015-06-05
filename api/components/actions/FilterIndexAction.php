@@ -20,6 +20,9 @@ class FilterIndexAction extends IndexAction
             $modelClass = $this->modelClass;
             $model = new $this->modelClass();
 
+            $limit=(isset($filter['limit'])) ? $filter['limit'] : 10;
+
+
             foreach ($filter as $key => $value)
             {
                 if(in_array($key, $this->pattern))
@@ -46,13 +49,19 @@ class FilterIndexAction extends IndexAction
                 {
                     return new ActiveDataProvider([
                         'query' => $modelClass::find()->where($filter),
+                        'pagination' => [
+                            'pageSize' => $limit,
+                        ],
                     ]);
                 }
 
                 else
                 {
                     return new ActiveDataProvider([
-                        'query' => $modelClass::find(),
+                        'query' => $modelClass::find()->offset(10),
+                        'pagination' => [
+                            'pageSize' => $limit,
+                        ],
                     ]);
                 }
             }
