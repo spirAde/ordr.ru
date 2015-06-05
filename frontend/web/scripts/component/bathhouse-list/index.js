@@ -13,6 +13,7 @@ var MapController = require('./controller/map.controller');
 var RusifyFilter = require('../../common/filter/rusify.filter');
 
 var FilterScrollDirective = require('./directive/filter-scroll.directive');
+var PopupScrollDirective = require('./directive/popup-scroll.directive');
 var StickyDirective = require('./directive/sticky.directive');
 
 var dataStorage = require('./provider/data-storage.factory');
@@ -30,6 +31,7 @@ BathhouseListModule.controller('MapController', MapController);
 BathhouseListModule.filter('rusify', RusifyFilter);
 
 BathhouseListModule.directive('filterScroll', FilterScrollDirective);
+BathhouseListModule.directive('popupScroll', PopupScrollDirective);
 BathhouseListModule.directive('sticky', StickyDirective);
 
 BathhouseListModule.factory('dataStorage', dataStorage);

@@ -16,6 +16,7 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 	 */
 	var storage = {
 		rooms: [],
+		markers: [],
 		excludedRooms: {
 			datetime: [],
 			price: [],
@@ -47,7 +48,7 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 		var _this = this;
 		var pages;
 
-		return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&expand=bathinfo')
+		return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&expand=bathhouse,settings')
 			.then(function(response) {
 
 				pages = _.range(2, response.data._meta.pageCount + 1);
@@ -62,14 +63,53 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 			})
 			.finally(function() {
 
-				_.forEach(pages, function(page) {
-
-					$http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&page=' + page + '&expand=bathinfo')
-						.then(function(response) {
-
-							_this.rooms = _.union(_this.rooms, _.map(response.data.items, _addProperties));
-						});
+				var promises = _.map(pages, function(page) {
+					return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&page=' + page + '&expand=bathhouse,settings');
 				});
+
+				$q.all(promises)
+					.then(function(responses) {
+
+						_.forEach(responses, function(response) {
+
+							_this.rooms = _.union(_this.rooms, response.data.items);
+						});
+					})
+					.catch(function(responses) {
+
+						return $q.reject(responses);
+					})
+					.finally(function() {
+
+						_.forEach(_this.rooms, function(room) {
+
+							var marker = _.find(_this.markers, {bathhouseId: room.bathhouse.id});
+
+							if (marker) {
+
+								marker.rooms.push({
+									id: room.id,
+									name: room.name,
+									available: true
+								});
+							}
+							else {
+								_this.markers.push({
+									bathhouseId: room.bathhouse.id,
+									name: room.bathhouse.name,
+									address: room.bathhouse.address,
+									point: room.bathhouse.point,
+									rooms: [{
+										id: room.id,
+										name: room.name,
+										available: true
+									}]
+								});
+							}
+						});
+
+						$rootScope.$emit('dataStorage:markers', _this.markers);
+					});
 			});
 	}
 
@@ -101,10 +141,11 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 			});
 	}
 
-	function getRoom(roomId) {
+	function getRoom(id) {
+
 		var _this = this;
-		var room = _.find(_this.rooms, function(room) { return room.id === roomId });
-		return room;
+
+		return _.find(_this.rooms, function(room) { return room.id === id });
 	}
 
 	function getBathhouse(bathhouseId, callback) {
@@ -218,10 +259,11 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 				_.forEach(_this.rooms, function(room) {
 
 					if (bool) {
-						if (_.indexOf(room.options, option) !== -1) {
+
+						if (_.indexOf(room.options, option) !== -1 || _.indexOf(room.bathhouse.options, option) !== -1) {
 							_repartition(true, type, room.id, true);
 						}
-						else {
+						else if (_.indexOf(room.options, option) === -1 && _.indexOf(room.bathhouse.options, option) === -1) {
 							_repartition(false, type, room.id, true);
 						}
 					}
@@ -241,6 +283,7 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 				_.forEach(_this.rooms, function(room) {
 
 					if (bool) {
+
 						if (_.indexOf(room.types, kind) !== -1) {
 							_repartition(true, type, room.id, true);
 						}
@@ -249,6 +292,7 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 						}
 					}
 					else {
+
 						if (_.indexOf(room.types, kind) === -1) {
 							_repartition(true, type, room.id, false);
 						}
@@ -258,16 +302,20 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 				break;
 
 			case 'prepayment':
+
 				var bool = data;
-				if (angular.isUndefined(bool)) {
+
+				if (_.isUndefined(bool)) {
 					_.forEach(_this.rooms, function(room) {
 						_repartition(true, type, room.id, false);
 					});
 				}
 				else {
 					_.forEach(_this.rooms, function(room) {
+
 						if (bool) {
-							if (room.prepayment) {
+
+							if (room.settings.prepayment) {
 								_repartition(true, type, room.id, false);
 							}
 							else {
@@ -275,7 +323,8 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 							}
 						}
 						else {
-							if (!room.prepayment) {
+
+							if (!room.settings.prepayment) {
 								_repartition(true, type, room.id, false);
 							}
 							else {
@@ -291,6 +340,7 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 					reg = new RegExp(bathhouseName.join('|'),'i');
 
 				_.forEach(_this.rooms, function(room) {
+
 					if (reg.test(room.name) || reg.test(room.bathhouse.name)) {
 						_repartition(true, type, room.id, false);
 					}

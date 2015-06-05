@@ -8,12 +8,12 @@
             event-broadcast="events">
     </leaflet>
 
-    <!--<div class="content" ng-if="showRoom">
+    <div class="content" ng-if="showRoom">
         <div class="item">
             <div class="wrap">
                 <div class="preview">
                     <div class="preview-top clear">
-                        <h2 class="type type-{{room.type_id}}">{{room.room_name}}</h2>
+                        <h2 class="type type-{{room.type_id}}">{{room.name}}</h2>
                         <div class="rate clear">
                             <a class="star icons active"></a>
                             <a class="star icons active"></a>
@@ -22,7 +22,7 @@
                             <a class="star icons"></a>
                         </div>
                         <a ng-click="closeRoom()" class="close"></a>
-                        <p class="icons address"><a href="#">{{::room.bathhouse_name}}</a> {{::room.address}} </p>
+                        <p class="icons address"><a href="#">{{::room.bathhouse.name}}</a> {{::room.bathhouse.address}} </p>
                     </div>
                     <div class="preview-bottom clear">
                         <div class="photo">
@@ -145,5 +145,5 @@
                 </div>
             </div>
         </div>
-    </div>-->
+    </div>
 </div>

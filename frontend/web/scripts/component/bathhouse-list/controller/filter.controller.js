@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-FilterController.$inject = ['$scope', '$rootScope', 'dataStorage', 'CONSTANTS'];
+FilterController.$inject = ['$scope', '$rootScope', '$stateParams', 'dataStorage', 'CONSTANTS'];
 
-function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
+function FilterController($scope, $rootScope, $stateParams, dataStorage, CONSTANTS) {
 
 	console.log(CONSTANTS);
 
@@ -39,7 +39,7 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 		$scope.filters.types[type] = false;
 	});
 
-	$scope.openedTop = true;
+	$scope.openedTop = $stateParams.mode === 'list';
 	$scope.openedBottom = false;
 
 	$scope.attached = false;
@@ -200,18 +200,21 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 
 	function changeOptions(option) {
 
-		/*dataservice.filterList('options', [option, $scope.filters.options[option]]);
+		dataStorage.filterList('options', [option, $scope.filters.options[option]]);
 
 		$scope.filters.options[option] ? trueOptions.push(option) : _.pull(trueOptions, option);
 
 		if (trueOptions.length) {
+
 			if (!_.contains($scope.tags, 'options')) {
+
 				$scope.tags.push('options');
 			}
 		}
 		else {
+
 			_.pull($scope.tags, 'options');
-		}*/
+		}
 	}
 
 	function changeType(type) {
@@ -234,16 +237,20 @@ function FilterController($scope, $rootScope, dataStorage, CONSTANTS) {
 	}
 
 	function changePrepayment(prepayment) {
-		/*dataservice.filterList('prepayment', prepayment);
 
-		if (!angular.isUndefined(prepayment)) {
+		dataStorage.filterList('prepayment', prepayment);
+
+		if (!_.isUndefined(prepayment)) {
+
 			if (!_.contains($scope.tags, 'prepayment')) {
+
 				$scope.tags.push('prepayment');
 			}
 		}
 		else {
+
 			_.pull($scope.tags, 'prepayment');
-		}*/
+		}
 	}
 
 	function searchByName(typedName) {

@@ -31,7 +31,7 @@ function appRoute($stateProvider, $urlRouterProvider, $locationProvider, $httpPr
 			templateUrl: 'templates/bathhouse-list/index.html'
 		})
 		.state('bathhouses.item', {
-			url: '/:bathhouseId',
+			url: '/:id',
 			reloadOnSearch: false,
 			templateUrl: 'templates/bathhouse-item/index.html'
 		});

@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-MapController.$inject = ['$scope', '$rootScope', '$stateParams', 'leafletData', 'CONSTANTS'];
+MapController.$inject = ['$scope', '$rootScope', '$stateParams', '$timeout', '$compile', 'leafletData', 'dataStorage', 'CONSTANTS'];
 
-function MapController($scope, $rootScope, $stateParams, leafletData, CONSTANTS) {
+function MapController($scope, $rootScope, $stateParams, $timeout, $compile, leafletData, dataStorage, CONSTANTS) {
 
 	var city = _.find(CONSTANTS.city, {slug: $stateParams.city});
 
@@ -17,6 +17,9 @@ function MapController($scope, $rootScope, $stateParams, leafletData, CONSTANTS)
 	$scope.popupHeight = undefined;
 
 	$scope.mapMode = $stateParams.mode === 'map';
+
+	$scope.activateRoom = activateRoom;
+	$scope.closeRoom = closeRoom;
 
 	var includedMarkers = []; //Список отфильтрованных маркеров
 	var mapObject = {};
@@ -43,8 +46,8 @@ function MapController($scope, $rootScope, $stateParams, leafletData, CONSTANTS)
 			}
 		},
 		defaults: {
-			scrollWheelZoom: $scope.mapMode ? true : false,
-			dragging: $scope.mapMode ? true : false,
+			scrollWheelZoom: $scope.mapMode,
+			dragging: $scope.mapMode,
 			zoomControl: false
 		},
 		markers: {}
@@ -56,6 +59,52 @@ function MapController($scope, $rootScope, $stateParams, leafletData, CONSTANTS)
 			logic: 'emit'
 		}
 	};
+
+	function closeRoom() {
+		$scope.showRoom = false;
+		$scope.room.active = false;
+		$scope.room = {};
+
+		//if (userservice.screen.width >= 1354) $scope.$emit('map:toggleReviews', undefined);
+	}
+
+	function activateRoom(roomId) {
+		$scope.room = dataStorage.getRoom(roomId);
+		$scope.room.active = true;
+		$scope.showRoom = true;
+
+		//if (userservice.screen.width >= 1354) $scope.$emit('map:toggleReviews', roomId);
+	}
+
+	// Динамически подставляем данные той бани, на маркер которой ткнул пользователь
+	$scope.$on('leafletDirectiveMap.popupopen', function(event, args) {
+		$compile(args.leafletEvent.target._popup._contentNode)($scope);
+	});
+
+	$scope.$on('leafletDirectiveMarkersClick', function(event, markerIdx) {
+
+		$scope.bathhouse = $scope.map.markers[markerIdx];
+
+		// После клика двигаем карту, чтобы он встал правее плашек
+		var markerLatLng = new L.LatLng($scope.bathhouse.lat, $scope.bathhouse.lng),
+			markerPoint = mapObject.latLngToContainerPoint(markerLatLng),
+			popupHeight = targetPoint.y - 225;
+
+		var countAvailableRooms = _.countBy($scope.bathhouse.rooms, function(room) { return room.available; });
+
+		// Рассчитываем высоту попапа
+		if (countAvailableRooms['true'] * 160 + 100 < popupHeight) {
+			$scope.popupHeightStyle = {height: countAvailableRooms['true'] * 160 + 100 + 'px'};
+		}
+		else {
+			$scope.popupHeightStyle = {height: popupHeight + 'px'};
+		}
+
+		mapObject.panBy(new L.Point(
+			markerPoint.x - targetPoint.x,
+			markerPoint.y - targetPoint.y
+		));
+	});
 
 	// Режим карта или список, в зависимости от флага
 	$rootScope.$on('header:toggleMode', function(event, mode) {
@@ -90,6 +139,37 @@ function MapController($scope, $rootScope, $stateParams, leafletData, CONSTANTS)
 			controlZoom.removeFrom(mapObject);
 
 			$scope.map.markers = {};
+		}
+	});
+
+	$rootScope.$on('dataStorage:markers', function(event, points) {
+
+		_.forEach(points, function(marker) {
+			markers.push({
+				lat: parseFloat(marker.point.latitude),
+				lng: parseFloat(marker.point.longitude),
+				name: marker.name,
+				address: marker.address,
+				bathhouseId: marker.bathhouseId,
+				message: '<div ng-include="\'templates/partials/bathhousePopup.html\'"></div>',
+				icon: {
+					type: 'mapbox',
+					'marker-symbol': _.size(marker.rooms),
+					'marker-color': '#18B2AE'
+				},
+				rooms: marker.rooms,
+				popupOptions: {
+					minWidth: 170
+				}
+			});
+		});
+
+		includedMarkers = markers;
+
+		if ($scope.mapMode) {
+			$timeout(function() {
+				$scope.map.markers = markers;
+			}, 0);
 		}
 	});
 
@@ -137,6 +217,8 @@ function MapController($scope, $rootScope, $stateParams, leafletData, CONSTANTS)
 				controlZoom.addTo(mapObject);
 			}
 
+			var mapSizes = map.getSize();
+			targetPoint = new L.Point(((mapSizes.x - 1354 - 40 - 85) / 2) + 1354 - 95, mapSizes.y - 25);
 			// Все цифры взяты на глаз, некогда автоматизировать
 			/*var mapSizes = map.getSize();
 

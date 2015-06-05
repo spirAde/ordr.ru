@@ -82,7 +82,7 @@ class BathhouseRoom extends ActiveRecord
                             'guestPrice'            => $settings->guest_price,
                             'prepayment'            => $settings->prepayment,
                             'freeSpan'              => $settings->free_span,
-                            'prepaymentPersent'     => $settings->prepayment_persent,
+                            'prepaymentPercent'     => $settings->prepayment_percent,
                         ];
                     },
                     'bathhouse'  => function ()

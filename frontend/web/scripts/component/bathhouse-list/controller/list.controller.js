@@ -2,14 +2,16 @@
 
 var _ = require('lodash');
 
-ListController.$inject = ['$scope', '$rootScope', '$timeout', 'dataStorage', 'userStorage', 'CONSTANTS'];
+ListController.$inject = ['$scope', '$rootScope', '$stateParams', '$timeout', 'dataStorage', 'userStorage', 'CONSTANTS'];
 
-function ListController($scope, $rootScope, $timeout, dataStorage, userStorage, CONSTANTS) {
+function ListController($scope, $rootScope, $stateParams, $timeout, dataStorage, userStorage, CONSTANTS) {
 
 	$scope.rooms = [];
 
 	$scope.order = 'popularity';
 	$scope.reverse = true;
+
+	$scope.listMode = $stateParams.mode === 'list';
 
 	$scope.isEmptyResult = false; // flag for case, when nothing to offer
 
@@ -58,7 +60,7 @@ function ListController($scope, $rootScope, $timeout, dataStorage, userStorage, 
 
 	$rootScope.$on('dataStorage:updateRooms', function(event, data) {
 
-		data.length === 0 ? $scope.isEmptyResult = true : $scope.isEmptyResult = false;
+		!data.length ? $scope.isEmptyResult = true : $scope.isEmptyResult = false;
 
 		$timeout(function() {
 
@@ -67,6 +69,18 @@ function ListController($scope, $rootScope, $timeout, dataStorage, userStorage, 
 				room.show = _.indexOf(data, room.id) !== -1;
 			});
 		}, 0);
+	});
+
+	$rootScope.$on('header:toggleMode', function(event, mode) {
+
+		if (!$scope.listMode && mode === 'list') {
+
+			$scope.listMode = true;
+		}
+		else if ($scope.listMode && mode === 'map') {
+
+			$scope.listMode = false;
+		}
 	});
 }
 

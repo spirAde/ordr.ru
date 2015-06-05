@@ -1,154 +1,162 @@
 <div class="content" ng-controller="ListController">
+    <div ng-if="listMode">
+        <div class="item" ng-if="room.show"
+            ng-repeat="room in rooms | orderBy : order : reverse track by room.id">
 
-    <div class="item" ng-if="room.show"
-        ng-repeat="room in rooms | orderBy : order : reverse track by room.id">
-
-        <div class="wrap">
-            <div class="preview">
-                <div class="preview-top clear">
-                    <h2 class="type type-1">{{::room.name}}</h2>
-                    <div class="rate clear">
-                        <a class="star icons active"></a>
-                        <a class="star icons active"></a>
-                        <a class="star icons active"></a>
-                        <a class="star icons"></a>
-                        <a class="star icons"></a>
+            <div class="wrap">
+                <div class="preview">
+                    <div class="preview-top clear">
+                        <h2 class="type type-1">{{::room.name}}</h2>
+                        <div class="rate clear">
+                            <a class="star icons active"></a>
+                            <a class="star icons active"></a>
+                            <a class="star icons active"></a>
+                            <a class="star icons"></a>
+                            <a class="star icons"></a>
+                        </div>
+                        <p class="icons address">
+                            <a ui-sref="bathhouses.item({id: room.bathhouse.id})">
+                                {{::room.bathhouse.name}}
+                            </a>
+                            {{::room.bathhouse.address}}
+                        </p>
                     </div>
-                    <p class="icons address">
-                        <a ui-sref="bathhouses.item({bathhouseId: room.bathinfo.bathhouseId})">
-                            {{::room.bathinfo.bathhouseName}}
-                        </a>
-                        {{::room.bathinfo.bathhouseAddress}}
-                    </p>
-                </div>
-                <div class="preview-bottom clear">
-                    <div class="photo">
-                        <div class="slider">
-                            <a href="tmp/2.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
-                            <a href="tmp/3.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
-                            <a href="tmp/4.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
+                    <div class="preview-bottom clear">
+                        <div class="photo">
+                            <div class="slider">
+                                <a href="tmp/2.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
+                                <a href="tmp/3.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
+                                <a href="tmp/4.jpg" class="lightbox"><img src="/images/1.jpg" alt="" width="234" height="140" /></a>
+                            </div>
+                        </div>
+                        <div class="more-info">
+                            <a href="#">
+                                <span>от {{::room.price}} руб</span>
+                                <span ng-click="showFullDescription(room.id)">
+                                    {{room.active ? 'Скрыть' : 'Подробнее'}}
+                                </span>
+                            </a>
                         </div>
                     </div>
-                    <div class="more-info">
-                        <a href="#">
-                            <span>от {{::room.price}} руб</span>
-                            <span ng-click="showFullDescription(room.id)">
-                                {{room.active ? 'Скрыть' : 'Подробнее'}}
-                            </span>
-                        </a>
-                    </div>
                 </div>
-            </div>
-            <div ng-class="{true: 'order active', false: 'order'}[room.active]" ng-if="room.active">
-                <div class="info clear">
-                    <div class="description w50-left">
-                        <p>{{::room.description}}</p>
-                    </div>
-                    <div class="services w50-right clear">
+                <div ng-class="{true: 'order active', false: 'order'}[room.active]" ng-if="room.active">
+                    <div class="info clear">
+                        <div class="description w50-left">
+                            <p>{{::room.description}}</p>
+                        </div>
+                        <div class="services w50-right clear">
 
-                        <div
+                            <div
                                 class="icons item-{{option}}"
                                 ng-repeat="option in room.options">
 
-                            {{::option | rusify}}
+                                {{::option | rusify}}
+
+                            </div>
+                            <div
+                                class="icons item-{{option}}"
+                                ng-repeat="option in room.bathhouse.options">
+
+                                {{::option | rusify}}
+
+                            </div>
 
                         </div>
-
                     </div>
-                </div>
-                <div class="booking">
-                    <div class="wrap">
-                        <div class="step-1 clear" ng-if="!orderComplete">
-                            <div class="wrap clear">
-                                <div class="w50-left">
-                                    <div class="wrap">
-                                        <div class="field field-input field-date">
+                    <div class="booking">
+                        <div class="wrap">
+                            <div class="step-1 clear" ng-if="!orderComplete">
+                                <div class="wrap clear">
+                                    <div class="w50-left">
+                                        <div class="wrap">
+                                            <div class="field field-input field-date">
 
-                                            <input
-                                                    type="text"
-                                                    id="order-datetime-field"
-                                                    placeholder="Выберите время"
-                                                    readonly="readonly"/>
-
-                                        </div>
-                                        <div class="field field-select">
-                                            <select-services
-                                                    list="room.services">
-                                            </select-services>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="w50-right">
-                                    <div class="wrap clear">
-                                        <div class="select-people">
-                                            <p>Количество гостей</p>
-                                            <div class="field field-select-people">
-
-                                                <select-people
-                                                        limit="room.guests.guest_limit"
-                                                        threshold="room.guests.guest_threshold"
-                                                        price="room.guests.extra_guest_price">
-
-                                                </select-people>
+                                                <input
+                                                        type="text"
+                                                        id="order-datetime-field"
+                                                        placeholder="Выберите время"
+                                                        readonly="readonly"/>
 
                                             </div>
-
+                                            <div class="field field-select">
+                                                <select-services
+                                                        list="room.services">
+                                                </select-services>
+                                            </div>
                                         </div>
-                                        <div class="next-step">
-                                            <a href="#" ng-click="checkOrder()">
-                                                <span class="total-cost">0 руб</span>
-                                                <span>Заказать</span>
-                                            </a>
+                                    </div>
+                                    <div class="w50-right">
+                                        <div class="wrap clear">
+                                            <div class="select-people">
+                                                <p>Количество гостей</p>
+                                                <div class="field field-select-people">
+
+                                                    <select-people
+                                                            limit="room.guests.guest_limit"
+                                                            threshold="room.guests.guest_threshold"
+                                                            price="room.guests.extra_guest_price">
+
+                                                    </select-people>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="next-step">
+                                                <a href="#" ng-click="checkOrder()">
+                                                    <span class="total-cost">0 руб</span>
+                                                    <span>Заказать</span>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <timecalendar
-                                schedule="room.schedule"></timecalendar>
+                            <timecalendar
+                                    schedule="room.schedule"></timecalendar>
 
-                        <!--<timecalendar
-                            roomId="room.id"
-                            schedule="room.schedule"
-                            type="bathhhouse"
-                            new-orders="room.newOrders"
-                            ng-if="!orderComplete">
+                            <!--<timecalendar
+                                roomId="room.id"
+                                schedule="room.schedule"
+                                type="bathhhouse"
+                                new-orders="room.newOrders"
+                                ng-if="!orderComplete">
 
-                        </timecalendar>-->
+                            </timecalendar>-->
 
-                        <div class="step-2 active" ng-if="orderComplete">
-                            <div class="wrap clear">
-                                <div class="w50-left">
-                                    <div class="wrap">
-                                        <p>27.08 c 13:00 до 15:00 и 28.08 c 13:00 до 15:00</p>
-                                        <table cellspacing="0" cellpadding="0">
-                                            <tbody>
-                                            <tr>
-                                                <td>Сауна х 4 часа</td>
-                                                <td>1600 рублей</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Сауна х 4 часа</td>
-                                                <td>1600 рублей</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Сауна х 4 часа</td>
-                                                <td>1600 рублей</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                            <div class="step-2 active" ng-if="orderComplete">
+                                <div class="wrap clear">
+                                    <div class="w50-left">
+                                        <div class="wrap">
+                                            <p>27.08 c 13:00 до 15:00 и 28.08 c 13:00 до 15:00</p>
+                                            <table cellspacing="0" cellpadding="0">
+                                                <tbody>
+                                                <tr>
+                                                    <td>Сауна х 4 часа</td>
+                                                    <td>1600 рублей</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Сауна х 4 часа</td>
+                                                    <td>1600 рублей</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Сауна х 4 часа</td>
+                                                    <td>1600 рублей</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="w50-right">
-                                    <div class="wrap clear">
-                                        <p>Для подтверждения заказа введите номер телефона</p>
-                                        <div class="form clear">
-                                            <div class="field field-input">
-                                                <input type="text" placeholder="+7" />
-                                            </div>
-                                            <div class="buttons">
-                                                <button>Отправить</button>
+                                    <div class="w50-right">
+                                        <div class="wrap clear">
+                                            <p>Для подтверждения заказа введите номер телефона</p>
+                                            <div class="form clear">
+                                                <div class="field field-input">
+                                                    <input type="text" placeholder="+7" />
+                                                </div>
+                                                <div class="buttons">
+                                                    <button>Отправить</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -159,12 +167,11 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <div ng-if="isEmptyResult" class="item messages">
-        К сожалению, нам ничего не удалось найти по Вашему запросу.
-        Рекомендуем немного изменить критерии поиска, или
-        <a ng-click="fullResetFilters()">сбросить</a> их полностью.
+        <div ng-if="isEmptyResult" class="item messages">
+            К сожалению, нам ничего не удалось найти по Вашему запросу.
+            Рекомендуем немного изменить критерии поиска, или
+            <a ng-click="fullResetFilters()">сбросить</a> их полностью.
+        </div>
     </div>
-
 </div>
