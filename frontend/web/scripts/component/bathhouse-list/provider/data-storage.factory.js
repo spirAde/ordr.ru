@@ -30,10 +30,6 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 		includedRooms: [],
 
 		getRooms: getRooms,
-		getAdditionalData: getAdditionalData,
-		getFilters: getFilters,
-		getMarkers: getMarkers,
-		getBathhouse: getBathhouse,
 
 		getRoom: getRoom,
 
@@ -48,7 +44,7 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 		var _this = this;
 		var pages;
 
-		return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&expand=bathhouse,settings')
+		return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&expand=bathhouse,settings,schedule,guests,services')
 			.then(function(response) {
 
 				pages = _.range(2, response.data._meta.pageCount + 1);
@@ -64,7 +60,7 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 			.finally(function() {
 
 				var promises = _.map(pages, function(page) {
-					return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&page=' + page + '&expand=bathhouse,settings');
+					return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&page=' + page + '&expand=bathhouse,settings,schedule,guests,services');
 				});
 
 				$q.all(promises)
@@ -113,47 +109,11 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 			});
 	}
 
-	function getAdditionalData(rooms, callback) {
-		_.forEach(rooms, function(room) {
-			$http
-				.get('http://api.ordr.ru/v1/rooms/' + room['id'] + '?schedule&storages&guests')
-				.then(function(response) {
-					callback(response.data);
-				});
-		});
-	}
-
-	function getFilters(callback) {
-		return $http
-			.get('http://api.ordr.ru/v1/starters/filter?city_id=1')
-			.then(function(response) {
-				callback(response.data);
-			});
-	}
-
-	function getMarkers(callback) {
-		var _this = this;
-
-		return $http
-			.get('http://api.ordr.ru/v1/bathhouses/geo?city_id=1')
-			.then(function(response) {
-				callback(response.data);
-			});
-	}
-
 	function getRoom(id) {
 
 		var _this = this;
 
 		return _.find(_this.rooms, function(room) { return room.id === id });
-	}
-
-	function getBathhouse(bathhouseId, callback) {
-		return $http
-			.get('http://api.ordr.ru/v1/bathhouses/' + bathhouseId)
-			.then(function(response) {
-				callback(response.data);
-			});
 	}
 
 	/**

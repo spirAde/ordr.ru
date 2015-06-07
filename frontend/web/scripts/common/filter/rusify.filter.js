@@ -25,7 +25,11 @@ function Rusify() {
 		name: 'Название',
 		guests: 'Кол-во гостей',
 		datetime: 'Дата/Время',
-		prepayment: 'Предоплата'
+		prepayment: 'Предоплата',
+
+		steaming: 'Паренье',
+		massage: 'Массаж',
+		other: 'Другое'
 	};
 
 	return function(input) {

@@ -325,33 +325,33 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
 .step-2 .buttons button:hover {background-color: #F39C12;}
 
 /* Calendar */
-.timecalendar {position: relative;}
-.timecalendar > .wrap {padding: 0 0 20px 0;height: 250px;}
-.timecalendar .scroll {padding: 0 20px;}
-.timecalendar-row {padding-bottom: 25px;margin-bottom: 25px;border-bottom: 1px solid rgba(255,255,255,.2);}
-.timecalendar-row.last {margin-bottom: 0;padding-bottom: 0;border: none;}
-.timecalendar-info {margin-bottom: 15px;}
-.timecalendar-info .date {float: left;font-family: 'proxima_bold', Arial, sans-serif;position: relative;top: 4px;margin-right: 20px;}
-.timecalendar-info .types {float: left;font-size: 12px;}
-.timecalendar-info .type {display: inline-block;padding: 5px;}
+.schedule {position: relative;}
+.schedule > .wrap {padding: 0 0 20px 0;height: 250px;}
+.schedule .scroll {padding: 0 20px;}
+.schedule-row {padding-bottom: 25px;margin-bottom: 25px;border-bottom: 1px solid rgba(255,255,255,.2);}
+.schedule-row.last {margin-bottom: 0;padding-bottom: 0;border: none;}
+.schedule-info {margin-bottom: 15px;}
+.schedule-info .date {float: left;font-family: 'proxima_bold', Arial, sans-serif;position: relative;top: 4px;margin-right: 20px;}
+.schedule-info .types {float: left;font-size: 12px;}
+.schedule-info .type {display: inline-block;padding: 5px;}
 
-.timecalendar-info .type-1 {border: 1px solid rgba(255,255,255,.2);color: rgba(255,255,255,.3);}
-.timecalendar-info .type-2 {border: 1px solid rgba(255,255,255,.2);color: #fff;}
-.timecalendar-info .type-3 {border: 1px solid rgba(255,255,255,.2);color: rgba(255,255,255,.3);background-color: rgba(75, 95, 106, 0.85)}
-.timecalendar-info .type-4 {border: 1px solid rgba(255,255,255,.2);color: #fff;background-color: #F4740C;}
+.schedule-info .type-1 {border: 1px solid rgba(255,255,255,.2);color: rgba(255,255,255,.3);}
+.schedule-info .type-2 {border: 1px solid rgba(255,255,255,.2);color: #fff;}
+.schedule-info .type-3 {border: 1px solid rgba(255,255,255,.2);color: rgba(255,255,255,.3);background-color: rgba(75, 95, 106, 0.85)}
+.schedule-info .type-4 {border: 1px solid rgba(255,255,255,.2);color: #fff;background-color: #F4740C;}
 
-.timecalendar-cells span {font-size: 12px;width: 40px;text-align: center;display: block;float: left;border-right: 1px solid rgba(255,255,255,.1);padding: 5px 0;cursor: pointer;}
-.timecalendar-cells span:hover {background-color: #F4740C;}
-.timecalendar-cells span:nth-child(2n) {margin-left: -41px;margin-top: 25px;border-top: 1px solid rgba(255,255,255,.2);}
-.timecalendar-cells span:nth-child(48n), .timecalendar-cells span:nth-child(47n) {border-right: none !important;}
+.schedule-cells span {font-size: 12px;width: 40px;text-align: center;display: block;float: left;border-right: 1px solid rgba(255,255,255,.1);padding: 5px 0;cursor: pointer;}
+.schedule-cells span:hover {background-color: #F4740C;}
+.schedule-cells span:nth-child(2n) {margin-left: -41px;margin-top: 25px;border-top: 1px solid rgba(255,255,255,.2);}
+.schedule-cells span:nth-child(48n), .schedule-cells span:nth-child(47n) {border-right: none !important;}
 
-.timecalendar-cells .cell-ordered {background-color: #F4740C !important;}
-.timecalendar-cells .cell-reserved {color: rgba(255,255,255,.3) !important;background-color: rgba(75, 95, 106, 0.85);}
-.timecalendar-cells .cell-disabled {color: rgba(255,255,255,.3) !important;background-color: transparent !important;}
+.schedule-cells .cell-ordered {background-color: #F4740C !important;}
+.schedule-cells .cell-reserved {color: rgba(255,255,255,.3) !important;background-color: rgba(75, 95, 106, 0.85);}
+.schedule-cells .cell-disabled {color: rgba(255,255,255,.3) !important;background-color: transparent !important;}
 
 /* Animation */
-.timecalendar, .order, .step-2 {display: none;}
-.timecalendar.active, .order.active, .step-2.active {display: block;}
+.schedule, .order, .step-2 {display: none;}
+.schedule.active, .order.active, .step-2.active {display: block;}
 .scroll {overflow: hidden;height: 100%;position: relative;}
 
 /* Front-page */
@@ -621,13 +621,13 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
     .step-1 .select-people {width: auto;float: none;}
     .step-1 .next-step {width: auto;float: none;margin-left: 0;margin-top: 15px;}
 
-    .timecalendar-row {border: none;}
-    .timecalendar .scroll {box-sizing: border-box;}
-    .timecalendar-cells span {box-sizing: border-box;padding: 10px 0;width: 50%;border-bottom: 1px solid rgba(255,255,255,.2);}
-    .timecalendar-cells span:nth-child(2n) {margin-left: 0;margin-top: 0;border-top: none;border-right: 0;}
-    .timecalendar-cells span:nth-child(47n) {border-right: 1px solid rgba(255,255,255,.2) !important;border-bottom: none;}
-    .timecalendar-cells span:nth-child(48n) {border-bottom: none;}
-    .timecalendar-info .types {display: none;}
+    .schedule-row {border: none;}
+    .schedule .scroll {box-sizing: border-box;}
+    .schedule-cells span {box-sizing: border-box;padding: 10px 0;width: 50%;border-bottom: 1px solid rgba(255,255,255,.2);}
+    .schedule-cells span:nth-child(2n) {margin-left: 0;margin-top: 0;border-top: none;border-right: 0;}
+    .schedule-cells span:nth-child(47n) {border-right: 1px solid rgba(255,255,255,.2) !important;border-bottom: none;}
+    .schedule-cells span:nth-child(48n) {border-bottom: none;}
+    .schedule-info .types {display: none;}
 }
 
 @media screen and (max-width: 480px) {
@@ -675,10 +675,10 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
     .w50-left {float: none;width: auto;}
     .w50-right {float: none;width: auto;}
     .services.w50-right {margin-top: 20px;}
-    .timecalendar-cells span {font-size: 10px;}
-    .timecalendar > .wrap {height: auto;}
-    .timecalendar-info .date {float: none;margin: 0 0 10px 0;text-align: center;}
-    .timecalendar-info .types {float: none;font-size: 8px;text-align: center;}
+    .schedule-cells span {font-size: 10px;}
+    .schedule > .wrap {height: auto;}
+    .schedule-info .date {float: none;margin: 0 0 10px 0;text-align: center;}
+    .schedule-info .types {float: none;font-size: 8px;text-align: center;}
 
     #sauna-services h3 {margin-bottom: 20px;width: 33.3333%;font-size: 14px;}
     #sauna-services h3:before {width: 60px;height: 60px;line-height: 60px;border-radius: 30px;font-size: 24px;}
@@ -726,9 +726,9 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
     .step-2 .field-input {width: auto;float: none}
     .step-2 .buttons {width: auto;float: none;margin-top: 10px;}
 
-    .timecalendar-row {margin: 0;padding: 0}
-    .timecalendar .scroll {overflow: inherit;}
-    .timecalendar, .order, .step-2 {display: block;}
+    .schedule-row {margin: 0;padding: 0}
+    .schedule .scroll {overflow: inherit;}
+    .schedule, .order, .step-2 {display: block;}
 }
 
 @media screen and (max-width: 320px) {
