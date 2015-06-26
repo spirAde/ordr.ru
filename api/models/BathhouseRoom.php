@@ -3,7 +3,7 @@
 namespace api\models;
 
 use Yii;
-use api\components\ApiHelpers;
+use common\components\ApiHelpers;
 use yii\db\Query;
 use yii\db\ActiveRecord;
 

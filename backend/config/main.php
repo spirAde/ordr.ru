@@ -13,19 +13,15 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
-        'request' => [
-            'class' => '\yii\web\Request',
-            'on beforeRequest' => function($event) {
-                    \yii\helpers\VarDumper::dump($event);
-                }/*,
-            'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
-            ],*/
+        'response' => [
+            'class' => 'yii\web\Response',
+            'format' => yii\web\Response::FORMAT_JSON,
+            'charset' => 'UTF-8',
         ],
         'user' => [
             'identityClass' => 'common\models\User',
-            'enableAutoLogin' => true,
-            'enableSession' => false
+            'enableSession' => false,
+            'enableAutoLogin' => false,
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -36,15 +32,34 @@ return [
                 ],
             ],
         ],
+        'request' => [
+            'class' => '\yii\web\Request',
+            'enableCookieValidation' => false,
+            'enableCsrfValidation' => false,
+            'enableCsrfCookie' => false,
+            'on beforeRequest' => function($event) {
+            },
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
+        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
         'urlManager' => [
-            //'enablePrettyUrl' => true,
+            'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-
+                'login' => 'login/index',
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'except' => ['delete', 'update', 'create', 'options'],
+                    'controller' => 'bathhouse',
+                    'patterns' => [
+                        'GET'                   => 'index',
+                    ]
+                ],
             ],
         ]
     ],
