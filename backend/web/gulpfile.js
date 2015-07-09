@@ -37,7 +37,7 @@ var browserifyBundlerApplyLibs = function(bundler, includeLibs) {
 	try {
 		var packageManifest = require('./package.json');
 
-		var libs = packageManifest.ordrFrontLibs || [];
+		var libs = packageManifest.controlFrontLibs || [];
 
 		_.each(libs, function(lib) {
 
@@ -158,8 +158,8 @@ var tasks = {
 
 gulp.task('browser-sync', function() {
 	browserSync({
-		proxy: 'ordr.ru',
-		port: 3010
+		proxy: 'control.ordr.ru',
+		port: 3011
 	});
 });
 
@@ -192,13 +192,13 @@ gulp.task('watch', ['clean'], function(callback) {
 
 	runSequence(['fonts', 'images', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
 
-	gulp.watch('./frontend/web/styles/*.css', ['reload-styles']);
+	gulp.watch('./backend/web/styles/*.css', ['reload-styles']);
 
-	gulp.watch(['./frontend/web/scripts/**/*.jsx', './frontend/web/scripts/**/*.js', './frontend/web/libs/**/*.js'], ['reload-js']);
+	gulp.watch(['./backend/web/scripts/**/*.jsx', './backend/web/scripts/**/*.js', './backend/web/libs/**/*.js'], ['reload-js']);
 
-	gulp.watch('./frontend/web/templates/**/*.html', ['reload-template']);
+	gulp.watch('./backend/web/templates/**/*.html', ['reload-template']);
 
-	gulp.watch('./frontend/web/images/*', ['reload-images']);
+	gulp.watch('./backend/web/images/*', ['reload-images']);
 
 	gutil.log(gutil.colors.bgGreen('Watching for changes...'));
 });

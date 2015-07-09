@@ -611,7 +611,7 @@ class DataController extends Controller {
                 'start_date'    => 'current',
                 'end_date'      => 'current',
                 'start_period'  => 90,
-                'end_period'    => 115,
+                'end_period'    => 114,
                 'services'      => '',
                 'guests'        => mt_rand(1,6),
                 'status'        => 0,

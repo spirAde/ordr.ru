@@ -234,8 +234,8 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
 /* Content */
 .content {position: relative;max-width: 1024px;z-index: 12;}
 .content .preview {padding: 20px;background-color: rgba(255,255,255,.9);}
-.content > .item {border-bottom: 1px solid #dce0e0;}
-.content > .item:last-child {border-bottom: none}
+.content .item {border-bottom: 1px solid #dce0e0;}
+.content .item:last-child {border-bottom: none}
 
 /* Preview info */
 .preview {color: #8D939E;position: relative;}

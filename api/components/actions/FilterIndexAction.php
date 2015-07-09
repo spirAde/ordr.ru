@@ -5,7 +5,7 @@ namespace api\components\actions;
 use Yii;
 use yii\rest\IndexAction;
 use yii\data\ActiveDataProvider;
-use api\components\ApiHelpers;
+use common\components\ApiHelpers;
 use yii\web\HttpException;
 
 class FilterIndexAction extends IndexAction

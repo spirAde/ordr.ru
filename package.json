@@ -35,13 +35,22 @@
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.1.0"
   },
-  "frontLibs": [
+  "ordrFrontLibs": [
     "angular",
     "angular-ui-router",
     "angular-touch",
     "angular-socket-io",
     "angular-leaflet-directive",
     "angular-awesome-slider",
+    "lodash",
+    "moment",
+    "socket.io-client"
+  ],
+  "controlFrontLibs": [
+    "angular",
+    "angular-ui-router",
+    "angular-touch",
+    "angular-socket-io",
     "lodash",
     "moment",
     "socket.io-client"
