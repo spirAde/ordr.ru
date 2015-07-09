@@ -1,5 +1,5 @@
 <?php
-namespace api\components;
+namespace common\components;
 
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -70,12 +70,12 @@ class ApiHelpers
 
     public static function writeFreeTime($periods)
     {
-        return base64_encode(serialize($periods));
+        return json_encode($periods);
     }
 
     public static function readFreeTime($periods)
     {
-        return unserialize(base64_decode($periods));
+        return json_decode($periods,true);
     }
 
     public static function getTime($time_id)
@@ -403,7 +403,6 @@ class ApiHelpers
     public static function getFreeTimeDecomposition($free_time = [], $step = 3)
     {
         $result = [];
-
         // Делим общий массив периодов по 30 минут, в дальнейшем добавим делитель, в зависимости от времени минимальной
         // заявки для разного типа организаций
         $divide_periods = range(self::FIRST_TIME_ID, self::LAST_TIME_ID, $step);
@@ -411,15 +410,15 @@ class ApiHelpers
         $tmp = [];
 
         // Выстраиваем все времена, исходя из концевых для каждого периода свободного времени
-        foreach ($free_time as $time) {
-            $tmp[] = array_values(range($time[0][0], $time[0][1], self::STEP));
+        foreach ($free_time as $time)
+        {
+            $tmp[] = array_values(range($time[0], $time[1], self::STEP));
         }
 
         $tmp_flatten = ArrayHelper::flatten($tmp);
 
         // Находим диапазоны, которые заняты
         $diff = array_diff($divide_periods, $tmp_flatten);
-
         // Преобразуем в человекопонятный вид и указываем доступноть времени
         foreach ($tmp_flatten as $time_id) {
             $result[$time_id] = [

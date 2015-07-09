@@ -1,0 +1,35 @@
+Public API description:
+
+1.  Bathhouse
+
+    1.1 http://api.ordr.ru/bathhouses
+        Fields: 'id','name','slug','address','description','contacts','options','cityId','distance','latitude','longitude'.
+        ExtraFields: -
+    1.2 http://api.ordr.ru/view/<bath_id>
+        Fields: 'id','name','slug','address','description','contacts','options','cityId','distance','latitude','longitude','rating_items'.
+        ExtraFields:    minPrice,
+                        rooms ['roomId','roomName','roomDescription','options','types','rating','popularity','reviews','price',
+                        'minDuration','prepayment','schedule','services','guests','show','active']
+    1.3 http://api.ordr.ru/geo/<bath_id>
+        Fields: 'id','name','slug','address','latitude','longitude',
+        ExtraFields:    rooms ['id','name','min_price','guest_limit','available']
+
+2.  BathhouseRooms
+
+    1.1 http://api.ordr.ru/rooms
+        Fields: 'id','name','types','cityId','rating','popularity','description','options'.
+        ExtraFields:    settings ['cleaningTime','minDuration','guestLimit','guestThreshold','guestPrice','prepayment',
+                        'freeSpan','prepaymentPercent']
+                        bathhouse ['id','name','address','distance','options','point'=>['latitude','longitude']]
+                        schedule [<date> => [<period_id> => ['time','enable','price','price_period'],..],..]
+                        services [<group_name> => ['id','name','price'], ...]
+                        guests ['guestLimit','guestThreshold','guestPrice']
+
+    1.2 http://api.ordr.ru/rooms/<room_id>
+        Fields: 'id'
+        ExtraFields:    schedule [<date> => [<period_id> => ['time','enable','price','price_period'],..],..]
+                        services [<group_name> => ['id','name','price'], ...]
+                        guests ['guestLimit','guestThreshold','guestPrice']
+
+Private API description:
+

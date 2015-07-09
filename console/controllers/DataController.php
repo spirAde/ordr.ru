@@ -1,8 +1,14 @@
 <?php
 namespace console\controllers;
 
+use common\components\ApiHelpers;
+use console\models\User;
+use console\models\BathhouseService;
+use console\models\BathhouseBooking;
+use console\models\BathhouseRoom;
 use Yii;
 use yii\console\Controller;
+use yii\helpers\ArrayHelper;
 use yii\helpers\VarDumper;
 use yii\helpers\OrdrHelper;
 use yii\db\Query;
@@ -59,7 +65,6 @@ class DataController extends Controller {
 
     public $description = 'Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime placeat, facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.';
     public $room_description = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-
     public $city_id = 1;
 
     public function actionIndex() {
@@ -543,8 +548,8 @@ class DataController extends Controller {
 
         $dates_range = OrdrHelper::datesRange($first_date, $end_date);
 
-        foreach ($rooms as $room) {
-
+        foreach ($rooms as $room)
+        {
             $bathhouse = (new Query())
                 ->select('bathhouse_room.bathhouse_id')
                 ->from('bathhouse_room')
@@ -557,10 +562,13 @@ class DataController extends Controller {
                 ->where('bathhouse_room_setting.room_id = :room_id', [':room_id' => $room['id']])
                 ->one();
 
-            foreach ($dates_range as $date) {
+            foreach ($dates_range as $date)
+            {
 
-                $full_free_time = 'YToyOntzOjQ6InVzZXIiO2E6MTp7aTowO2E6Mjp7aTowO2k6MDtpOjE7aToxNDQ7fX1zOjc6Im1hbmFnZXIiO2E6MTp7aTowO2E6Mjp7aTowO2k6MDtpOjE7aToxNDE7fX19';
-
+                $full_free_time = json_encode(array(
+                    0   => 0,
+                    1   => 144
+                ));
                 $connection->createCommand()
                     ->insert('bathhouse_schedule', [
                         'room_id' => $room['id'],
@@ -574,62 +582,199 @@ class DataController extends Controller {
         }
     }
 
-    public function actionOrders() {
-
-    }
-
-    public function actionType() {
-
-        VarDumper::dump([
-            'user' => [
-                0 => [0, 144]
+    public function actionOrders()
+    {
+        $order_samples = [
+            [
+                'start_date'    => 'current',
+                'end_date'      => 'current',
+                'start_period'  => 30,
+                'end_period'    => 42,
+                'services'      => '',
+                'guests'        => mt_rand(1,6),
+                'status'        => 0,
+                'user'          =>
+                    [
+                        'id'                => 1,
+                        'phone'             => '89009000000',
+                        'is_ban'            => 0,
+                        'last_order_date'   => date('Y:m:d'),
+                    ],
+                'manager_id'    => 0,
+                'cost_period'   => mt_rand(1,9) * 1000,
+                'cost_services' => mt_rand(1,9) * 1000,
+                'cost_guests'   => mt_rand(1,9) * 1000,
+                'total'         => mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000,
+                'comment'       => 'Vse pychkom'
             ],
-            'manager' => [
-                0 => [0, 141]
+            [
+                'start_date'    => 'current',
+                'end_date'      => 'current',
+                'start_period'  => 90,
+                'end_period'    => 115,
+                'services'      => '',
+                'guests'        => mt_rand(1,6),
+                'status'        => 0,
+                'user'          =>
+                    [
+                        'id'                => 2,
+                        'phone'             => '89009000001',
+                        'is_ban'            => 0,
+                        'last_order_date'   => date('Y:m:d'),
+                    ],
+                'manager_id'    => 0,
+                'cost_period'   => mt_rand(1,9) * 1000,
+                'cost_services' => mt_rand(1,9) * 1000,
+                'cost_guests'   => mt_rand(1,9) * 1000,
+                'total'         => mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000,
+                'comment'       => 'Vse pychkom'
+            ],
+            [
+                'start_date'    => 'current',
+                'end_date'      => 'next',
+                'start_period'  => 132,
+                'end_period'    => 12,
+                'services'      => '',
+                'guests'        => mt_rand(1,6),
+                'status'        => 0,
+                'user'          =>
+                    [
+                        'id'                => 3,
+                        'phone'             => '89009000002',
+                        'is_ban'            => 0,
+                        'last_order_date'   => date('Y:m:d'),
+                    ],
+                'manager_id'    => 0,
+                'cost_period'   => mt_rand(1,9) * 1000,
+                'cost_services' => mt_rand(1,9) * 1000,
+                'cost_guests'   => mt_rand(1,9) * 1000,
+                'total'         => mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000,
+                'comment'       => 'Vse pychkom'
             ]
-        ]);
-
-        /*$connection = new \yii\db\Connection([
-            'dsn' => 'mysql:host=127.0.0.1;dbname=ordrDB',
-            'username' => 'root',
-            'password' => 'root',
-            'charset' => 'utf8'
-        ]);
-
-        $types = [
-            1 => 'bathhouse',
-            2 => 'sauna',
-            3 => 'hammam'
         ];
-
-        $rooms = (new Query())
-            ->select('bathhouse_room.id')
-            ->from('bathhouse_room')
+        $first_date = date('Y-m-d', strtotime('now'));
+        $end_date = date('Y-m-d', strtotime('now', strtotime('+7 days')));
+        $dates_range = OrdrHelper::datesRange($first_date, $end_date);
+        $rooms = BathhouseRoom::find()
+            ->joinWith(['bathhouseRoomSettings'])
+            ->indexBy('id')
+            ->asArray()
             ->all();
 
-        foreach ($rooms as $room) {
+        foreach($rooms as $room)
+        {
+            $services = BathhouseService::find()
+                ->select(
+                    'bathhouse_service.id,
+                                bathhouse_service.name,
+                                bathhouse_service.category,
+                                bathhouse_service.price')
+                ->where('bathhouse_service.bathhouse_id = :bathhouse_id', [':bathhouse_id' => $room['id']])
+                ->asArray()
+                ->all();
 
-            $types_id = array_rand($types, mt_rand(1, 3));
+            $service_ids = ArrayHelper::getColumn($services,'id');
 
-            if (is_array($types_id)) {
-                foreach ($types_id as $type_id) {
+            foreach ($dates_range as $date)
+            {
+                foreach($order_samples as $sample)
+                {
+                    $count_services = mt_rand(0,4);
+                    $selected_services = [];
+                    if(!empty($service_ids))
+                    {
+                        for ($i = 0; $i < $count_services; $i++)
+                        {
+                            $ind = (int)mt_rand(0, count($service_ids)-1);
+                            if(array_key_exists($ind,$service_ids))
+                                $selected_services[] = $service_ids[$ind];
+                        }
+                    }
+                    $sample['start_date'] = $date;
+                    $sample['end_date'] = ($sample['end_date'] == 'current') ? $date : date('Y-m-d', strtotime('+1 days',strtotime($date)));
 
-                    $connection->createCommand()
-                        ->insert('bathhouse_room_type', [
-                            'room_id' => $room['id'],
-                            'type_id' => $type_id
+                    $booking = BathhouseBooking::find()
+                        ->where('start_date = :start_date
+                                    AND end_date = :end_date
+                                    AND start_period = :start_period
+                                    AND end_period = :end_period
+                                    AND room_id = :room_id',
+                        [
+                            ':start_date'   => $sample['start_date'],
+                            ':end_date'     => $sample['end_date'],
+                            ':start_period' => $sample['start_period'],
+                            ':end_period'   => $sample['end_period'],
+                            ':room_id'      => $room['id'],
                         ])
-                        ->execute();
+                        ->one();
+                    if($booking != null)
+                        continue;
+                    $booking = new BathhouseBooking();
+                    $booking->bathhouse_id  = $room['bathhouse_id'];
+                    $booking->room_id       = $room['id'];
+                    $booking->start_date    = $sample['start_date'];
+                    $booking->end_date      = $sample['end_date'];
+                    $booking->start_period  = $sample['start_period'];
+                    $booking->end_period    = $sample['end_period'];
+                    $booking->services      = json_encode($selected_services);
+                    $booking->guests        = $sample['guests'];
+                    $booking->status_id     = $sample['status'];
+                    $booking->status_id     = $sample['status'];
+                    $booking->manager_id    = $sample['manager_id'];
+                    $booking->cost_period   = $sample['cost_period'];
+                    $booking->cost_services = $sample['cost_services'];
+                    $booking->cost_guests   = $sample['cost_guests'];
+                    $booking->total         = $sample['total'];
+                    $booking->comment       = $sample['comment'];
+                    $booking->created       = date('Y-m-d H:i:s');
+
+                    $user = User::findOne($sample['user']['id']);
+                    if($user == null)
+                    {
+                        $user = new User();
+                        $user->id = $sample['user']['id'];
+                        $user->phone = $sample['user']['phone'];
+                        $user->is_ban = $sample['user']['is_ban'];
+                        $user->last_order_date = date('Y-m-d');
+                        $user->save();
+                    }
+
+                    $booking->user_id = $user->id;
+
+                    if(!$booking->save())
+                        var_dump($booking->getErrors());
                 }
-            }
-            else {
-                $connection->createCommand()
-                    ->insert('bathhouse_room_type', [
-                        'room_id' => $room['id'],
-                        'type_id' => $types_id
+
+                $all_bookings = BathhouseBooking::find()
+                    ->select('start_period,end_period,start_date,end_date')
+                    ->where('start_date = :start_date OR end_date = :end_date AND room_id = :room_id',[
+                        ':start_date'   => $date,
+                        ':end_date'     => $date,
+                        ':room_id'      => $room['id'],
                     ])
+                    ->all();
+
+                $busy_periods = [];
+
+                foreach($all_bookings as $book_item)
+                {
+                    //заявка, пришедшая с прошлого дня
+                    if($book_item->end_date == $date and $book_item->start_date != $date)
+                        $busy_periods[] = [0,$book_item->end_period];
+                    //заявка с переходом на следующий день
+                    elseif($book_item->end_date != $date and $book_item->start_date == $date)
+                        $busy_periods[] = [$book_item->start_period,144];
+                    else
+                        $busy_periods[] = [$book_item->start_period,$book_item->end_period];
+                }
+
+                $free_period_for_date = ApiHelpers::getFreeTime($busy_periods,$room['bathhouseRoomSettings']['min_duration']);
+
+                yii::$app->db->createCommand()
+                    ->update('bathhouse_schedule', ['schedule'  => json_encode($free_period_for_date)], 'date = "'.$date.'" AND room_id = '.$room['id'])
                     ->execute();
             }
-        }*/
+        }
     }
+
 }

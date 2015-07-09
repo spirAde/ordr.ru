@@ -1,35 +1,20 @@
 <?php
 
-namespace app\models;
+namespace backend\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
-/**
- * This is the model class for table "managers".
- *
- * @property integer $id
- * @property string $username
- * @property string $password
- * @property string $type
- * @property string $full_name
- * @property integer $organization_id
- * @property string $phone
- * @property string $token
- * @property string $expiry_date
- */
-class Managers extends \yii\db\ActiveRecord
+class Managers extends ActiveRecord
 {
-    /**
-     * @inheritdoc
-     */
+    public $organization_name = '';
+    public $city_id = '';
+
     public static function tableName()
     {
         return 'managers';
     }
 
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return [
@@ -42,21 +27,30 @@ class Managers extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'username' => 'Username',
-            'password' => 'Password',
-            'type' => 'Type',
-            'full_name' => 'Full Name',
-            'organization_id' => 'Organization ID',
-            'phone' => 'Phone',
-            'token' => 'Token',
-            'expiry_date' => 'Expiry Date',
+            'id'                => 'ID',
+            'username'          => 'Username',
+            'password'          => 'Password',
+            'type'              => 'Type',
+            'full_name'         => 'Full Name',
+            'organization_id'   => 'Organization ID',
+            'phone'             => 'Phone',
+            'token'             => 'Token',
+            'expiry_date'       => 'Expiry Date',
         ];
     }
+
+    public function getBathhouse()
+    {
+        return $this->hasOne(Bathhouse::className(), ['id' => 'organization_id']);
+    }
+
+    public static function makeHash($password)
+    {
+        //todo salt or smth complicated
+        return md5($password);
+    }
+
 }
