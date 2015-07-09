@@ -13,6 +13,7 @@ var MapController = require('./controller/map.controller');
 var RusifyFilter = require('../../common/filter/rusify.filter');
 
 var SelectServicesDirective = require('./directive/select-services.directive');
+
 var FilterScrollDirective = require('./directive/filter-scroll.directive');
 var PopupScrollDirective = require('./directive/popup-scroll.directive');
 var StickyDirective = require('./directive/sticky.directive');
@@ -22,6 +23,7 @@ var ScheduleRowDirective = require('./directive/schedule-row.directive');
 var SchedulePanelScrollDirective = require('./directive/schedule-panel-scroll.directive');
 
 var dataStorage = require('./provider/data-storage.factory');
+var orderStorage = require('./provider/order-storage.factory');
 
 var BathhouseListModule = angular.module('BathhouseListModule', [
 	'leaflet-directive'
@@ -45,5 +47,6 @@ BathhouseListModule.directive('scheduleRow', ScheduleRowDirective);
 BathhouseListModule.directive('schedulePanelScroll', SchedulePanelScrollDirective);
 
 BathhouseListModule.factory('dataStorage', dataStorage);
+BathhouseListModule.factory('orderStorage', orderStorage);
 
 module.exports = BathhouseListModule;

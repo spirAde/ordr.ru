@@ -21,7 +21,16 @@ function FilterController($scope, $rootScope, $stateParams, dataStorage, CONSTAN
 		},
 		options: {},
 		price: {},
-		distance: {},
+		distance: {
+			value: 5,
+			options: {
+				from: 1,
+				to: 10,
+				step: 1,
+				dimension: " km",
+				className: 'slider'
+			}
+		},
 		guest: {},
 		types: {},
 		prepayment: undefined
@@ -66,15 +75,15 @@ function FilterController($scope, $rootScope, $stateParams, dataStorage, CONSTAN
 					ceil: distanceCeil,
 					floor: distanceFloor
 				};
-				break;
+				break;*/
 
 			case 'options':
-				_.forEach(defaultData.options, function(option) {
+				_.forEach(optionsList, function(option) {
 					$scope.filters.options[option] = false;
 				});
 				break;
 
-			case 'price':
+			/*case 'price':
 				var priceFloor = defaultData.price[0],
 					priceCeil = defaultData.price[1];
 
@@ -103,13 +112,13 @@ function FilterController($scope, $rootScope, $stateParams, dataStorage, CONSTAN
 				break;
 
 			/*case 'guests':
-				break;
+				break;*/
 
 			case 'name':
 				$scope.typedName = '';
 				break;
 
-			case 'prepayment':
+			/*case 'prepayment':
 				$scope.filters.prepayment = undefined;
 				break;*/
 		}
@@ -255,16 +264,19 @@ function FilterController($scope, $rootScope, $stateParams, dataStorage, CONSTAN
 
 	function searchByName(typedName) {
 
-		/*dataservice.filterList('name', typedName);
+		dataStorage.filterList('name', typedName);
 
 		if (typedName.length){
+
 			if (!_.contains($scope.tags, 'name')) {
+
 				$scope.tags.push('name');
 			}
 		}
 		else {
+
 			_.pull($scope.tags, 'name');
-		}*/
+		}
 	}
 
 	$rootScope.$on('dataservice:updateOffersCount', function(event, data) {

@@ -29,6 +29,8 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 		},
 		includedRooms: [],
 
+		loadData: loadData,
+
 		getRooms: getRooms,
 
 		getRoom: getRoom,
@@ -39,75 +41,63 @@ function dataStorage($rootScope, $http, $q, $timeout, userStorage, CONSTANTS) {
 
 	return storage;
 
-	function getRooms(cityId) {
+	function loadData(cityId) {
 
 		var _this = this;
-		var pages;
+		var pages = _.range(1, Math.ceil(parseInt(CONSTANTS.offers[cityId].roomCount) / 10) + 1);
 
-		return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&expand=bathhouse,settings,schedule,guests,services')
-			.then(function(response) {
+		var promises = _.map(pages, function(page) {
+			return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&page=' + page + '&expand=bathhouse,settings,schedule,guests,services');
+		});
 
-				pages = _.range(2, response.data._meta.pageCount + 1);
+		return $q.all(promises)
+			.then(function(responses) {
 
-				_this.rooms = response.data.items;
+				_.forEach(responses, function(response) {
 
-				return _.map(response.data.items, _addProperties);
+					_this.rooms = _.union(_this.rooms, response.data.items);
+				});
+
+				return _.map(_this.rooms, _addProperties);
 			})
-			.catch(function(response) {
+			.catch(function(responses) {
 
-				return $q.reject(response);
+				return $q.reject(responses);
 			})
 			.finally(function() {
 
-				var promises = _.map(pages, function(page) {
-					return $http.get('http://api.ordr.ru/rooms?cityId=' + cityId + '&page=' + page + '&expand=bathhouse,settings,schedule,guests,services');
+				_.forEach(_this.rooms, function(room) {
+
+					var marker = _.find(_this.markers, {bathhouseId: room.bathhouse.id});
+
+					if (marker) {
+
+						marker.rooms.push({
+							id: room.id,
+							name: room.name,
+							available: true
+						});
+					}
+					else {
+						_this.markers.push({
+							bathhouseId: room.bathhouse.id,
+							name: room.bathhouse.name,
+							address: room.bathhouse.address,
+							point: room.bathhouse.point,
+							rooms: [{
+								id: room.id,
+								name: room.name,
+								available: true
+							}]
+						});
+					}
 				});
 
-				$q.all(promises)
-					.then(function(responses) {
-
-						_.forEach(responses, function(response) {
-
-							_this.rooms = _.union(_this.rooms, response.data.items);
-						});
-					})
-					.catch(function(responses) {
-
-						return $q.reject(responses);
-					})
-					.finally(function() {
-
-						_.forEach(_this.rooms, function(room) {
-
-							var marker = _.find(_this.markers, {bathhouseId: room.bathhouse.id});
-
-							if (marker) {
-
-								marker.rooms.push({
-									id: room.id,
-									name: room.name,
-									available: true
-								});
-							}
-							else {
-								_this.markers.push({
-									bathhouseId: room.bathhouse.id,
-									name: room.bathhouse.name,
-									address: room.bathhouse.address,
-									point: room.bathhouse.point,
-									rooms: [{
-										id: room.id,
-										name: room.name,
-										available: true
-									}]
-								});
-							}
-						});
-
-						$rootScope.$emit('dataStorage:markers', _this.markers);
-					});
+				$rootScope.$emit('dataStorage:markers', _this.markers);
 			});
 	}
+
+	function getRooms() {}
 
 	function getRoom(id) {
 

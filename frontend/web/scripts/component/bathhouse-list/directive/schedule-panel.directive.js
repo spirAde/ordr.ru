@@ -45,6 +45,7 @@ function SchedulePanel($timeout, CONSTANTS) {
 			this.endRowIndex = 0;        // Индекс ряда, в котором выбранно второе время
 			this.startPeriodId = 0;      // Период начала времени заказа
 			this.endPeriodId = 0;        // Период окончания времени заказа
+			this.startRowCells = [];
 
 			// Возвращает цену и период этой цены, исходя из текущей ячейки принадлещей
 			// этому периоду
@@ -80,8 +81,8 @@ function SchedulePanel($timeout, CONSTANTS) {
 			// Находим первые крайние занятые ячейки, исходя из выбранной пользователем первой даты и времени
 			this.getUtmostDisabledCellPeriods = function(date, currPeriodId) {
 				var periods = $scope.schedule[date],
-					firstThreshold = parseInt(currPeriodId) - (parseInt(this.room['min_duration']) - 1) * 3,
-					lastThreshold = parseInt(currPeriodId) + (parseInt(this.room['min_duration']) - 1) * 3,
+					firstThreshold = parseInt(currPeriodId) - (parseInt(this.room.settings.minDuration) - 1),
+					lastThreshold = parseInt(currPeriodId) + (parseInt(this.room.settings.minDuration) - 1),
 					firstPeriod,
 					lastPeriod,
 					disabledPeriods = [];

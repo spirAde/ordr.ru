@@ -8,6 +8,8 @@ function ListController($scope, $rootScope, $stateParams, $timeout, dataStorage,
 
 	$scope.rooms = [];
 
+	$scope.activeRoom = undefined;
+
 	$scope.order = 'popularity';
 	$scope.reverse = true;
 
@@ -20,7 +22,7 @@ function ListController($scope, $rootScope, $stateParams, $timeout, dataStorage,
 	$scope.createOrder = createOrder;
 	$scope.fullResetFilters = fullResetFilters;
 
-	dataStorage.getRooms(1).then(function(rooms) {
+	dataStorage.loadData(1).then(function(rooms) {
 
 		$scope.rooms = rooms;
 		console.log($scope.rooms);
@@ -35,6 +37,8 @@ function ListController($scope, $rootScope, $stateParams, $timeout, dataStorage,
 				room.active = false;
 			}
 			else {
+
+				$scope.activeRoom = room;
 
 				room.active = !room.active;
 			}

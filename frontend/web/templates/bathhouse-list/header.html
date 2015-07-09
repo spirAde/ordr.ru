@@ -20,10 +20,10 @@
                ng-click="vm.sortList('popularity')">Популярность</a>
 
             <a ng-class="{
-                'icons active down': vm.order === 'distance' && vm.reverse,
-                'icons active up': vm.order === 'distance' && !vm.reverse,
-                'icons': vm.order !== 'distance'}"
-               ng-click="vm.sortList('distance')">Удаленность</a>
+                'icons active down': vm.order === 'bathhouse.distance' && vm.reverse,
+                'icons active up': vm.order === 'bathhouse.distance' && !vm.reverse,
+                'icons': vm.order !== 'bathhouse.distance'}"
+               ng-click="vm.sortList('bathhouse.distance')">Удаленность</a>
 
             <a ng-class="{
                 'icons active down': vm.order === 'price' && vm.reverse,

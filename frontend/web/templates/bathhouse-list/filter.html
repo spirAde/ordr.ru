@@ -54,10 +54,10 @@
                     <ul>
                         <li>
                             <input type="radio" id="radio-1" name="selector"
-                                   ng-model="filters.prepayment"
-                                   ng-checked="filters.prepayment === true"
-                                   value="true"
-                                   ng-click="changePrepayment(true)">
+                               ng-model="filters.prepayment"
+                               ng-checked="filters.prepayment === true"
+                               value="true"
+                               ng-click="changePrepayment(true)">
                             <label for="radio-1">Да</label>
 
                             <div class="check"><div class="inside"></div></div>
@@ -65,10 +65,10 @@
 
                         <li>
                             <input type="radio" id="radio-2" name="selector"
-                                   ng-model="filters.prepayment"
-                                   ng-checked="filters.prepayment === false"
-                                   value="false"
-                                   ng-click="changePrepayment(false)"/>
+                               ng-model="filters.prepayment"
+                               ng-checked="filters.prepayment === false"
+                               value="false"
+                               ng-click="changePrepayment(false)"/>
                             <label for="radio-2">Нет</label>
 
                             <div class="check"><div class="inside"></div></div>
@@ -76,10 +76,10 @@
 
                         <li>
                             <input type="radio" id="radio-3" name="selector"
-                                   ng-model="filters.prepayment"
-                                   ng-checked="filters.prepayment === undefined"
-                                   value="undefined"
-                                   ng-click="changePrepayment(undefined)"/>
+                               ng-model="filters.prepayment"
+                               ng-checked="filters.prepayment === undefined"
+                               value="undefined"
+                               ng-click="changePrepayment(undefined)"/>
                             <label for="radio-3">Неважно</label>
 
                             <div class="check"><div class="inside"></div></div>
@@ -93,13 +93,13 @@
                     <div class="field field-range field-range-double">
 
                         <slider-range
-                                class="slider"
-                                floor="filters.price.floor"
-                                ceil="filters.price.ceil"
-                                model="filters.price.min"
-                                high="filters.price.max"
-                                step="50"
-                                type="'price'">
+                            class="slider"
+                            floor="filters.price.floor"
+                            ceil="filters.price.ceil"
+                            model="filters.price.min"
+                            high="filters.price.max"
+                            step="50"
+                            type="'price'">
                         </slider-range>
 
                     </div>
@@ -110,12 +110,13 @@
                     <h3>До центра, км</h3>
                     <div class="field field-range">
 
-                        <slider-range
+                        <slider
                             class="slider"
-                            ceil="filters.distance.ceil"
-                            model="filters.distance.max"
+                            ceiling="filters.distance.options.ceiling"
+                            floor="filters.distance.options.floor"
+                            ng-model="filters.distance.value"
                             type="'distance'">
-                        </slider-range>
+                        </slider>
 
                     </div>
                 </div>
@@ -126,12 +127,12 @@
                     <div class="field field-range">
 
                         <slider-range
-                                class="slider"
-                                ceil="filters.guest.ceil"
-                                model="filters.guest.max"
-                                translate="translate"
-                                step="1"
-                                type="'guest'">
+                            class="slider"
+                            ceil="filters.guest.ceil"
+                            model="filters.guest.max"
+                            translate="translate"
+                            step="1"
+                            type="'guest'">
                         </slider-range>
 
                     </div>
@@ -143,10 +144,10 @@
                     <div class="field field-input">
 
                         <input type="text"
-                               ng-model="typedName"
-                               ng-model-options="{debounce: {'default': 500}}"
-                               ng-change="searchByName(typedName)"
-                               placeholder="Название">
+                           ng-model="typedName"
+                           ng-model-options="{debounce: {'default': 500}}"
+                           ng-change="searchByName(typedName)"
+                           placeholder="Название">
 
                     </div>
                 </div>
