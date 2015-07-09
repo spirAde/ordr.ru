@@ -1,6 +1,6 @@
 <?php
 
-namespace api\components\actions;
+namespace backend\components\actions;
 
 use Yii;
 use yii\rest\IndexAction;
@@ -10,6 +10,7 @@ use yii\web\HttpException;
 
 class FilterIndexAction extends IndexAction
 {
+
     private $pattern = ['page', 'fields', 'order', 'limit', 'expand'];
 
     public function run()
@@ -17,10 +18,12 @@ class FilterIndexAction extends IndexAction
         $this->prepareDataProvider = function($action)
         {
             $filter = yii::$app->request->get();
+
             $modelClass = $this->modelClass;
             $model = new $this->modelClass();
 
             $limit=(isset($filter['limit'])) ? $filter['limit'] : 10;
+            $organization_id = Yii::$app->user->identity->organization_id;
 
 
             foreach ($filter as $key => $value)
@@ -48,7 +51,7 @@ class FilterIndexAction extends IndexAction
                 if($filter)
                 {
                     return new ActiveDataProvider([
-                        'query' => $modelClass::find()->where($filter),
+                        'query' => $modelClass::find()->where($filter)->andWhere('bathhouse_id = '.$organization_id),
                         'pagination' => [
                             'pageSize' => $limit,
                         ],
@@ -58,7 +61,7 @@ class FilterIndexAction extends IndexAction
                 else
                 {
                     return new ActiveDataProvider([
-                        'query' => $modelClass::find(),
+                        'query' => $modelClass::find()->andWhere('bathhouse_id = '.$organization_id),
                         'pagination' => [
                             'pageSize' => $limit,
                         ],

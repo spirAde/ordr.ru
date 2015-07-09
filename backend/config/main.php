@@ -13,8 +13,13 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
+        'response' => [
+            'class' => 'yii\web\Response',
+            'format' => yii\web\Response::FORMAT_JSON,
+            'charset' => 'UTF-8',
+        ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'common\models\Managers',
             'enableSession' => false,
             'enableAutoLogin' => false,
         ],
@@ -27,9 +32,20 @@ return [
                 ],
             ],
         ],
+        'request' => [
+            'class' => '\yii\web\Request',
+            'enableCookieValidation' => false,
+            'enableCsrfValidation' => false,
+            'enableCsrfCookie' => false,
+            'on beforeRequest' => function($event) {
+            },
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ]
+        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
-        ]/*,
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
@@ -41,11 +57,11 @@ return [
                     'except' => ['delete', 'update', 'create', 'options'],
                     'controller' => 'bathhouse',
                     'patterns' => [
-                        'GET' => 'index',
+                        'GET'                   => 'index',
                     ]
                 ],
             ],
-        ]*/
+        ]
     ],
     'params' => $params,
 ];
