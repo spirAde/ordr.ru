@@ -10,8 +10,6 @@ class SiteController extends Controller
 
     public $layout = false;
 
-    //here we will making preload for manager panel
-
     public function actionIndex()
     {
         return $this->render('//layouts/main');

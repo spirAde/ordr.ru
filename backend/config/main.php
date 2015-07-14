@@ -13,11 +13,7 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
-        'response' => [
-            'class' => 'yii\web\Response',
-            'format' => yii\web\Response::FORMAT_JSON,
-            'charset' => 'UTF-8',
-        ],
+
         'user' => [
             'identityClass' => 'common\models\Managers',
             'enableSession' => false,
@@ -51,6 +47,7 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                '/' => 'site/index',
                 'login' => 'login/index',
                 [
                     'class' => 'yii\rest\UrlRule',
