@@ -5,10 +5,12 @@ use Yii;
 use yii\helpers\JWT;
 use yii\helpers\ArrayHelper;
 use yii\rest\ActiveController;
+use backend\models\Managers;
 
 use yii\filters\auth\CompositeAuth;
 use yii\filters\ContentNegotiator;
 use yii\filters\RateLimiter;
+use yii\web\HttpException;
 use yii\web\Response;
 use yii\filters\VerbFilter;
 use yii\helpers\VarDumper;
@@ -58,13 +60,47 @@ class ApiController extends ActiveController
 
             $secret = \Yii::$app->params['secret'];
             $user = JWT::decode($matches[1], $secret);
-            die(var_dump($user));
+
             if ($user)
-                return true;
+            {
+                if(isset($user->token_lifetime) and !empty($user->token_lifetime) and ($user->token_lifetime - time()) > 0)
+                {
+                    $manager = Managers::findIdentity($user->id);
+
+                    if($manager == null)
+                        throw new UnauthorizedHttpException('Undefined user');
+                    else
+                    {
+                        Yii::$app->user->login($manager);
+
+                        return true;
+                    }
+                }
+                else
+                    throw new UnauthorizedHttpException('Token expired');
+            }
             else
                 throw new UnauthorizedHttpException('Undefined user');
         }
-        throw new UnauthorizedHttpException('Undefined user');
+
+        throw new BadRequestHttpException('Bad request');
+    }
+
+    public function afterAction($action, $result)
+    {
+        Yii::$app->user->logout();
+
+        return parent::afterAction($action, $result);
+    }
+
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),[
+            'index' => [
+                'class' => 'backend\components\actions\FilterIndexAction',
+                'modelClass' => $this->modelClass,
+            ]
+        ]);
     }
 
 }

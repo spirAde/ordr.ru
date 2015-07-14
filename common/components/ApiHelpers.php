@@ -10,6 +10,15 @@ class ApiHelpers
     const LAST_TIME_ID = 144;
     const STEP = 3;
 
+    public static function checkOrder($model)
+    {
+        return true;
+    }
+
+    public static function reformScheduleForDay($room_id, $start_date, $end_date)
+    {
+        return true;
+    }
 
     // Возвращает свободные промежутки времени для записи, исходя из занятых периодов и
     // минимально возможного времени на запись
