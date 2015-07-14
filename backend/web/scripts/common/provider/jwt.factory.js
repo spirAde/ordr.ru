@@ -29,7 +29,7 @@ function jwt() {
 		return decodeURIComponent(escape(window.atob(output)));
 	}
 
-	function decodeToken() {
+	function decodeToken(token) {
 
 		var parts = token.split('.');
 

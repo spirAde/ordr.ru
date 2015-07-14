@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-LoginController.$inject = ['$scope', 'auth', 'localStorage'];
+LoginController.$inject = ['$scope', '$state', 'auth', 'localStorage'];
 
-function LoginController($scope, auth, localStorage) {
+function LoginController($scope, $state, auth, localStorage) {
 
 	$scope.credentials = {
 		username: '',
@@ -14,7 +14,10 @@ function LoginController($scope, auth, localStorage) {
 	$scope.login = login;
 
 	function login(credentials) {
-		console.log('credentials', credentials);
+
+		auth.login(credentials);
+
+		$state.go('manager');
 	}
 }
 
