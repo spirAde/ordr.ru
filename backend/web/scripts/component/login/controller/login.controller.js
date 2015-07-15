@@ -15,9 +15,11 @@ function LoginController($scope, $state, auth, localStorage) {
 
 	function login(credentials) {
 
-		auth.login(credentials);
+		auth.login(credentials)
+			.then(function(response) {
 
-		$state.go('manager');
+				if (response) $state.go('manager');
+			});
 	}
 }
 

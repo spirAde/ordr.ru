@@ -3,11 +3,11 @@
 /* ordr-icons */
 @font-face {
     font-family: "ordr-icons";
-    src:url("../fonts/ordr-icons-2.eot");
-    src:url("../fonts/ordr-icons-2.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/ordr-icons-2.woff") format("woff"),
-    url("../fonts/ordr-icons-2.ttf") format("truetype"),
-    url("../fonts/ordr-icons-2.svg") format("svg");
+    src:url("fonts/ordr-icons-2.eot");
+    src:url("fonts/ordr-icons-2.eot?#iefix") format("embedded-opentype"),
+    url("fonts/ordr-icons-2.woff") format("woff"),
+    url("fonts/ordr-icons-2.ttf") format("truetype"),
+    url("fonts/ordr-icons-2.svg") format("svg");
     font-weight: normal;
     font-style: normal;
 }
@@ -149,11 +149,11 @@
 
 @font-face {
     font-family: "control";
-    src:url("../fonts/control.eot");
-    src:url("../fonts/control.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/control.woff") format("woff"),
-    url("../fonts/control.ttf") format("truetype"),
-    url("../fonts/control.svg#control") format("svg");
+    src:url("fonts/control.eot");
+    src:url("fonts/control.eot?#iefix") format("embedded-opentype"),
+    url("fonts/control.woff") format("woff"),
+    url("fonts/control.ttf") format("truetype"),
+    url("fonts/control.svg#control") format("svg");
     font-weight: normal;
     font-style: normal;
 

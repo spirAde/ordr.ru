@@ -11,7 +11,7 @@ function appRoute($stateProvider, $urlRouterProvider, $locationProvider, $httpPr
 
 	$stateProvider
 		.state('login', {
-			url: '/login',
+			url: '/',
 			templateUrl: 'templates/login/index.html',
 			controller: 'LoginController'
 		})
@@ -22,7 +22,7 @@ function appRoute($stateProvider, $urlRouterProvider, $locationProvider, $httpPr
 			controller: 'ManagerController'
 		});
 
-	$urlRouterProvider.otherwise('/login');
+	$urlRouterProvider.otherwise('/');
 }
 
 module.exports = appRoute;

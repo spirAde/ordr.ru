@@ -87,6 +87,15 @@ var tasks = {
 			.pipe(gulp.dest('./build/images'));
 	},
 
+	bower: function() {
+		return gulp.src([
+				'./bower_components/jquery/dist/jquery.min.js',
+				'./bower_components/owl.carousel/dist/owl.carousel.min.js'
+			])
+			.pipe(concat('plugins.js'))
+			.pipe(gulp.dest('./build'));
+	},
+
 	browserify: function() {
 
 		var debug = !production;
@@ -186,11 +195,12 @@ gulp.task('fonts', tasks.fonts);
 gulp.task('images', tasks.images);
 gulp.task('browserify', tasks.browserify);
 gulp.task('browserify-libs', tasks.browserifyLibs);
+gulp.task('bower', tasks.bower);
 gulp.task('template', tasks.template);
 
 gulp.task('watch', ['clean'], function(callback) {
 
-	runSequence(['fonts', 'images', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
+	runSequence(['fonts', 'images', 'template', 'styles'], 'browserify', 'browserify-libs', 'bower', callback);
 
 	gulp.watch('./backend/web/styles/*.css', ['reload-styles']);
 

@@ -55,7 +55,13 @@ app.run(function($state, $location, jwt, localStorage) {
 
 			userData = jwt.decodeToken(token);
 
-			console.log(userData);
+			localStorage.setData(userData);
+
+			$state.go('manager');
+		}
+		else {
+
+			$state.go('manager');
 		}
 	}
 });

@@ -54,7 +54,7 @@ return [
                     'except' => ['delete', 'update', 'create', 'options'],
                     'controller' => 'bathhouse',
                     'patterns' => [
-                        'GET'                   => 'index',
+                        'GET' => 'index',
                     ]
                 ],
             ],

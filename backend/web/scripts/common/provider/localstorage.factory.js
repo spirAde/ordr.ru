@@ -30,13 +30,15 @@ function localStorage($window) {
 
 	function getData() {
 
-		return store.getItem('userData');
+		var userData = store.getItem('userData');
+
+		return JSON.parse(userData);
 	}
 
 	function setData(data) {
 
 		if (data) {
-			store.setItem('userData', data);
+			store.setItem('userData', JSON.stringify(data));
 		}
 		else {
 			store.removeItem('userData');
