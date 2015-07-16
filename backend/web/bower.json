@@ -1,0 +1,20 @@
+{
+  "name": "control.ordr.ru",
+  "version": "0.0.0",
+  "homepage": "https://github.com/spirAde/ordr.ru",
+  "authors": [
+    "spirAde <spirAde@yandex.ru>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "owl.carousel": "https://github.com/smashingboxes/OwlCarousel2.git#~2.0.0-beta.3",
+    "jquery": "~2.1.4"
+  }
+}
