@@ -227,7 +227,6 @@ class BathhouseRoom extends ActiveRecord
                     ApiHelpers::readFreeTime($period['schedule']));
         }
 
-
         $prices = (new Query())
             ->select(
                 'bathhouse_room_price.start_period,

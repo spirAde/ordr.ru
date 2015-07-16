@@ -4,28 +4,6 @@ namespace api\models;
 
 use Yii;
 
-/**
- * This is the model class for table "bathhouse_booking".
- *
- * @property integer $id
- * @property integer $bathhouse_id
- * @property integer $room_id
- * @property string $start_date
- * @property string $end_date
- * @property integer $start_period
- * @property integer $end_period
- * @property string $services
- * @property integer $guests
- * @property integer $status_id
- * @property integer $user_id
- * @property integer $manager_id
- * @property double $cost_period
- * @property double $cost_services
- * @property double $cost_guests
- * @property double $total
- * @property string $comment
- * @property string $created
- */
 class BathhouseBooking extends \yii\db\ActiveRecord
 {
     /**

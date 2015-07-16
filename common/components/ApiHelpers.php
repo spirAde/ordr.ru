@@ -419,17 +419,16 @@ class ApiHelpers
         $tmp = [];
 
         // Выстраиваем все времена, исходя из концевых для каждого периода свободного времени
-        foreach ($free_time as $time)
-        {
-            $tmp[] = array_values(range($time[0], $time[1], self::STEP));
-        }
+            $tmp[] = array_values(range($free_time[0], $free_time[1], self::STEP));
+
 
         $tmp_flatten = ArrayHelper::flatten($tmp);
 
         // Находим диапазоны, которые заняты
         $diff = array_diff($divide_periods, $tmp_flatten);
         // Преобразуем в человекопонятный вид и указываем доступноть времени
-        foreach ($tmp_flatten as $time_id) {
+        foreach ($tmp_flatten as $time_id)
+        {
             $result[$time_id] = [
                 'time' => self::getTime($time_id),
                 'enable' => true,
@@ -445,7 +444,7 @@ class ApiHelpers
 
         ksort($result);
 
-        if (isset($result[self::LAST_TIME_ID])) unset($result[self::LAST_TIME_ID]);
+        //if (isset($result[self::LAST_TIME_ID])) unset($result[self::LAST_TIME_ID]);
 
         return $result;
     }

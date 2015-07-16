@@ -52,9 +52,18 @@ return [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'except' => ['delete', 'update', 'create', 'options'],
-                    'controller' => 'bathhouse',
+                    'controller' => 'room',
                     'patterns' => [
-                        'GET' => 'index',
+                        'GET'                   => 'index',
+                        'GET <id:\d+>'          => 'index',
+                    ]
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'order',
+                    'patterns' => [
+                        'GET'                   => 'index',
+                        'POST'                  => 'create',
                     ]
                 ],
             ],

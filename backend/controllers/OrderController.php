@@ -21,7 +21,7 @@ class OrderController extends ApiController
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(),[
-            'create' => $this->actionCreate()
+            'create' => [],
         ]);
     }
 
@@ -42,8 +42,8 @@ class OrderController extends ApiController
             //$transaction = BathhouseBooking::getDb()->beginTransaction();
             if ($model->save())
             {
-                //$model->manager_id = Yii::$app->user->identity->id;
-                //$model->bathhouse_id = Yii::$app->user->identity->organization_id;
+                $model->manager_id = Yii::$app->user->identity->id;
+                $model->bathhouse_id = Yii::$app->user->identity->organization_id;
                 $response = Yii::$app->getResponse();
                 $response->setStatusCode(201);
                 $id = implode(',', array_values($model->getPrimaryKey(true)));
