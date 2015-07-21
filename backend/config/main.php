@@ -40,21 +40,21 @@ return [
             ]
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'main/error',
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
+            'suffix' => '/',
             'rules' => [
                 '/' => 'site/index',
                 'login' => 'login/index',
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'except' => ['delete', 'update', 'create', 'options'],
                     'controller' => 'room',
                     'patterns' => [
-                        'GET'                   => 'index',
+                        'GET '                   => 'index',
                         'GET <id:\d+>'          => 'index',
                     ]
                 ],

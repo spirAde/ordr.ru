@@ -11,6 +11,7 @@ RewriteEngine on
 # если директория или файл существуют, используем их
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-
+# add trailing slash
+RewriteRule ^(.*)([^/]+)$ /$0/ [R=301,L]
 # в противном случае перенаправляем запрос через index.php
 RewriteRule . index.php

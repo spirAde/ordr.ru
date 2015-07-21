@@ -36,10 +36,10 @@ class LoginController extends Controller
             $manager_result['type']                 = $manager->type;
             $manager_result['full_name']            = $manager->full_name;
             $manager_result['phone']                = $manager->phone;
-            $manager_result['organization_id']      = $manager->organization_id;
-            $manager_result['organization_name']    = $bathhouse->name;
-            $manager_result['city_id']              = $bathhouse->city_id;
-            $manager_result['token_lifetime']       = $token_lifetime;
+            $manager_result['organizationId']       = $manager->organization_id;
+            $manager_result['organizationName']     = $bathhouse->name;
+            $manager_result['cityId']               = $bathhouse->city_id;
+            $manager_result['tokenLifetime']        = $token_lifetime;
         }
 
         $token = JWT::encode($manager_result, Yii::$app->params['secret']);

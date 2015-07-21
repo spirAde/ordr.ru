@@ -13,7 +13,7 @@ class Managers extends ActiveRecord implements IdentityInterface
 
     public static function tableName()
     {
-        return 'managers';
+        return 'manager';
     }
 
     public function rules()

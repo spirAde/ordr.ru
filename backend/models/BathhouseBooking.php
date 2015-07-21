@@ -13,6 +13,34 @@ class BathhouseBooking extends \yii\db\ActiveRecord
         return 'bathhouse_booking';
     }
 
+    public function fields()
+    {
+        switch (yii::$app->controller->action->id) {
+            case 'index': {
+                return [
+                    'id'            => 'id',
+                    'bathhouseId'   => 'bathhouse_id',
+                    'roomId'        => 'room_id',
+                    'startDate'     => 'start_date',
+                    'endDate'       => 'end_date',
+                    'startPeriod'   => 'start_period',
+                    'endPeriod'     => 'end_period',
+                    'services'      => 'services',
+                    'guests'        => 'guests',
+                    'statusId'      => 'status_id',
+                    'userId'        => 'user_id',
+                    'managerId'     => 'manager_id',
+                    'costPeriod'    => 'cost_period',
+                    'costServices'  => 'cost_services',
+                    'costGuests'    => 'cost_guests',
+                    'total'         => 'total',
+                    'comment'       => 'comment',
+                    'created'       => 'created',
+                ];
+            }
+        }
+    }
+
     public function rules()
     {
         return [

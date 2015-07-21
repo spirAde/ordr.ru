@@ -11,7 +11,7 @@ class Managers extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'managers';
+        return 'manager';
     }
 
     /**
