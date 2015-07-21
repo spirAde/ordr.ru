@@ -2,6 +2,7 @@
 
 <!doctype html>
 <html lang="ru" ng-app="app">
+
 <head>
 
     <base href="/" />

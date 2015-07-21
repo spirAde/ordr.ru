@@ -8,23 +8,23 @@
             <a ng-click="openMessages();" ng-class="{true: 'item-noty icons new', false: 'item-noty icons'}[newMessages]">Сообщения</a>
         </div>
         <div class="user">
-            <a href="#" class="username">{{::managerName.lastName}} {{::managerName.firstName}}</a>
-            <a href="#" class="logout icons"></a>
+            <a href="#" class="username">{{::user.name}}</a>
+            <a href="#" class="logout icons" ng-click="logout();"></a>
         </div>
     </div>
-
+    {{::user.name}}
     <div class="main">
         <div class="content">
             <div class="title clear">
-                <h1>{{::bathhouse.name}}</h1>
+                <h1>{{::user.bathhouse}}</h1>
             </div>
 
-            <datepaginator></datepaginator>
+            <date-paginator></date-paginator>
 
             <div class="wrapper">
-                <div class="room" ng-repeat="room in bathhouse.rooms track by $index">
+                <div class="room" ng-repeat="room in rooms track by room.id">
                     <div class="clear">
-                        <h2>{{::room.room_name}}</h2>
+                        <h2>{{::room.name}}</h2>
                         <div class="help">
                             <span class="item-1 past">Занято</span>
                             <span class="item-2 reserve">Занято</span>
@@ -34,7 +34,7 @@
                     </div>
                     <div class="wrap">
 
-                        <time-calendar-carousel
+                        <schedule
                             room-id="room.room_id"
                             orders="room.orders"
                             min-duration="room.min_duration"
@@ -43,7 +43,7 @@
                             show-order="showOrder(roomId, orderId, callback);"
                             new-order="newOrder(order, callback);"
                             get-orders="getOrders(roomId, startDate, endDate);">
-                        </time-calendar-carousel>
+                        </schedule>
 
                     </div>
                 </div>

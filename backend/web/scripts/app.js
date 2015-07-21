@@ -43,6 +43,8 @@ app.run(function($state, $location, jwt, localStorage) {
 
 	var token = localStorage.getToken();
 
+	console.log(token);
+
 	if ($state.current.name !== 'login' && !token) {
 
 		$state.go('login');
