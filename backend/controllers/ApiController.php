@@ -63,7 +63,7 @@ class ApiController extends ActiveController
 
             if ($user)
             {
-                if(isset($user->token_lifetime) and !empty($user->token_lifetime) and ($user->token_lifetime - time()) > 0)
+                if(isset($user->tokenLifetime) and !empty($user->tokenLifetime) and ($user->tokenLifetime - time()) > 0)
                 {
                     $manager = Managers::findIdentity($user->id);
 
