@@ -80,24 +80,12 @@ return [
             'showScriptName' => false,
             'rules' => [
                 //open api routes
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'except' => ['delete', 'update', 'create', 'options'],
-                    'controller' => 'open/bathhouse',
-                    'patterns' => [
-                        'GET '                  => 'index',
-                        'GET <id:\d+>'          => 'view',
-                        'GET geo/<city_id:\d+>' => 'geo'
-                    ]
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'open/room',
-                    'patterns' => [
-                        'GET'                   => 'index',
-                        'GET <id:\d+>'          => 'view',
-                    ]
-                ],
+                'GET bathhouses'            => 'open/bathhouse/index',
+                'GET bathhouses/<id:\d+>'   => 'open/bathhouse/view',
+
+                'GET rooms'                 => 'open/room/index',
+                'GET rooms/<id:\d+>'        => 'open/room/view',
+                
                 // end open api routes
                 // closed api routes
                 'closed/login'  => 'closed/login/index',
