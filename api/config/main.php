@@ -12,6 +12,14 @@ return [
     'controllerNamespace' => 'api\controllers',
     'bootstrap' => ['log'],
     'modules' => [
+        'open' => [
+            'basePath' => '@api/modules/open',
+            'class' => 'api\modules\open\Open'
+        ],
+        'closed' => [
+            'basePath' => '@api/modules/closed',
+            'class' => 'api\modules\closed\Closed'
+        ]
     ],
     'components' => [
         /*'controllerMap' => [
@@ -71,31 +79,45 @@ return [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                //open api routes
                 [
                     'class' => 'yii\rest\UrlRule',
                     'except' => ['delete', 'update', 'create', 'options'],
-                    'controller' => 'bathhouse',
+                    'controller' => 'open/bathhouse',
                     'patterns' => [
-                        'GET'                   => 'index',
+                        'GET '                  => 'index',
                         'GET <id:\d+>'          => 'view',
                         'GET geo/<city_id:\d+>' => 'geo'
                     ]
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'room',
+                    'controller' => 'open/room',
                     'patterns' => [
                         'GET'                   => 'index',
                         'GET <id:\d+>'          => 'view',
                     ]
                 ],
+                // end open api routes
+                // closed api routes
+                'closed/login'  => 'closed/login/index',
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'order',
+                    'controller' => 'closed/room',
                     'patterns' => [
-                        'POST'                  => 'check',
+                        'GET '                   => 'index',
+                        'GET <id:\d+>'          => 'index',
                     ]
                 ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'closed/order',
+                    'patterns' => [
+                        'GET'                   => 'index',
+                        'POST'                  => 'create',
+                    ]
+                ],
+                // end closed api routes
             ],
         ]
     ],

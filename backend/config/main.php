@@ -49,23 +49,6 @@ return [
             'suffix' => '/',
             'rules' => [
                 '/' => 'site/index',
-                'login' => 'login/index',
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'room',
-                    'patterns' => [
-                        'GET '                   => 'index',
-                        'GET <id:\d+>'          => 'index',
-                    ]
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => 'order',
-                    'patterns' => [
-                        'GET'                   => 'index',
-                        'POST'                  => 'create',
-                    ]
-                ],
             ],
         ]
     ],
