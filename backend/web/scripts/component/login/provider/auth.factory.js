@@ -11,7 +11,7 @@ function auth($http, jwt, localStorage) {
 
 	function login(credentials) {
 
-		return $http.post('http://control.ordr.ru/login', credentials)
+		return $http.post('http://api.ordr.ru/closed/login', credentials)
 			.then(function(response) {
 
 				var token = response.data.token;
