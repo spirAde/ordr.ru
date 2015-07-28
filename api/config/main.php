@@ -85,7 +85,7 @@ return [
 
                 'GET rooms'                 => 'open/room/index',
                 'GET rooms/<id:\d+>'        => 'open/room/view',
-                
+
                 // end open api routes
                 // closed api routes
                 'closed/login'  => 'closed/login/index',
