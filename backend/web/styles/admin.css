@@ -75,13 +75,13 @@ html,body {
 
 .room > .clear h2 {float: left;}
 
-.timecalendar-carousel {position: relative;}
-.timecalendar-carousel .item {box-sizing: border-box;text-align: center;border: 1px solid #7f8c9d;margin: 0 10px 0 0;padding: 20px 0;cursor: pointer;transition: background 0.3s ease 0s;}
-.timecalendar-carousel .item:hover {background-color: #E5E9EC;}
-.timecalendar-carousel .item.enabled {background-color: #fff;border-color:#E5E9EC; color:#E5E9EC;}
-.timecalendar-carousel .item.service-order {background-color:#F4740C;border-color:#F4740C;color:#fff;}
-.timecalendar-carousel .item.disabled {background-color: #7f8c9d; color: #fff ;}
-.timecalendar-carousel .item.manager-order {background-color: #18B2AD;border-color:#18B2AD ; color:#fff ;}
+.schedule-panel {position: relative;}
+.schedule-panel .item {box-sizing: border-box;text-align: center;border: 1px solid #7f8c9d;margin: 0 10px 0 0;padding: 20px 0;cursor: pointer;transition: background 0.3s ease 0s;}
+.schedule-panel .item:hover {background-color: #E5E9EC;}
+.schedule-panel .item.enabled {background-color: #fff;border-color:#E5E9EC; color:#E5E9EC;}
+.schedule-panel .item.service-order {background-color:#F4740C;border-color:#F4740C;color:#fff;}
+.schedule-panel .item.disabled {background-color: #7f8c9d; color: #fff ;}
+.schedule-panel .item.manager-order {background-color: #18B2AD;border-color:#18B2AD ; color:#fff ;}
 
 .owl-orders .owl-item {height: 62px;}
 .owl-orders .owl-stage-outer {height: 62px;}

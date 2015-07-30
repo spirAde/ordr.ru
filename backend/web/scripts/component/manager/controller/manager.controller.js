@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-ManagerController.$inject = ['$scope', '$state', 'localStorage', 'dataStorage'];
+ManagerController.$inject = ['$scope', '$state', '$timeout', 'localStorage', 'dataStorage'];
 
-function ManagerController($scope, $state, localStorage, dataStorage) {
+function ManagerController($scope, $state, $timeout, localStorage, dataStorage) {
 
 	$scope.rooms = [];
 	$scope.orders = [];
@@ -18,16 +18,20 @@ function ManagerController($scope, $state, localStorage, dataStorage) {
 
 		$scope.rooms = rooms;
 
-		dataStorage.loadOrders().then(function(orders) {
+		_.forEach(rooms, function(room) {
 
-			_.forEach($scope.rooms, function(room) {
+			room.orders = [];
 
-				room.orders = [];
+			dataStorage.loadOrders(room.id).then(function(orders) {
 
-				room.orders = _.where(orders, {room_id: room.id});
+				room.orders = orders;
 			});
 		});
 	});
+
+	$timeout(function() {
+		console.log($scope.rooms);
+	}, 5000);
 
 	$scope.logout = logout;
 
