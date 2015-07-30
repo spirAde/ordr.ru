@@ -94,4 +94,14 @@ class ApiController extends ActiveController
         return parent::afterAction($action, $result);
     }
 
+    public function actions()
+    {
+        return ArrayHelper::merge(parent::actions(),[
+            'index' => [
+                'class' => 'api\components\actions\FilterIndexAction',
+                'modelClass' => $this->modelClass,
+            ]
+        ]);
+    }
+
 }
