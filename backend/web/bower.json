@@ -18,6 +18,7 @@
     "jquery": "~2.1.4",
     "bootstrap": "~3.3.5",
     "bootstrap-datepaginator": "~1.1.0",
-    "bootstrap-datepicker": "~1.4.0"
+    "bootstrap-datepicker": "~1.4.0",
+    "jquery-mousewheel": "~3.1.13"
   }
 }

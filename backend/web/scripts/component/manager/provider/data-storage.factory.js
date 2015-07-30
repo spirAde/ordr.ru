@@ -33,10 +33,10 @@ function dataStorage($rootScope, $http, $q, localStorage) {
 
 	function loadOrders(id) {
 
-		return $http.get('http://api.ordr.ru/closed/orders?roomId=' + id + '&limit=1000')
+		return $http.get('http://api.ordr.ru/closed/orders/sorted?limit=1000&room_id=' + id + '&start=2015-07-30&end=2015-08-06')
 			.then(function(response) {
 
-				return response.data.items;
+				return response.data;
 			})
 			.catch(function(response) {
 

@@ -20,7 +20,7 @@ function ManagerController($scope, $state, $timeout, localStorage, dataStorage) 
 
 		_.forEach(rooms, function(room) {
 
-			room.orders = [];
+			room.orders = {};
 
 			dataStorage.loadOrders(room.id).then(function(orders) {
 

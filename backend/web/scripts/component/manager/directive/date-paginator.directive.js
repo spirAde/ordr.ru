@@ -14,12 +14,12 @@ function DatePaginator($rootScope, $compile) {
 		template: '<div class="date clear"></div>',
 		link: function($scope, $element) {
 
-			var wrap = angular.element('<div class="wrap clear"></div>');
+			var $wrap = $('<div class="wrap clear"></div>');
 
-			$element.append(wrap);
-			$compile(wrap)($scope);
+			$element.append($wrap);
+			$compile($wrap)($scope);
 
-			$(wrap).datepaginator({
+			$wrap.datepaginator({
 				language: 'ru',
 				itemWidth: 90,
 				selectedItemWidth: 200,
@@ -35,7 +35,7 @@ function DatePaginator($rootScope, $compile) {
 			});
 
 			$rootScope.$on('timeCalendarCarousel:setDate', function(event, date) {
-				wrap.datepaginator('setSelectedDate', date);
+				$wrap.datepaginator('setSelectedDate', date);
 			});
 		}
 	}

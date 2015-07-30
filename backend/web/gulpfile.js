@@ -90,12 +90,13 @@ var tasks = {
 	bower: function() {
 		return gulp.src([
 				'./bower_components/jquery/dist/jquery.min.js',
+				'./bower_components/jquery-mousewheel/jquery.mousewheel.min.js',
 				'./bower_components/bootstrap/dist/js/bootstrap.min.js',
 				'./bower_components/moment/moment.js',
 				'./bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
 				'./bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ru.min.js',
 				'./bower_components/bootstrap-datepaginator/public/js/bootstrap-datepaginator.js',
-				'./bower_components/owl.carousel/dist/owl.carousel.min.js'
+				'./bower_components/owl.carousel/dist/owl.carousel.js'
 			])
 			.pipe(concat('plugins.js'))
 			.pipe(gulp.dest('./build'));
