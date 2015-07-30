@@ -22,6 +22,7 @@ class OrderController extends ApiController
 
     public function actions()
     {
+
         return ArrayHelper::merge(parent::actions(),[
             'create' => [],
         ]);
@@ -120,8 +121,10 @@ class OrderController extends ApiController
                     'statusId'          => $order['status_id'],
                     'roomId'            => $order['room_id'],
                     'bathhouseId'       => $order['bathhouse_id'],
-                    'oneDay'            => $oneDay
+                    'oneDay'            => $oneDay,
+                    'throughSite'      => ($order['manager_id'] == 0)
                 ];
+
                 if(!$oneDay)
                 {
                     $orders_sorted[$order['end_date']][] = [
@@ -140,7 +143,8 @@ class OrderController extends ApiController
                         'statusId'      => $order['status_id'],
                         'roomId'        => $order['room_id'],
                         'bathhouseId'   => $order['bathhouse_id'],
-                        'oneDay'        => $oneDay
+                        'oneDay'        => $oneDay,
+                        'throughSite'  => ($order['manager_id'] == 0)
                     ];
                 }
             }
