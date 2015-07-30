@@ -67,7 +67,7 @@ class OrderController extends ApiController
             if(!empty($date_filters) and is_array($date_filters) and isset($date_filters['start']) and isset($date_filters['end'])
                 and strtotime($date_filters['start']) !== false and strtotime($date_filters['end']) !== false)
             {
-                $query->andWhere('start_date BETWEElN STR_TO_DATE(:start, "%Y-%m-%d")
+                $query->andWhere('start_date BETWEEN STR_TO_DATE(:start, "%Y-%m-%d")
                             AND STR_TO_DATE(:end, "%Y-%m-%d")',
                     [
                     ':start'    => date('Y-m-d',strtotime($date_filters['start'])),
