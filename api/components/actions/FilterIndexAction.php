@@ -56,18 +56,11 @@ class FilterIndexAction extends IndexAction
                 elseif(ApiHelpers::decamelize($key) != $key)
                 {
                     unset($filter[$key]);
-                    $filter[ApiHelpers::decamelize($key)] = [
-                        'value' => $value,
-                        'separator' => $separator
-                    ];
-
+                    $filter[ApiHelpers::decamelize($key)] = $value;
                 }
                 else
                 {
-                    $filter[$key] = [
-                        'value' => $value,
-                        'separator' => $separator
-                    ];
+                    $filter[$key] = $value;
                 }
             }
             try

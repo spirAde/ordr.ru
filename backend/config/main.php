@@ -42,15 +42,7 @@ return [
         'errorHandler' => [
             'errorAction' => 'main/error',
         ],
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
-            'showScriptName' => false,
-            'suffix' => '/',
-            'rules' => [
-                '/' => 'site/index',
-            ],
-        ]
+        
     ],
     'params' => $params,
 ];

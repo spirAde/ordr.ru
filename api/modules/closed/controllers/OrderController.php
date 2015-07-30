@@ -9,6 +9,7 @@ use yii\helpers\Url;
 use api\modules\closed\models\BathhouseBooking;
 use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
+use yii\web\HttpException;
 
 class OrderController extends ApiController
 {
@@ -48,11 +49,29 @@ class OrderController extends ApiController
                 unset($filter[$key]);
                 continue;
             }
+
             if($key === 'start' or $key === 'end')
             {
-                $date_filters[$key] = $value;
+
                 unset($filter[$key]);
+                $date_filters[$key] = $value;
+                continue;
             }
+
+            if (!$model->hasAttribute(ApiHelpers::decamelize($key)))
+            {
+                throw new HttpException(404, 'Invalid query param: ' . $key);
+            }
+            elseif(ApiHelpers::decamelize($key) != $key)
+            {
+                unset($filter[$key]);
+                $filter[ApiHelpers::decamelize($key)] = $value;
+            }
+            else
+            {
+                $filter[$key] = $value;
+            }
+
         }
         try
         {
@@ -64,9 +83,11 @@ class OrderController extends ApiController
             foreach($filter as $key => $item)
                 $query->andWhere($key . '=' . $item);
 
-            if(!empty($date_filters) and is_array($date_filters) and isset($date_filters['start']) and isset($date_filters['end'])
-                and strtotime($date_filters['start']) !== false and strtotime($date_filters['end']) !== false)
+            if(!empty($date_filters) and is_array($date_filters) and isset($date_filters['end']) !== false and strtotime($date_filters['end']) !== false)
             {
+                if(!isset($date_filters['start']) or strtotime($date_filters['start']) === false)
+                    $date_filters['start'] = date('Y-m-d');
+
                 $query->andWhere('start_date BETWEEN STR_TO_DATE(:start, "%Y-%m-%d")
                             AND STR_TO_DATE(:end, "%Y-%m-%d")',
                     [
