@@ -102,6 +102,7 @@ return [
                     'controller' => 'closed/order',
                     'patterns' => [
                         'GET'                   => 'index',
+                        'GET sorted'            => 'sorted',
                         'POST'                  => 'create',
                     ]
                 ],

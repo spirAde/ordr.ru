@@ -2,7 +2,6 @@
 
 namespace api\components\actions;
 
-use api\modules\open\models\Bathhouse;
 use Yii;
 use yii\helpers\VarDumper;
 use yii\rest\IndexAction;

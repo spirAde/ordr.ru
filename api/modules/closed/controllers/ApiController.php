@@ -19,6 +19,7 @@ use yii\web\UnauthorizedHttpException;
 
 class ApiController extends ActiveController
 {
+    protected $pattern = ['page', 'fields', 'order', 'limit', 'expand'];
 
     public function behaviors()
     {
@@ -91,16 +92,6 @@ class ApiController extends ActiveController
         Yii::$app->user->logout();
 
         return parent::afterAction($action, $result);
-    }
-
-    public function actions()
-    {
-        return ArrayHelper::merge(parent::actions(),[
-            'index' => [
-                'class' => 'api\components\actions\FilterIndexAction',
-                'modelClass' => $this->modelClass,
-            ]
-        ]);
     }
 
 }
