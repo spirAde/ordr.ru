@@ -260,9 +260,6 @@ function Schedule($rootScope, $compile) {
 						})
 						.value();
 
-					console.log(startPeriodsId);
-					console.log(endPeriodsId);
-
 					_.forEach(_.range(0, 144, 3), function (periodId, idx, self) {
 
 						// Сперва выстраиваем временнУю линию
@@ -300,10 +297,12 @@ function Schedule($rootScope, $compile) {
 
 								// Если заявка двухдневная, пересчитываем продолжительность
 								if (!order.oneDay && date !== _.last(dates) && order.startPeriod !== 0) {
+
 									var nextDay = moment(date).add(1, 'days').format('YYYY-MM-DD');
-									var endNextDayOrderPeriod = parseInt($scope.orders[nextDay][0].startPeriod);
+									var endNextDayOrderPeriod = parseInt($scope.orders[nextDay][0].endPeriod);
 
 									orderDuration = (144 - startPeriodsId[startOrderIndex] + endNextDayOrderPeriod) / 3;
+
 								}
 								else {
 									orderDuration = (endPeriodsId[startOrderIndex] - startPeriodsId[startOrderIndex] + 3) / 3;
