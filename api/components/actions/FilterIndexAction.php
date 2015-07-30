@@ -51,16 +51,22 @@ class FilterIndexAction extends IndexAction
 
                 if (!$model->hasAttribute(ApiHelpers::decamelize($key)))
                 {
-                    //throw new HttpException(404, 'Invalid query param:' . $key);
+                    throw new HttpException(404, 'Invalid query param:' . $key);
                 }
                 elseif(ApiHelpers::decamelize($key) != $key)
                 {
                     unset($filter[$key]);
-                    $filter[ApiHelpers::decamelize($key)] = $value;
+                    $filter[ApiHelpers::decamelize($key)] = [
+                        'value'     => $value,
+                        'separator' => $separator
+                        ];
                 }
                 else
                 {
-                    $filter[$key] = $value;
+                    $filter[$key] = [
+                        'value'     => $value,
+                        'separator' => $separator
+                    ];
                 }
             }
             try
@@ -73,6 +79,8 @@ class FilterIndexAction extends IndexAction
                 $query->limit = $limit;
                 $query->offset = $offset;
 
+                if(yii::$app->controller->module->id == 'closed')
+                    $query->andWhere('bathhouse_id = :bathhouse_id', [':bathhouse_id' => yii::$app->user->identity->organization_id]);
                 return new ArrayDataProvider([
                     'allModels' => $query->all(),
                     'pagination' => [
