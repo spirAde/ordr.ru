@@ -83,8 +83,8 @@ class OrderController extends ApiController
 
             foreach($filter as $key => $item)
                 $query->andWhere($key . '=' . $item);
-
-            if(!empty($date_filters) and is_array($date_filters) and isset($date_filters['end']) !== false and strtotime($date_filters['end']) !== false)
+            $is_active_date_filters = (!empty($date_filters) and is_array($date_filters) and isset($date_filters['end']) !== false and strtotime($date_filters['end']) !== false);
+            if($is_active_date_filters)
             {
                 if(!isset($date_filters['start']) or strtotime($date_filters['start']) === false)
                     $date_filters['start'] = date('Y-m-d');
@@ -106,45 +106,42 @@ class OrderController extends ApiController
             {
                 $oneDay = $order['start_date'] === $order['end_date'];
                 $orders_sorted[$order['start_date']][] = [
-                    'id'                => $order['id'],
+                    'id'                => (int)$order['id'],
                     'startDate'         => $order['start_date'],
                     'endDate'           => ($oneDay) ? $order['end_date'] : $order['start_date'],
-                    'startPeriod'       => $order['start_period'],
-                    'endPeriod'         => ($oneDay) ? $order['end_period'] : OrdrHelper::LAST_TIME_ID,
+                    'startPeriod'       => (int)$order['start_period'],
+                    'endPeriod'         => (int)($oneDay) ? $order['end_period'] : OrdrHelper::LAST_TIME_ID,
                     'services'          => $order['services'],
-                    'guests'            => $order['guests'],
+                    'guests'            => (int)$order['guests'],
                     'comment'           => $order['comment'],
-                    'costPeriod'        => $order['cost_period'],
-                    'costServices'      => $order['cost_services'],
-                    'costGuests'        => $order['cost_guests'],
-                    'total'             => $order['total'],
-                    'statusId'          => $order['status_id'],
-                    'roomId'            => $order['room_id'],
-                    'bathhouseId'       => $order['bathhouse_id'],
-                    'oneDay'            => $oneDay,
-                    'throughSite'      => ($order['manager_id'] == 0)
+                    'costPeriod'        => (float)$order['cost_period'],
+                    'costServices'      => (float)$order['cost_services'],
+                    'costGuests'        => (float)$order['cost_guests'],
+                    'total'             => (float)$order['total'],
+                    'statusId'          => (int)$order['status_id'],
+                    'roomId'            => (int)$order['room_id'],
+                    'bathhouseId'       => (int)$order['bathhouse_id'],
+                    'oneDay'            => (boolean)$oneDay
                 ];
-
-                if(!$oneDay)
+                if(!$oneDay and !$is_active_date_filters)
                 {
                     $orders_sorted[$order['end_date']][] = [
-                        'id'            => $order['id'],
+                        'id'            => (int)$order['id'],
                         'startDate'     => $order['end_date'],
                         'endDate'       => $order['end_date'],
-                        'startPeriod'   => OrdrHelper::FIRST_TIME_ID,
-                        'endPeriod'     => $order['end_period'],
+                        'startPeriod'   => (int)OrdrHelper::FIRST_TIME_ID,
+                        'endPeriod'     => (int)$order['end_period'],
                         'services'      => $order['services'],
-                        'guests'        => $order['guests'],
+                        'guests'        => (int)$order['guests'],
                         'comment'       => $order['comment'],
-                        'costPeriod'    => $order['cost_period'],
-                        'costServices'  => $order['cost_services'],
-                        'costGuests'    => $order['cost_guests'],
-                        'total'         => $order['total'],
-                        'statusId'      => $order['status_id'],
-                        'roomId'        => $order['room_id'],
-                        'bathhouseId'   => $order['bathhouse_id'],
-                        'oneDay'        => $oneDay,
-                        'throughSite'  => ($order['manager_id'] == 0)
+                        'costPeriod'    => (float)$order['cost_period'],
+                        'costServices'  => (float)$order['cost_services'],
+                        'costGuests'    => (float)$order['cost_guests'],
+                        'total'         => (float)$order['total'],
+                        'statusId'      => (int)$order['status_id'],
+                        'roomId'        => (int)$order['room_id'],
+                        'bathhouseId'   => (int)$order['bathhouse_id'],
+                        'oneDay'        => (boolean)$oneDay
                     ];
                 }
             }
