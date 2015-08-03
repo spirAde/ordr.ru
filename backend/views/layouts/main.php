@@ -30,7 +30,6 @@
     <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle-libs.js"></script>
     <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle.js"></script>
     <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/templates.js"></script>
-    <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/plugins.js"></script>
 
 </body>
 

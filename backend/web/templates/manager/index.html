@@ -19,7 +19,7 @@
                 <h1>{{::user.bathhouse}}</h1>
             </div>
 
-            <date-paginator></date-paginator>
+            <date-paginator select-date="selectDate(date);"></date-paginator>
 
             <div class="wrapper">
                 <div class="room" ng-repeat="room in rooms track by room.id">

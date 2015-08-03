@@ -29,11 +29,13 @@ function ManagerController($scope, $state, $timeout, localStorage, dataStorage) 
 		});
 	});
 
-	$timeout(function() {
-		console.log($scope.rooms);
-	}, 5000);
-
+	$scope.selectDate = selectDate;
 	$scope.logout = logout;
+
+	$timeout(function() { console.log($scope.rooms); }, 5000);
+
+	function selectDate(date) {
+	}
 
 	function logout() {
 

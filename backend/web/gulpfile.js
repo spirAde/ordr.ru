@@ -87,21 +87,6 @@ var tasks = {
 			.pipe(gulp.dest('./build/images'));
 	},
 
-	bower: function() {
-		return gulp.src([
-				'./bower_components/jquery/dist/jquery.min.js',
-				'./bower_components/jquery-mousewheel/jquery.mousewheel.min.js',
-				'./bower_components/bootstrap/dist/js/bootstrap.min.js',
-				'./bower_components/moment/moment.js',
-				'./bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js',
-				'./bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ru.min.js',
-				'./bower_components/bootstrap-datepaginator/public/js/bootstrap-datepaginator.js',
-				'./bower_components/owl.carousel/dist/owl.carousel.js'
-			])
-			.pipe(concat('plugins.js'))
-			.pipe(gulp.dest('./build'));
-	},
-
 	browserify: function() {
 
 		var debug = !production;
@@ -201,12 +186,11 @@ gulp.task('fonts', tasks.fonts);
 gulp.task('images', tasks.images);
 gulp.task('browserify', tasks.browserify);
 gulp.task('browserify-libs', tasks.browserifyLibs);
-gulp.task('bower', tasks.bower);
 gulp.task('template', tasks.template);
 
 gulp.task('watch', ['clean'], function(callback) {
 
-	runSequence(['fonts', 'images', 'template', 'styles'], 'browserify', 'browserify-libs', 'bower', callback);
+	runSequence(['fonts', 'images', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
 
 	gulp.watch('./backend/web/styles/*.css', ['reload-styles']);
 

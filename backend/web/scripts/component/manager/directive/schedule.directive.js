@@ -2,25 +2,38 @@
 
 var _ = require('lodash');
 var moment = require('moment');
+var Hamster = require('hamsterjs');
 
-Schedule.$inject = ['$rootScope', '$compile'];
+Schedule.$inject = ['$rootScope', '$window', '$document', '$compile', '$filter'];
 
-function Schedule($rootScope, $compile) {
+function Schedule($rootScope, $window, $document, $compile, $filter) {
 
-	var now = moment().format('YYYY-MM-DD'),
-		itemsLength = undefined,
+	var ESC_KEY = 27;
 
-	// Так как прокрутка в owl-carousel работает некорректно для merge ячеек, мы будем слайдить в обход ее,
-	// поэтому фиксируем:
-		currentSlide = undefined,       // текущую позицию карусели, индекс крайней левой видимой ячейки
-		currentOrdersShift = undefined, // общее смещение относительно начала карусели с заказами
-		currentTimeShift = undefined;   // общее смещение относительно начала карусели с временем
+	var options = {
+		margin: 0,
+		items: 24,
+		scrollItems: 3
+	};
+
+	var template = {
+
+		panel: '<div class="schedule-panel schedule-carousel schedule-loaded"></div>',
+
+		stageOuter: '<div class="schedule-stage-outer"></div>',
+		stageOrder: '<div class="order-stage"></div>',
+		stageTime: '<div class="time-stage"></div>',
+
+		itemOuter: '<div class="schedule-item"></div>',
+		itemOrder: '<div class="order-item"></div>',
+		itemTime: '<div class="time-item"></div>'
+	};
 
 	return {
 		restrict: 'EA',
 		replace: true,
 		transclude: true,
-		template: '<div class="schedule-panel"></div>',
+		template: template.panel,
 		scope: {
 			orders: '=orders',
 			roomId: '=roomId',
@@ -31,253 +44,193 @@ function Schedule($rootScope, $compile) {
 			getOrders: '&getOrders',
 			newOrder: '&newOrder'
 		},
-		link: function($scope, $element) {
+		controller: function($scope, $element) {
 
-			var itemsIndexes, itemsPeriods, // каждая ячейка карусели будет рассписываться в массиве индексов и периодов
+			this.getTime = function(periodId) {
 
-				visibleItemsLength,// Количество ячеек всего за исключением, той части, что остается видимой всегда
+				return $filter('periodToTime')(periodId);
+			};
+		},
+		link: function($scope, $element, $attrs, controller) {
 
-			// Забираем ширину ячейки, и настройки влияющие на анимацию
-				itemOrderWidth,
-				itemTimeWidth,
+			var $stageOuter, $stageOrder, $stageTime;
 
-			// Эти флаги просто дублирование настроек owl-carousel, необходимы для animateScroll
-				support3d,
-				isTouch;
+			var totalWidth = 0;
+			var itemWidth = 0;
+			var shift = 0;
+			var transform = 0;
+			var current = 0;
 
-			// данные о заказе, который на данный момент создает манагер
-			var newOrder = {
-				roomId: undefined,
-				startDate: undefined,
-				endDate: undefined,
-				startPeriodId: undefined,
-				endPeriodId: undefined
+			var items = [];
+			var timeLineItems = [];
+
+			var order = {
+				roomId: $scope.roomId,
+				startDate: '',
+				endDate: '',
+				startPeriod: undefined,
+				endPeriod: undefined,
+
+				startIndex: undefined,
+				endIndex: undefined
 			};
 
-			var startOrderIndex;
+			$scope.$watch('orders', function(newVal, oldVal) {
 
-			var lessMinDuration = false,  // флаг, на случай если расстояние между заказами меньше min_duration
+				// First render
+				if (_.isEmpty(newVal) && _.isEmpty(oldVal)) {
 
-				skip = 0,                   // при построении карусели, когда будет текущий период попадать на начало заказа,
-			                              // высчитываем его продолжительность, именно столько раз надо будет пропустить
-			                              // все последующие итерации
+					_initialize();
+					_subscribe();
+					_calculate();
+				}
 
-				tempDisabledCellsIndex = [],// при первом клике(начало заказа) мы будем фиксировать индексы ячеек, которые лежат
-			                              // на удалении меньше, чем minDuration
+				// New data
+				else if (!_.isEmpty(newVal)) {
 
-				moveLeftFromStart = false,  // указываем в какую сторону повел манагер после начала оформления начала заказа
+					// Build only new dates
+					var newDates = _.difference(_.keys(newVal), _.keys(oldVal));
 
-				mouseMoveIndexes = [],      // при начале оформления заказа, фиксируем здесь ячейки, которые встречаются по ходу
-			                              // вождения мышкой по ячейкам
-				isOdd = true,
+					if (newDates.length) {
 
-				$owlOrdersContainer = $('<div class="owl-orders"></div>'),
-				$owlTimeContainer = $('<div class="owl-time"></div>'),
+						_buildData(newDates);
+						_renderTime(newDates.length);
+						_renderOrder();
+					}
+				}
+			}, true);
 
-				$orderItem,
-				$timeItem,
 
-				$owlOrdersStage,
-				$owlTimeStage;
+			// DOM manipulation
 
-			// Поехали! Создаем просто каркас самой карусели с заказами и временем
-			init();
+			function _initialize() {
 
-			function init() {
+				$stageOuter = angular.element(template.stageOuter);
+				$stageOrder = angular.element(template.stageOrder);
+				$stageTime = angular.element(template.stageTime);
 
-				$element.append($owlTimeContainer);
-				$element.append($owlOrdersContainer);
-				$compile($element)($scope);
+				$stageOuter.append($stageTime);
+				$stageOuter.append($stageOrder);
+				$element.append($stageOuter);
 
-				$owlTimeContainer.owlCarousel({
-					responsiveClass: true,
-					items: 24,
-					nav: false,
-					merge: true,
-					//stagePadding: 20,
-					//mergeFit: false,
-					dots: false,
-					responsive: {
-						1024: {
-							items: 16
-						},
-						1400: {
-							items: 24
+				$compile($stageOuter)($scope);
+			}
+
+			function _subscribe() {
+
+				Hamster($element[0]).wheel(function(event, delta) {
+
+					event.preventDefault();
+
+					_changePosition(delta);
+
+					var scroll = _.throttle(_.bind(_scroll, this, delta), 750);
+
+					scroll();
+				});
+
+				$stageOrder.bind('click', function(event) {
+
+					event.preventDefault();
+
+					var target = event.target;
+					var classList = target.classList;
+
+					if (_.indexOf(classList, 'disabled') === -1) {
+
+						if (_.indexOf(classList, 'service-order') !== -1) {
+
+							_showOrder(target.dataset.order);
 						}
-					},
-					onInitialized: function() {
+						else if (_.indexOf(classList, 'manager-order') !== -1) {
 
-						isTouch = this.state.isTouch;
-						support3d = this.support3d;
-
-						$owlTimeStage = this.$stage[0];
-
-						if (_.isUndefined(currentSlide)) {
-							itemsLength = this.settings.items;
-							currentSlide = 0;
-							currentOrdersShift = 0;
-							currentTimeShift = 0;
+							_showOrder(target.dataset.order);
 						}
-					},
-					onRefreshed: function() {
+						else {
 
-						_.forEach(this._items, function($item, idx) {
+							var index = _.indexOf(this.children, event.target.parentElement);
 
-							if (idx % 2 === 0) {
-
-								$($item).css('margin-left', -1);
-							}
-						});
-
-						visibleItemsLength = _.size($scope.orders) * 48 - this.settings.items;
-
-						itemsLength = this.settings.items;
-
-						itemTimeWidth = (this._width / this.settings.items).toFixed(3);
+							_createOrder(index);
+						}
 					}
 				});
 
-				$owlOrdersContainer.owlCarousel({
-					responsiveClass: true,
-					items: 24,
-					merge: true,
-					nav: false,
-					//loop: true,
-					//margin: 10,
-					//stagePadding: 25,
-					mergeFit: false,
-					dots: false,
-					responsive: {
-						1024: {
-							items: 16
-						},
-						1400: {
-							items: 24
-						}
-					},
-					onInitialized: function () {
-						$owlOrdersStage = this.$stage[0];
+				$document.bind('keydown keypress', function(event) {
 
-						/*$owlOrdersStage.addEventListener('click', function(e) {
-						 actionOrder(e);
-						 }, false);*/
+					if (event.keyCode === ESC_KEY) {
 
-						/*$owlOrdersStage.addEventListener('mouseover', function(e) {
-						 actionMouseMove(e);
-						 }, false);
+						if (order.startDate && !order.endDate) {
 
-						 $owlOrdersStage.addEventListener('mouseout', function(e) {
-						 actionMouseMove(e);
-						 }, false);*/
-					},
-					onRefreshed: function() {
-						itemsIndexes = this._mergers;
-						itemsPeriods = [];
-
-						_.reduce(itemsIndexes, function(sum, num) {
-							sum += num * 3;
-							itemsPeriods.push(sum);
-							return sum;
-						}, 0);
-
-						itemOrderWidth = (this._width / this.settings.items).toFixed(3);
-					}
-				});
-
-				$owlOrdersContainer.on('mousewheel', '.owl-stage', function(e) {
-
-					var dateDiff, nextDate, prevDate;
-
-					if (e.deltaY > 0) {
-
-						if (currentSlide < visibleItemsLength) {
-
-							currentSlide++;
-							currentOrdersShift -= parseFloat(itemOrderWidth);
-							currentTimeShift -= parseFloat(itemTimeWidth);
-
-							if ((currentSlide - itemsLength) % 48 === 0) {
-
-								dateDiff = ((currentSlide - itemsLength) / 48);
-								nextDate = moment(now).add(dateDiff + 1, 'days').format('YYYY-MM-DD');
-
-								if (_.indexOf(_.keys($scope.orders), nextDate) === -1) {
-									$scope.$emit('getNextPrevDateOrders', nextDate);
-								}
-							}
-							else if (currentSlide % 48 === 0) {
-
-								dateDiff = ((currentSlide - itemsLength) / 48);
-								nextDate = moment(now).add(dateDiff + 1, 'days').format('YYYY-MM-DD');
-
-								$scope.$emit('timeCalendarCarousel:setDate', nextDate);
-							}
-
-							$scope.$emit('scrollAllRooms');
+							_resolveClosestItems(order.startIndex);
+							_resetOrder();
 						}
 					}
-					else {
-
-						if (currentSlide > 0) {
-
-							currentSlide--;
-							currentOrdersShift += parseFloat(itemOrderWidth);
-							currentTimeShift += parseFloat(itemTimeWidth);
-
-							if ((currentSlide + 1) % 48 === 0) {
-
-								dateDiff = currentSlide / 48;
-								prevDate = moment(now).add(dateDiff, 'days').format('YYYY-MM-DD');
-
-								$scope.$emit('timeCalendarCarousel:setDate', prevDate);
-							}
-
-							$scope.$emit('scrollAllRooms');
-						}
-					}
-
-					e.preventDefault();
 				});
 			}
 
-			var addDays = function(dates) {
+			function _calculate() {
 
-				_.forEach(dates, function (date, dateIdx) {
+				if (!itemWidth) {
+
+					var viewPort = $element.parent()[0].offsetWidth;
+
+					itemWidth = (viewPort / options.items).toFixed(3);
+				}
+
+				if (!shift) {
+
+					shift = ((itemWidth * 1000 + options.margin * 1000) * options.scrollItems) / 1000;
+				}
+
+				if (!timeLineItems.length) {
+
+					var odd = true;
+
+					_.forEach(_.range(0, 144, 3), function(periodId) {
+
+						timeLineItems.push({
+							time: odd ? controller.getTime(periodId) : null,
+							margin: odd ? -1 : 0
+						});
+
+						odd = !odd;
+					});
+				}
+			}
+
+			function _scroll() {
+
+				$stageOuter.css({
+					transform: 'translate3d(' + transform + 'px' + ',0px, 0px)',
+					transition: (250 / 1000) + 's'
+				});
+			}
+
+			function _buildData(dates) {
+
+				var skip = 0;
+				var lessMinDuration = false;
+
+				_.forEach(dates, function(date) {
+
+					var orders = $scope.orders[date];
 
 					var startPeriodsId = _
-						.chain($scope.orders[date])
+						.chain(orders)
 						.pluck('startPeriod')
-						.map(function (periodId) {
-							return parseInt(periodId, 10);
-						})
+						.map(function(periodId) { return parseInt(periodId, 10); })
 						.value();
 
 					var endPeriodsId = _
-						.chain($scope.orders[date])
+						.chain(orders)
 						.pluck('endPeriod')
-						.map(function (periodId) {
-							return periodId - 3;
-						})
+						.map(function(periodId) { return periodId - 3; })
 						.value();
 
-					_.forEach(_.range(0, 144, 3), function (periodId, idx, self) {
+					_.forEach(_.range(0, 144, 3), function(periodId) {
 
-						// Сперва выстраиваем временнУю линию
-						var showTime = periodId,
-							$owlItem;
-
-						$timeItem = isOdd ?
-							$('<div class="time-item left">' + showTime + '</div>') :
-							$('<div class="time-item right"></div>');
-
-						$owlItem = $('<div class="owl-item"></div>');
-						$owlItem.append($timeItem);
-						$owlTimeContainer.trigger('add', [$owlItem]);
-
-						isOdd = !isOdd;
-
-						// Затем саму карусель с заказами
 						var startOrderIndex = _.indexOf(startPeriodsId, periodId);
+						var cellWidth;
 
 						// Данная ячейка не относится к заказу
 						if (skip === 0) {
@@ -287,95 +240,279 @@ function Schedule($rootScope, $compile) {
 
 								lessMinDuration = false;
 
-								var order = _.find($scope.orders[date], function (order) {
-									return order.startPeriod == periodId;
-								});
+								var order = _.find(orders, function(order) { return parseInt(order.startPeriod) === periodId});
+								var orderDuration;
 
-								// Определяем через манагера или через сайт был создан заказ
-								var className = order.managerId ? 'item manager-order' : 'item service-order',
-									orderDuration;
-
-								// Если заявка двухдневная, пересчитываем продолжительность
 								if (!order.oneDay && date !== _.last(dates) && order.startPeriod !== 0) {
 
 									var nextDay = moment(date).add(1, 'days').format('YYYY-MM-DD');
+
 									var endNextDayOrderPeriod = parseInt($scope.orders[nextDay][0].endPeriod);
 
-									orderDuration = (144 - startPeriodsId[startOrderIndex] + endNextDayOrderPeriod) / 3;
-
+									orderDuration = (144 - parseInt(startPeriodsId[startOrderIndex]) + parseInt(endNextDayOrderPeriod)) / 3;
 								}
 								else {
-									orderDuration = (endPeriodsId[startOrderIndex] - startPeriodsId[startOrderIndex] + 3) / 3;
+
+									orderDuration = (parseInt(endPeriodsId[startOrderIndex]) - parseInt(startPeriodsId[startOrderIndex]) + 3) / 3;
 								}
 
 								skip = orderDuration - 1;
 
 								if (!_.isUndefined(startPeriodsId[startOrderIndex + 1])) {
+
 									var durationBetweenOrders = startPeriodsId[startOrderIndex + 1] - endPeriodsId[startOrderIndex] - 3;
 									lessMinDuration = durationBetweenOrders < $scope.minDuration && durationBetweenOrders !== 0;
 								}
 
-								$orderItem = $('<div data-order="' + order.id + '" class="' + className + '" ' +
-								'data-merge="' + orderDuration + '"></div>');
-
-								$owlItem = $('<div class="owl-item"></div>');
-								$owlItem.append($orderItem);
-								$owlOrdersContainer.trigger('add', [$owlItem]);
+								items.push({
+									periodId: periodId,
+									date: date,
+									merge: orderDuration,
+									itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * orderDuration) / 1000).toFixed(3),
+									lessMinDuration: lessMinDuration,
+									throughSite: order.throughSite,
+									orderId: order.id
+								});
 							}
 							else {
-								$orderItem = $('<div class="item" data-merge="1"></div>');
 
-								if (lessMinDuration) {
-									$orderItem.addClass('disabled');
-								}
-
-								$owlItem = $('<div class="owl-item"></div>');
-								$owlItem.append($orderItem);
-								$owlOrdersContainer.trigger('add', [$owlItem]);
+								items.push({
+									periodId: periodId,
+									date: date,
+									merge: 1,
+									itemWidth: ((parseFloat(itemWidth * 1000) + parseInt(options.margin * 1000)) / 1000).toFixed(3),
+									lessMinDuration: lessMinDuration,
+									throughSite: null,
+									orderId: null
+								});
 							}
 						}
 						else {
+
 							skip--;
 						}
 					});
+
+					totalWidth = (_.sum(items, 'itemWidth') + 50).toFixed(3);
+				});
+			}
+
+			function _renderTime(repeat) {
+
+				_.forEach(_.range(0, repeat), function(idx) {
+
+					_.forEach(timeLineItems, function(timeItem, index, _this) {
+
+						var $itemTime = angular.element(template.itemTime);
+						var $itemOuter = angular.element(template.itemOuter);
+
+						if (timeItem.time) {
+
+							$itemTime[0].innerHTML = timeItem.time;
+							$itemTime.addClass('left');
+						}
+						else {
+
+							$itemTime.addClass('right');
+						}
+
+						$itemOuter[0].style.width = itemWidth + 'px';
+						$itemOuter[0].style.marginLeft = timeItem.margin + 'px';
+
+						$itemOuter.append($itemTime);
+						$stageTime.append($itemOuter);
+					});
+				});
+			}
+
+			function _renderOrder() {
+
+				$stageOuter[0].style.width = totalWidth + 'px';
+
+				_.forEach(items, function(item) {
+
+					var $itemOrder = angular.element(template.itemOrder);
+					var $itemOuter = angular.element(template.itemOuter);
+
+					$itemOuter[0].style.width = item.itemWidth + 'px';
+
+					var classes = [];
+
+					if (item.orderId) $itemOrder.attr('data-order', item.orderId);
+
+					if (!_.isNull(item.throughSite)) {
+
+						item.throughSite ? classes.push('item service-order') : classes.push('item manager-order');
+					}
+
+					if (item.lessMinDuration) classes.push('disabled');
+
+					$itemOrder
+						.attr('data-merge', item.merge);
+
+					$itemOrder.addClass(classes.join(' '));
+
+					$itemOuter.append($itemOrder);
+					$stageOrder.append($itemOuter);
+				});
+			}
+
+			function _changePosition(delta) {
+
+				var shifting = shift * (-delta);
+
+				transform = Math.min(transform + parseFloat(shifting), 0);
+				transform = Math.max(transform, -totalWidth + options.items * itemWidth);
+
+				var length = 0;
+
+				_.forEach(items, function(item, idx) {
+
+					length += parseInt(item.itemWidth);
+
+					if (Math.abs(transform) < length) {
+
+						current = idx;
+						return false;
+					}
+				});
+			}
+
+			function _rejectClosestItems(index) {
+
+				var from = Math.max(index - ($scope.minDuration / 3), 0);
+				var to = Math.min(index + ($scope.minDuration / 3), items.length);
+
+				var childrenBefore = _.slice(_.toArray($stageOrder[0].childNodes), from, index);
+				var chidlrenAfter = _.slice(_.toArray($stageOrder[0].childNodes), index, to);
+
+				_.forEach(childrenBefore, function(child) {
+
+					child.childNodes[0].className += ' disabled';
 				});
 
-				$owlTimeContainer.trigger('refresh');
-				$owlOrdersContainer.trigger('refresh');
-			};
+				_.forEach(childrenBefore, function(child) {
 
-			$scope.$watch('orders', function(newVal, oldVal) {
+					child.childNodes[0].className += ' disabled';
+				});
+			}
 
-				if (!_.isUndefined(newVal)) {
+			function _resolveClosestItems(index) {
 
-					// Достраиваем только даты, которых еще нету в карусели
-					var newDates = _.difference(_.keys(newVal), _.keys(oldVal));
-					if (newDates.length) addDays(newDates);
+				var from = Math.max(index - ($scope.minDuration / 3), 0);
+				var to = Math.min(index + ($scope.minDuration / 3), items.length);
+
+				var children = _.slice(_.toArray($stageOrder[0].childNodes), from, to);
+
+				_.forEach(children, function(child) {
+					child.childNodes[0].classList.remove('disabled');
+				});
+			}
+
+			function _checkClosestItems(index) {}
+
+			function _mergeItems() {
+
+				var duration = order.endIndex - order.startIndex + 1;
+
+				var item = {
+					periodId: order.startPeriod,
+					date: order.startDate,
+					merge: duration,
+					itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * duration) / 1000).toFixed(3),
+					lessMinDuration: false,
+					throughSite: false,
+					orderId: null
+				};
+
+				items.splice(order.startIndex, order.endIndex - 2);
+
+				items[order.startIndex] = item;
+
+				var removedItems = _.toArray($stageOrder[0].children).splice(order.startIndex, order.endIndex - 1);
+
+				_.forEach(removedItems, function(item) {
+					item.remove();
+				});
+
+				var $itemOrder = angular.element(template.itemOrder);
+				var $itemOuter = angular.element(template.itemOuter);
+
+				$itemOuter[0].style.width = item.itemWidth + 'px';
+
+				var classes = [];
+
+				if (item.orderId) $itemOrder.attr('data-order', item.orderId);
+
+				if (!_.isNull(item.throughSite)) {
+
+					item.throughSite ? classes.push('item service-order') : classes.push('item manager-order');
 				}
-			}, true);
 
-			$rootScope.$on('scrollAllRooms', function(event) {
-				animateScrollStage.call($owlOrdersStage, currentOrdersShift);
-				animateScrollStage.call($owlTimeStage, currentTimeShift);
-			});
+				if (item.lessMinDuration) classes.push('disabled');
 
-			function animateScrollStage(coordinate) {
-				if (support3d) {
-					$(this).css({
-						transform: 'translate3d(' + coordinate + 'px' + ', 0px, 0px)',
-						transition: (250 / 1000) + 's'
-					});
+				$itemOrder
+					.attr('data-merge', item.merge);
+
+				$itemOrder.addClass(classes.join(' '));
+
+				$itemOuter.append($itemOrder);
+
+				$stageOrder[0].insertBefore($itemOuter[0], $stageOrder[0].children[order.startIndex]);
+			}
+
+			function _unmergeItems() {
+
+
+			}
+
+
+			// Order manipulation
+
+			function _showOrder(id) {
+
+			}
+
+			function _createOrder(index) {
+
+				var item = items[index];
+
+				// start creating order
+				if (!order.startDate && !order.startPeriod) {
+
+					order.startDate = item.date;
+					order.startPeriod = item.periodId;
+
+					order.startIndex = index;
+
+					_rejectClosestItems(index);
 				}
-				else if (isTouch) {
-					this.css({
-						left: coordinate + 'px'
-					});
+				else if (!order.endDate && !order.endPeriod) {
+
+					order.endDate = item.date;
+					order.endPeriod = item.periodId;
+
+					order.endIndex = index;
+
+					_mergeItems();
+					_checkClosestItems(order.startIndex);
+
+					_resetOrder();
 				}
-				else {
-					this.animate({
-						left: coordinate
-					}, 250 / 1000);
-				}
+			}
+
+			function _resetOrder() {
+
+				order = {
+					roomId: $scope.roomId,
+					startDate: '',
+					endDate: '',
+					startPeriod: undefined,
+					endPeriod: undefined,
+
+					startIndex: undefined,
+					endIndex: undefined
+				};
 			}
 		}
 	}
