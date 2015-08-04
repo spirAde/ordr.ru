@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var moment = require('moment');
 
 ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'localStorage', 'dataStorage'];
 
@@ -8,6 +9,8 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 	$scope.rooms = [];
 	$scope.orders = [];
+
+	$scope.currentDate = moment().format('YYYY-MM-DD');
 
 	$scope.user = {
 		name: 'Петухова Ольга',
@@ -80,6 +83,10 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 	}
 
 	function selectDate(date) {
+
+		$timeout(function() {
+			$scope.currentDate = moment(date).format('YYYY-MM-DD');
+		}, 0);
 	}
 
 	function logout() {

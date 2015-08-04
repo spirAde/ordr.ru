@@ -3,9 +3,9 @@
 var _ = require('lodash');
 var moment = require('moment');
 
-DatePaginator.$inject = ['$compile', '$window'];
+DatePaginator.$inject = ['$rootScope', '$compile', '$window'];
 
-function DatePaginator($compile, $window) {
+function DatePaginator($rootScope, $compile, $window) {
 
 	var options = {
 

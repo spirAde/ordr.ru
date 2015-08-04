@@ -39,6 +39,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 			roomId: '=roomId',
 			minDuration: '=minDuration',
 			changePosition: '=changePosition',
+			currentDate: '=currentDate',
 
 			showOrder: '&showOrder',
 			getOrders: '&getOrders',
@@ -56,6 +57,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 			var $stageOuter, $stageOrder, $stageTime;
 
 			var totalWidth = 0;
+			var dayWidth = 0;
 			var itemWidth = 0;
 			var shift = 0;
 			var transform = 0;
@@ -97,6 +99,18 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 						_renderTime(newDates.length);
 						_renderOrder();
 					}
+				}
+			}, true);
+
+			$scope.$watch('currentDate', function(newDate, oldDate) {
+
+				if (!moment(newDate).isSame(oldDate)) {
+
+					var diff = moment(newDate).diff(moment(), 'days');
+
+					transform = -diff * 1000 * dayWidth / 1000;
+
+					_scroll();
 				}
 			}, true);
 
@@ -180,6 +194,11 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 				if (!shift) {
 
 					shift = ((itemWidth * 1000 + options.margin * 1000) * options.scrollItems) / 1000;
+				}
+
+				if (!dayWidth) {
+
+					dayWidth = ((itemWidth * 1000 + options.margin * 1000) * 48) / 1000;
 				}
 
 				if (!timeLineItems.length) {
