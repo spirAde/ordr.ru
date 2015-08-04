@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-ManagerController.$inject = ['$scope', '$state', '$timeout', 'localStorage', 'dataStorage'];
+ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'localStorage', 'dataStorage'];
 
-function ManagerController($scope, $state, $timeout, localStorage, dataStorage) {
+function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dataStorage) {
 
 	$scope.rooms = [];
 	$scope.orders = [];
@@ -29,10 +29,55 @@ function ManagerController($scope, $state, $timeout, localStorage, dataStorage) 
 		});
 	});
 
+	$scope.showOrder = showOrder;
+	$scope.createOrder = createOrder;
+
 	$scope.selectDate = selectDate;
 	$scope.logout = logout;
 
-	$timeout(function() { console.log($scope.rooms); }, 5000);
+
+	function showOrder(roomId, orderId, callback) {
+
+		var room = _.find($scope.rooms, {id: roomId});
+		var orders = _.where(_.flatten(_.toArray(room.orders)), {id: orderId}); // maybe 2days order
+
+		ngDialog.open({
+			template: templates.showManagerOrder,
+			scope: $scope,
+			controller: ['$scope', function($scope) {
+
+				$scope.cancelOrder = function() {
+					ngDialog.close();
+				};
+
+			}]
+		});
+	}
+
+	function createOrder(order, callback) {
+
+		ngDialog.open({
+			template: templates.createOrder,
+			scope: $scope,
+			controller: ['$scope', function ($scope) {
+
+				$scope.cancelOrder = function() {
+
+					ngDialog.close();
+
+					callback({status: 'canceled'});
+				};
+
+				$scope.saveOrder = function() {
+
+					ngDialog.close();
+
+					callback({status: 'created'});
+				}
+			}]
+		});
+
+	}
 
 	function selectDate(date) {
 	}
@@ -44,6 +89,12 @@ function ManagerController($scope, $state, $timeout, localStorage, dataStorage) 
 
 		$state.go('login');
 	}
+
+	var templates = {
+		createOrder: '/templates/templates/createOrder.html',
+		showManagerOrder: '/templates/templates/showManagerOrder.html',
+		showSiteOrder: '/templates/templates/showSiteOrder.html'
+	};
 }
 
 module.exports = ManagerController;

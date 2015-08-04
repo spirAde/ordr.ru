@@ -42,7 +42,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 			showOrder: '&showOrder',
 			getOrders: '&getOrders',
-			newOrder: '&newOrder'
+			createOrder: '&createOrder'
 		},
 		controller: function($scope, $element) {
 
@@ -348,7 +348,8 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 					if (item.lessMinDuration) classes.push('disabled');
 
 					$itemOrder
-						.attr('data-merge', item.merge);
+						.attr('data-merge', item.merge)
+						.attr('data-period', item.periodId);
 
 					$itemOrder.addClass(classes.join(' '));
 
@@ -380,18 +381,26 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 			function _rejectClosestItems(index) {
 
-				var from = Math.max(index - ($scope.minDuration / 3), 0);
-				var to = Math.min(index + ($scope.minDuration / 3), items.length);
+				var from = Math.max(index - ($scope.minDuration / 3) + 1, 0);
+				var to = Math.min(index + ($scope.minDuration / 3) - 1, items.length);
 
 				var childrenBefore = _.slice(_.toArray($stageOrder[0].childNodes), from, index);
-				var chidlrenAfter = _.slice(_.toArray($stageOrder[0].childNodes), index, to);
+				var childrenAfter = _.slice(_.toArray($stageOrder[0].childNodes), index, to);
 
-				_.forEach(childrenBefore, function(child) {
+				_.forEach(childrenBefore.reverse(), function(child) {
+
+					var classes = child.childNodes[0].classList;
+
+					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) return false;
 
 					child.childNodes[0].className += ' disabled';
 				});
 
-				_.forEach(childrenBefore, function(child) {
+				_.forEach(childrenAfter, function(child) {
+
+					var classes = child.childNodes[0].classList;
+
+					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) return false;
 
 					child.childNodes[0].className += ' disabled';
 				});
@@ -399,17 +408,102 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 			function _resolveClosestItems(index) {
 
-				var from = Math.max(index - ($scope.minDuration / 3), 0);
-				var to = Math.min(index + ($scope.minDuration / 3), items.length);
+				var from = Math.max(index - ($scope.minDuration / 3) + 1, 0);
+				var to = Math.min(index + ($scope.minDuration / 3) - 1, items.length);
 
-				var children = _.slice(_.toArray($stageOrder[0].childNodes), from, to);
+				var childrenBefore = _.slice(_.toArray($stageOrder[0].childNodes), from, index);
+				var childrenAfter = _.slice(_.toArray($stageOrder[0].childNodes), index, to);
 
-				_.forEach(children, function(child) {
+				_.forEach(childrenBefore.reverse(), function(child) {
+
+					var classes = child.childNodes[0].classList;
+
+					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) return false;
+
+					child.childNodes[0].classList.remove('disabled');
+				});
+
+				_.forEach(childrenAfter, function(child) {
+
+					var classes = child.childNodes[0].classList;
+
+					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) return false;
+
 					child.childNodes[0].classList.remove('disabled');
 				});
 			}
 
-			function _checkClosestItems(index) {}
+			function _checkClosestItemsAfterMerge(index) {
+
+				var from = Math.max(index - ($scope.minDuration / 3), 0);
+				var to = Math.min(index + ($scope.minDuration / 3) + 1, items.length);
+
+				var childrenBefore = _.slice(_.toArray($stageOrder[0].childNodes), from, index);
+				var childrenAfter = _.slice(_.toArray($stageOrder[0].childNodes), index + 1, to);
+
+				var before = [];
+				var after = [];
+
+				_.forEach(childrenBefore.reverse(), function(child) {
+
+					var classes = child.childNodes[0].classList;
+
+					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) {
+
+						return false;
+					}
+
+					before.push(child.childNodes[0]);
+				});
+
+				_.forEach(childrenAfter, function(child) {
+
+					var classes = child.childNodes[0].classList;
+
+					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) {
+
+						return false;
+					}
+
+					after.push(child.childNodes[0]);
+				});
+
+				// If previous cells length less than minDuration
+				if (before.length !== $scope.minDuration / 3) {
+
+					_.forEach(before, function(child) {
+
+						var classes = child.classList;
+
+						if (_.indexOf(classes, 'disabled') === -1) {
+
+							child.className += ' disabled';
+						}
+					});
+				}
+
+				// Clear temporary disable
+				else {
+
+					_.forEach(before, function(child) {
+
+						child.classList.remove('disabled');
+					});
+				}
+
+				if (after.length !== $scope.minDuration / 3) {
+
+					_.forEach(after, function(child) {
+
+						var classes = child.classList;
+
+						if (_.indexOf(classes, 'disabled') === -1) {
+
+							child.className += ' disabled';
+						}
+					});
+				}
+			}
 
 			function _mergeItems() {
 
@@ -425,15 +519,14 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 					orderId: null
 				};
 
-				items.splice(order.startIndex, order.endIndex - 2);
+				_.forEach(_.range(order.startIndex, order.endIndex + 1), function() {
 
-				items[order.startIndex] = item;
+					var node = $stageOrder[0].childNodes[order.startIndex];
 
-				var removedItems = _.toArray($stageOrder[0].children).splice(order.startIndex, order.endIndex - 1);
-
-				_.forEach(removedItems, function(item) {
-					item.remove();
+					node.parentNode.removeChild(node);
 				});
+
+				_.pullAt(items, _.range(order.startIndex, order.endIndex));
 
 				var $itemOrder = angular.element(template.itemOrder);
 				var $itemOuter = angular.element(template.itemOuter);
@@ -459,11 +552,8 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 				$itemOuter.append($itemOrder);
 
 				$stageOrder[0].insertBefore($itemOuter[0], $stageOrder[0].children[order.startIndex]);
-			}
 
-			function _unmergeItems() {
-
-
+				items[order.startIndex] = item;
 			}
 
 
@@ -471,6 +561,9 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 			function _showOrder(id) {
 
+				$scope.showOrder({roomId: $scope.roomId, orderId: id, callback: function(response) {
+
+				}});
 			}
 
 			function _createOrder(index) {
@@ -494,10 +587,20 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 					order.endIndex = index;
 
-					_mergeItems();
-					_checkClosestItems(order.startIndex);
+					$scope.createOrder({order: order, callback: function(data) {
 
-					_resetOrder();
+						if (data.status === 'created') {
+
+							_mergeItems();
+							_checkClosestItemsAfterMerge(order.startIndex);
+						}
+						else {
+
+							_resolveClosestItems(order.startIndex);
+						}
+
+						_resetOrder();
+					}});
 				}
 			}
 

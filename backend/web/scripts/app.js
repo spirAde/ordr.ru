@@ -3,6 +3,7 @@
 var angular = require('angular');
 var uiRouter = require('angular-ui-router');
 var ngTouch = require('angular-touch');
+var ngDialog = require('ng-dialog');
 
 var moment = require('moment');
 
@@ -21,6 +22,7 @@ var ManagerModule = require('./component/manager');
 var app = angular.module('controlApp', [
 	uiRouter,
 	ngTouch,
+	ngDialog,
 
 	TemplatesModule.name,
 
