@@ -69,32 +69,3 @@
 
     <div class="md-overlay" ng-show="overlay"></div>
 </div>
-
-<script>
-
-    $(document).ready(function() {
-
-        /*$('.scroll').perfectScrollbar({
-            suppressScrollX: true
-        });*/
-
-
-        /*$('.md-close').click(function(){
-            $('.md-modal').removeClass('md-show');
-            $('body').removeClass('body-overlay');
-            $('.md-overlay').hide();
-        });
-
-        $('.md-overlay').click(function(){
-            $('.md-close').click();
-        });*/
-
-        $('body').delegate('.time .item', 'click', function(){
-            $('body').addClass('body-overlay');
-            $('#modal-1').addClass('md-show');
-            $('.md-overlay').show();
-            return false;
-        });
-    });
-
-</script>

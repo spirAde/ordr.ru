@@ -93,8 +93,6 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					// Build only new dates
 					var newDates = _.difference(_.keys(newVal), _.keys(oldVal));
 
-					console.log(newDates);
-
 					if (newDates.length) {
 
 						var data = _buildData(newDates);

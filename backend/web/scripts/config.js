@@ -8,7 +8,7 @@ function appConfig($compileProvider, $httpProvider, $provide, ngDialogProvider) 
 		className: 'ngdialog-theme-default',
 		plain: false,
 		showClose: false,
-		closeByDocument: true,
+		closeByDocument: false,
 		closeByEscape: true,
 		disableAnimation: true
 	});
