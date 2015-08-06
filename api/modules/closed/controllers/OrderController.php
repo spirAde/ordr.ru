@@ -22,10 +22,9 @@ class OrderController extends ApiController
 
     public function actions()
     {
-
-        return ArrayHelper::merge(parent::actions(),[
-            'create' => [],
-        ]);
+        $actions = parent::actions();
+        unset($actions['create']);
+        return $actions;
     }
 
     public function beforeAction($action)
@@ -121,9 +120,10 @@ class OrderController extends ApiController
                     'statusId'          => (int)$order['status_id'],
                     'roomId'            => (int)$order['room_id'],
                     'bathhouseId'       => (int)$order['bathhouse_id'],
-                    'oneDay'            => (boolean)$oneDay
+                    'oneDay'            => (boolean)$oneDay,
+                    'throughService'    => (boolean)($order['manager_id'] > 0)
                 ];
-                if(!$oneDay and !$is_active_date_filters)
+                if(!$oneDay)
                 {
                     $orders_sorted[$order['end_date']][] = [
                         'id'            => (int)$order['id'],
@@ -141,12 +141,12 @@ class OrderController extends ApiController
                         'statusId'      => (int)$order['status_id'],
                         'roomId'        => (int)$order['room_id'],
                         'bathhouseId'   => (int)$order['bathhouse_id'],
-                        'oneDay'        => (boolean)$oneDay
+                        'oneDay'        => (boolean)$oneDay,
+                        'throughService'=> (boolean)($order['manager_id'] > 0)
                     ];
                 }
             }
             return $orders_sorted;
-
 
         }
         catch (Exception $ex)
@@ -157,14 +157,22 @@ class OrderController extends ApiController
 
     public function actionCreate()
     {
-
         $model = new BathhouseBooking();
-        $model->load(Yii::$app->getRequest()->getBodyParams(), '');
+        $params = Yii::$app->getRequest()->getBodyParams();
+        foreach($params as $id => $value)
+            if($model->hasAttribute(ApiHelpers::decamelize($id)) and $model->isAttributeSafe(ApiHelpers::decamelize($id)))
+                $model->setAttribute(ApiHelpers::decamelize($id),$value);
 
-        if(ApiHelpers::checkOrder($model))
+        $model->bathhouse_id = yii::$app->user->identity->organization_id;
+
+        if(!$model->validate())
+            return $model;
+
+        if(ApiHelpers::checkOrder($model, $model->room->bathhouseRoomSettings->min_duration))
         {
-            //$transaction = BathhouseBooking::getDb()->beginTransaction();
-            if ($model->save())
+            $transaction = BathhouseBooking::getDb()->beginTransaction();
+
+            if ($model->save(false))
             {
                 $model->manager_id = Yii::$app->user->identity->id;
                 $model->bathhouse_id = Yii::$app->user->identity->organization_id;
@@ -177,14 +185,18 @@ class OrderController extends ApiController
             {
                 throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
             }
+            else
+            {
+                return $model;
+            }
             if(ApiHelpers::reformScheduleForDay($model->room_id, $model->start_date, $model->end_date))
             {
-               // $transaction->commit();
+                $transaction->commit();
                 return $model;
             }
             else
             {
-                //$transaction->rollBack();
+                $transaction->rollBack();
                 throw new ServerErrorHttpException('Schedule forming error. Order not saved');
             }
         }
