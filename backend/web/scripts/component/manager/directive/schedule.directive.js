@@ -4,15 +4,15 @@ var _ = require('lodash');
 var moment = require('moment');
 var Hamster = require('hamsterjs');
 
-Schedule.$inject = ['$rootScope', '$document', '$compile', 'CONSTANTS'];
+Schedule.$inject = ['$rootScope', '$document', '$window', '$compile', 'CONSTANTS'];
 
-function Schedule($rootScope, $document, $compile, CONSTANTS) {
+function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 	var ESC_KEY = 27;
 
 	var options = {
 		margin: 0,
-		items: 24,
+		responsive: [{breakpoint: 800, items: 12}, {breakpoint: 1024, items: 16}, {breakpoint: 1600, items: 24}],
 		scrollItems: 3
 	};
 
@@ -53,15 +53,17 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 			var $stageOuter, $stageOrder, $stageTime;
 
-			var totalWidth = 0;
-			var dayWidth = 0;
-			var itemWidth = 0;
-			var shift = 0;
-			var transform = 0;
-			var current = 0;
-			var totalItems = 0;
+			var viewportItems = 0;  // items contains in viewport
+			var totalWidth = 0;     // total width of all elements
+			var dayWidth = 0;       // total width of elements for one day
+			var itemWidth = 0;      // one element width
+			var shift = 0;          // shift when scrolling in pixels
+			var transform = 0;      // transform of carousel
+			var current = 0;        // current single item position
+			var totalItems = 0;     // total count of items
+			var lastDate = '';
 
-			var items = [];
+			var items = [];         // each cells with data
 			var timeLineItems = [];
 
 			var order = {
@@ -91,12 +93,17 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					// Build only new dates
 					var newDates = _.difference(_.keys(newVal), _.keys(oldVal));
 
+					console.log(newDates);
+
 					if (newDates.length) {
 
-						_buildData(newDates);
+						var data = _buildData(newDates);
+
+						items = items.concat(data);
+
 						_postCalculate();
 						_renderTime(newDates.length);
-						_renderOrder();
+						_renderOrder(data);
 					}
 				}
 			}, true);
@@ -195,37 +202,22 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 			function _preCalculate() {
 
-				if (!itemWidth) {
+				var viewPort = $element.parent()[0].offsetWidth;
+				var match = -1;
+				var overwrites = options.responsive;
 
-					var viewPort = $element.parent()[0].offsetWidth;
+				_.forEach(overwrites, function(data) {
 
-					itemWidth = (viewPort / options.items).toFixed(3);
-				}
+					if (data.breakpoint <= viewPort && data.breakpoint > match) {
+						viewportItems = data.items;
+					}
+				});
 
-				if (!shift) {
+				itemWidth = (viewPort / viewportItems).toFixed(3);
 
-					shift = ((itemWidth * 1000 + options.margin * 1000) * options.scrollItems) / 1000;
-				}
+				shift = ((itemWidth * 1000 + options.margin * 1000) * options.scrollItems) / 1000;
 
-				if (!dayWidth) {
-
-					dayWidth = ((itemWidth * 1000 + options.margin * 1000) * 48) / 1000;
-				}
-
-				if (!timeLineItems.length) {
-
-					var odd = true;
-
-					_.forEach(_.range(0, 144, 3), function(periodId) {
-
-						timeLineItems.push({
-							time: odd ? CONSTANTS.periods[periodId] : null,
-							margin: odd ? -1 : 0
-						});
-
-						odd = !odd;
-					});
-				}
+				dayWidth = ((itemWidth * 1000 + options.margin * 1000) * 48) / 1000;
 			}
 
 			function _postCalculate() {
@@ -233,6 +225,22 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				var dates = _.keys($scope.orders);
 
 				totalItems = dates.length * 48;
+
+				totalWidth = (_.sum(items, 'itemWidth') + 50).toFixed(3);
+
+				var odd = true;
+
+				_.forEach(_.range(0, 144, 3), function(periodId) {
+
+					timeLineItems.push({
+						time: odd ? CONSTANTS.periods[periodId] : null,
+						margin: odd ? -1 : 0
+					});
+
+					odd = !odd;
+				});
+
+				lastDate = _.last(dates);
 			}
 
 			function _scroll() {
@@ -245,6 +253,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 			function _buildData(dates) {
 
+				var data = [];
 				var skip = 0;
 				var lessMinDuration = false;
 
@@ -300,7 +309,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 									lessMinDuration = durationBetweenOrders < $scope.minDuration && durationBetweenOrders !== 0;
 								}
 
-								items.push({
+								data.push({
 									periodId: periodId,
 									date: date,
 									merge: orderDuration,
@@ -312,7 +321,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 							}
 							else {
 
-								items.push({
+								data.push({
 									periodId: periodId,
 									date: date,
 									merge: 1,
@@ -328,16 +337,16 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 							skip--;
 						}
 					});
-
-					totalWidth = (_.sum(items, 'itemWidth') + 50).toFixed(3);
 				});
+
+				return data;
 			}
 
 			function _renderTime(repeat) {
 
-				_.forEach(_.range(0, repeat), function(idx) {
+				_.forEach(_.range(0, repeat), function() {
 
-					_.forEach(timeLineItems, function(timeItem, index, _this) {
+					_.forEach(timeLineItems, function(timeItem) {
 
 						var $itemTime = angular.element(template.itemTime);
 						var $itemOuter = angular.element(template.itemOuter);
@@ -361,11 +370,11 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				});
 			}
 
-			function _renderOrder() {
+			function _renderOrder(data) {
 
 				$stageOuter[0].style.width = totalWidth + 'px';
 
-				_.forEach(items, function(item) {
+				_.forEach(data, function(item) {
 
 					var $itemOrder = angular.element(template.itemOrder);
 					var $itemOuter = angular.element(template.itemOuter);
@@ -400,17 +409,27 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				var prev = current;
 
 				transform = Math.min(transform + parseFloat(shifting), 0);
-				transform = Math.max(transform, -totalWidth + options.items * itemWidth);
+				transform = Math.max(transform, -totalWidth + viewportItems * itemWidth);
 
 				current += options.scrollItems * (delta);
 				current = Math.min(Math.max(current, 0), totalItems);
 
+				// TODO: incorrect for fast scrolling, doesn't switch date in datepaginator
 				if (current % 48 === 0 && delta > 0) {
+
+					console.log('change on next date');
 
 					$scope.currentDate = moment($scope.currentDate).add(1, 'days').format('YYYY-MM-DD');
 					$scope.$emit('schedule:changeDate', {date: $scope.currentDate});
+					
+					if (moment(lastDate).diff(moment($scope.currentDate), 'days') === 0) {
+
+						_getOrders();
+					}
 				}
 				else if (prev !== 0 && prev % 48 === 0 && delta < 0) {
+
+					console.log('change on prev date');
 
 					$scope.currentDate = moment($scope.currentDate).subtract(1, 'days').format('YYYY-MM-DD');
 					$scope.$emit('schedule:changeDate', {date: $scope.currentDate});
@@ -650,6 +669,13 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 						_resetOrder();
 					}});
 				}
+			}
+
+			function _getOrders() {
+
+				console.log('_getOrders', lastDate);
+
+				$scope.getOrders({roomId: $scope.roomId, date: lastDate});
 			}
 
 			function _resetOrder() {

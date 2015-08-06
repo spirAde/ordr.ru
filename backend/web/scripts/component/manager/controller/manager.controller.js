@@ -118,6 +118,8 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 	function getOrders(roomId, date) {
 
+		console.log('getOrder', date);
+
 		dataStorage.loadOrders(roomId, date).then(function(orders) {
 
 			var room = _.find($scope.rooms, {id: roomId});
