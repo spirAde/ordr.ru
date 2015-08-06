@@ -123,7 +123,7 @@ class OrderController extends ApiController
                     'oneDay'            => (boolean)$oneDay,
                     'throughService'    => (boolean)($order['manager_id'] > 0)
                 ];
-                if(!$oneDay and !$is_active_date_filters)
+                if(!$oneDay)
                 {
                     $orders_sorted[$order['end_date']][] = [
                         'id'            => (int)$order['id'],
