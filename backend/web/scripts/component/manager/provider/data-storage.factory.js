@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var moment = require('moment');
 
 dataStorage.$inject = ['$rootScope', '$http', '$q', 'localStorage'];
 
@@ -11,7 +12,9 @@ function dataStorage($rootScope, $http, $q, localStorage) {
 	var storage = {
 		rooms: [],
 		loadData: loadData,
-		loadOrders: loadOrders
+		loadOrders: loadOrders,
+		createOrder: createOrder,
+		removeOrder: removeOrder
 	};
 
 	return storage;
@@ -31,12 +34,40 @@ function dataStorage($rootScope, $http, $q, localStorage) {
 			});
 	}
 
-	function loadOrders(id) {
+	function loadOrders(id, date) {
 
-		return $http.get('http://api.ordr.ru/closed/orders/sorted?limit=1000&room_id=' + id + '&start=2015-07-03&end=2015-08-03')
+		var endDate = moment(date).add(7, 'days').format('YYYY-MM-DD');
+
+		return $http.get('http://api.ordr.ru/closed/orders/sorted?limit=1000&room_id=' + id + '&start=' + date + '&end=' + endDate)
 			.then(function(response) {
 
 				return response.data;
+			})
+			.catch(function(response) {
+
+				return $q.reject(response);
+			});
+	}
+
+	function createOrder(order) {
+
+		return $http.post('http://api.ordr.ru/closed/orders', order)
+			.then(function(response) {
+
+				console.log(response);
+			})
+			.catch(function(response) {
+
+				return $q.reject(response);
+			});
+	}
+
+	function removeOrder(id) {
+
+		return $http.delete('http://api.ordr.ru/closed/orders', id)
+			.then(function(response) {
+
+				console.log(response);
 			})
 			.catch(function(response) {
 

@@ -10,21 +10,21 @@
 <div class="form">
     <div class="field">
         <input type="text" readonly="readonly"
-           value="{{newOrder.startDate}} {{newOrder.startPeriodId | periodToTime}} - {{newOrder.endDate}} {{newOrder.endPeriodId | periodToTime}}"
+           value="{{order.startDate}} {{::order.startTime}} - {{::order.endDate}} {{::order.endTime}}"
         />
     </div>
     <div class="field">
         <select-services list="bathhouse.services" calculate="calculateServices(services);"></select-services>
     </div>
     <div class="field-comment">
-        <textarea class="order-comment" ng-model="newOrder.comment"></textarea>
+        <textarea class="order-comment" ng-model="order.comment"></textarea>
     </div>
     <div class="result">
         <div class="result-text">
             <p>Итого: </p>
         </div>
         <div class="result-summ">
-            <input type="text" readonly="readonly" ng-model="newOrder.summ" />
+            <input type="text" readonly="readonly" ng-model="order.summ" />
         </div>
     </div>
 </div>

@@ -4,9 +4,9 @@ var _ = require('lodash');
 var moment = require('moment');
 var Hamster = require('hamsterjs');
 
-Schedule.$inject = ['$rootScope', '$window', '$document', '$compile', '$filter'];
+Schedule.$inject = ['$rootScope', '$document', '$compile', 'CONSTANTS'];
 
-function Schedule($rootScope, $window, $document, $compile, $filter) {
+function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 	var ESC_KEY = 27;
 
@@ -29,6 +29,11 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 		itemTime: '<div class="time-item"></div>'
 	};
 
+	var orderItemClasses = {
+		service: 'service-order',
+		manager: 'manager-order'
+	};
+	
 	return {
 		restrict: 'EA',
 		replace: true,
@@ -38,21 +43,13 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 			orders: '=orders',
 			roomId: '=roomId',
 			minDuration: '=minDuration',
-			changePosition: '=changePosition',
 			currentDate: '=currentDate',
 
 			showOrder: '&showOrder',
 			getOrders: '&getOrders',
 			createOrder: '&createOrder'
 		},
-		controller: function($scope, $element) {
-
-			this.getTime = function(periodId) {
-
-				return $filter('periodToTime')(periodId);
-			};
-		},
-		link: function($scope, $element, $attrs, controller) {
+		link: function($scope, $element) {
 
 			var $stageOuter, $stageOrder, $stageTime;
 
@@ -106,13 +103,25 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 				if (!moment(newDate).isSame(oldDate)) {
 
-					var diff = moment(newDate).diff(moment(), 'days');
+					var diff = moment(newDate).diff(moment().format('YYYY-MM-DD'), 'days');
 
 					transform = -diff * 1000 * dayWidth / 1000;
+					current = diff * 48;
 
 					_scroll();
 				}
 			}, true);
+
+			$rootScope.$on('schedule:changePosition', function(event, data) {
+
+				if (data.id !== $scope.roomId) {
+
+					current = data.position;
+					transform = -(current / options.scrollItems) * 1000 * shift / 1000;
+
+					_scroll();
+				}
+			});
 
 
 			// DOM manipulation
@@ -150,19 +159,19 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 					var target = event.target;
 					var classList = target.classList;
 
+					var index = _.indexOf(this.children, target.parentElement);
+
 					if (_.indexOf(classList, 'disabled') === -1) {
 
-						if (_.indexOf(classList, 'service-order') !== -1) {
+						if (_.indexOf(classList, orderItemClasses.service) !== -1) {
 
-							_showOrder(target.dataset.order);
+							_showOrder(target.dataset.order, index);
 						}
-						else if (_.indexOf(classList, 'manager-order') !== -1) {
+						else if (_.indexOf(classList, orderItemClasses.manager) !== -1) {
 
-							_showOrder(target.dataset.order);
+							_showOrder(target.dataset.order, index);
 						}
 						else {
-
-							var index = _.indexOf(this.children, event.target.parentElement);
 
 							_createOrder(index);
 						}
@@ -208,7 +217,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 					_.forEach(_.range(0, 144, 3), function(periodId) {
 
 						timeLineItems.push({
-							time: odd ? controller.getTime(periodId) : null,
+							time: odd ? CONSTANTS.periods[periodId] : null,
 							margin: odd ? -1 : 0
 						});
 
@@ -249,7 +258,6 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 					_.forEach(_.range(0, 144, 3), function(periodId) {
 
 						var startOrderIndex = _.indexOf(startPeriodsId, periodId);
-						var cellWidth;
 
 						// Данная ячейка не относится к заказу
 						if (skip === 0) {
@@ -384,18 +392,25 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 				transform = Math.min(transform + parseFloat(shifting), 0);
 				transform = Math.max(transform, -totalWidth + options.items * itemWidth);
 
-				var length = 0;
+				current += options.scrollItems * (delta);
+				current = Math.min(Math.max(current, 0), _.keys($scope.orders).length * 48);
 
-				_.forEach(items, function(item, idx) {
 
-					length += parseInt(item.itemWidth);
+				/*if ((current - options.items) % 48 === 0) {
 
-					if (Math.abs(transform) < length) {
+					var diff = (current - options.items) / 48;
 
-						current = idx;
-						return false;
+					if (delta > 0) {
+
+						console.log(moment().add(diff + 1, 'days').format('YYYY-MM-DD'));
 					}
-				});
+					else {
+
+						console.log(moment().add(diff, 'days').format('YYYY-MM-DD'));
+					}
+				}*/
+
+				$scope.$emit('schedule:changePosition', {id: $scope.roomId, position: current});
 			}
 
 			function _rejectClosestItems(index) {
@@ -410,7 +425,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 					var classes = child.childNodes[0].classList;
 
-					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) return false;
+					if (_.indexOf(classes, orderItemClasses.service) !== -1 || _.indexOf(classes, orderItemClasses.manager) !== -1) return false;
 
 					child.childNodes[0].className += ' disabled';
 				});
@@ -419,7 +434,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 					var classes = child.childNodes[0].classList;
 
-					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) return false;
+					if (_.indexOf(classes, orderItemClasses.service) !== -1 || _.indexOf(classes, orderItemClasses.manager) !== -1) return false;
 
 					child.childNodes[0].className += ' disabled';
 				});
@@ -437,7 +452,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 					var classes = child.childNodes[0].classList;
 
-					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) return false;
+					if (_.indexOf(classes, orderItemClasses.service) !== -1 || _.indexOf(classes, orderItemClasses.manager) !== -1) return false;
 
 					child.childNodes[0].classList.remove('disabled');
 				});
@@ -446,7 +461,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 					var classes = child.childNodes[0].classList;
 
-					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) return false;
+					if (_.indexOf(classes, orderItemClasses.service) !== -1 || _.indexOf(classes, orderItemClasses.manager) !== -1) return false;
 
 					child.childNodes[0].classList.remove('disabled');
 				});
@@ -467,7 +482,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 					var classes = child.childNodes[0].classList;
 
-					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) {
+					if (_.indexOf(classes, orderItemClasses.service) !== -1 || _.indexOf(classes, orderItemClasses.manager) !== -1) {
 
 						return false;
 					}
@@ -479,7 +494,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 
 					var classes = child.childNodes[0].classList;
 
-					if (_.indexOf(classes, 'service-order') !== -1 || _.indexOf(classes, 'manager-order') !== -1) {
+					if (_.indexOf(classes, orderItemClasses.service) !== -1 || _.indexOf(classes, orderItemClasses.manager) !== -1) {
 
 						return false;
 					}
@@ -575,13 +590,21 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 				items[order.startIndex] = item;
 			}
 
+			function _unmergeItems(index, order) {
+
+			}
+
 
 			// Order manipulation
 
-			function _showOrder(id) {
+			function _showOrder(id, index) {
 
-				$scope.showOrder({roomId: $scope.roomId, orderId: id, callback: function(response) {
+				$scope.showOrder({roomId: $scope.roomId, orderId: id, callback: function(data) {
 
+					if (data.status === 'removed') {
+
+						_unmergeItems(index, data.order);
+					}
 				}});
 			}
 
@@ -602,7 +625,7 @@ function Schedule($rootScope, $window, $document, $compile, $filter) {
 				else if (!order.endDate && !order.endPeriod) {
 
 					order.endDate = item.date;
-					order.endPeriod = item.periodId;
+					order.endPeriod = item.periodId + 3;
 
 					order.endIndex = index;
 

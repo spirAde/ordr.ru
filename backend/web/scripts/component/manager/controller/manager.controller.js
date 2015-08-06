@@ -3,9 +3,9 @@
 var _ = require('lodash');
 var moment = require('moment');
 
-ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'localStorage', 'dataStorage'];
+ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'localStorage', 'dataStorage', 'CONSTANTS'];
 
-function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dataStorage) {
+function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dataStorage, CONSTANTS) {
 
 	$scope.rooms = [];
 	$scope.orders = [];
@@ -25,12 +25,14 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 			room.orders = {};
 
-			dataStorage.loadOrders(room.id).then(function(orders) {
+			dataStorage.loadOrders(room.id, $scope.currentDate).then(function(orders) {
 
 				room.orders = orders;
 			});
 		});
 	});
+
+	$scope.getOrders = getOrders;
 
 	$scope.showOrder = showOrder;
 	$scope.createOrder = createOrder;
@@ -39,20 +41,43 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 	$scope.logout = logout;
 
 
+	$timeout(function() {
+		console.log($scope.rooms);
+	}, 5000);
+
 	function showOrder(roomId, orderId, callback) {
 
 		var room = _.find($scope.rooms, {id: roomId});
-		var orders = _.where(_.flatten(_.toArray(room.orders)), {id: orderId}); // maybe 2days order
+		var orders = _.where(_.flatten(_.toArray(room.orders)), {id: parseInt(orderId)}); // maybe 2days order
 
 		ngDialog.open({
 			template: templates.showManagerOrder,
 			scope: $scope,
 			controller: ['$scope', function($scope) {
 
+				$scope.order = _.pick(orders[0], ['id', 'roomId', 'startDate', 'startPeriod']);
+
+				$scope.order = _.assign($scope.order, {
+					startTime: CONSTANTS.periods[orders[0].startPeriod],
+					endDate: orders.length > 1 ? orders[1].endDate : orders[0].endDate,
+					endTime: orders.length > 1 ? CONSTANTS.periods[orders[1].endPeriod] : CONSTANTS.periods[orders[0].endPeriod]
+				});
+
 				$scope.cancelOrder = function() {
 					ngDialog.close();
 				};
 
+				$scope.removeOrder = function() {
+
+					dataStorage.removeOrder(orders[0].id).then(function(data) {
+
+						console.log(data);
+					});
+
+					ngDialog.close();
+				};
+
+				$scope.updateOrder = function() {};
 			}]
 		});
 	}
@@ -62,7 +87,16 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 		ngDialog.open({
 			template: templates.createOrder,
 			scope: $scope,
-			controller: ['$scope', function ($scope) {
+			controller: ['$scope', function($scope) {
+
+				$scope.order = _.pick(order, ['roomId', 'startDate', 'endDate']);
+
+				$scope.order = _.assign($scope.order, {
+					startTime: CONSTANTS.periods[order.startPeriod],
+					endTime: CONSTANTS.periods[order.endPeriod],
+					comment: '',
+					summ: 0
+				});
 
 				$scope.cancelOrder = function() {
 
@@ -73,6 +107,13 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 				$scope.saveOrder = function() {
 
+					var data = _.pick(order, ['roomId', 'startDate', 'endDate', 'startPeriod', 'endPeriod']);
+
+					dataStorage.createOrder(data).then(function(data) {
+
+						console.log(data);
+					});
+
 					ngDialog.close();
 
 					callback({status: 'created'});
@@ -80,6 +121,16 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 			}]
 		});
 
+	}
+
+	function getOrders(roomId, date) {
+
+		dataStorage.loadOrders(roomId, date).then(function(orders) {
+
+			var room = _.find($scope.rooms, {id: roomId});
+
+			room.orders = _.assign(room.orders, orders);
+		});
 	}
 
 	function selectDate(date) {
@@ -98,9 +149,9 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 	}
 
 	var templates = {
-		createOrder: '/templates/templates/createOrder.html',
-		showManagerOrder: '/templates/templates/showManagerOrder.html',
-		showSiteOrder: '/templates/templates/showSiteOrder.html'
+		createOrder: 'templates/partials/createOrder.html',
+		showManagerOrder: 'templates/partials/showManagerOrder.html',
+		showSiteOrder: 'templates/partials/showServiceOrder.html'
 	};
 }
 
