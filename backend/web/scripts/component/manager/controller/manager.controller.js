@@ -10,8 +10,6 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 	$scope.rooms = [];
 	$scope.orders = [];
 
-	$scope.currentDate = moment().format('YYYY-MM-DD');
-
 	$scope.user = {
 		name: 'Петухова Ольга',
 		bathhouse: 'Бани на Малиновой'
@@ -25,7 +23,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 			room.orders = {};
 
-			dataStorage.loadOrders(room.id, $scope.currentDate).then(function(orders) {
+			dataStorage.loadOrders(room.id, moment().format('YYYY-MM-DD')).then(function(orders) {
 
 				room.orders = orders;
 			});
@@ -37,13 +35,8 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 	$scope.showOrder = showOrder;
 	$scope.createOrder = createOrder;
 
-	$scope.selectDate = selectDate;
 	$scope.logout = logout;
 
-
-	$timeout(function() {
-		console.log($scope.rooms);
-	}, 5000);
 
 	function showOrder(roomId, orderId, callback) {
 
@@ -131,13 +124,6 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 			room.orders = _.assign(room.orders, orders);
 		});
-	}
-
-	function selectDate(date) {
-
-		$timeout(function() {
-			$scope.currentDate = moment(date).format('YYYY-MM-DD');
-		}, 0);
 	}
 
 	function logout() {

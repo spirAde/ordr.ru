@@ -59,6 +59,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 			var shift = 0;
 			var transform = 0;
 			var current = 0;
+			var totalItems = 0;
 
 			var items = [];
 			var timeLineItems = [];
@@ -81,7 +82,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 					_initialize();
 					_subscribe();
-					_calculate();
+					_preCalculate();
 				}
 
 				// New data
@@ -93,24 +94,25 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					if (newDates.length) {
 
 						_buildData(newDates);
+						_postCalculate();
 						_renderTime(newDates.length);
 						_renderOrder();
 					}
 				}
 			}, true);
 
-			$scope.$watch('currentDate', function(newDate, oldDate) {
+			$rootScope.$on('date-paginator:changeDate', function(event, data) {
 
-				if (!moment(newDate).isSame(oldDate)) {
+				if (data.scroll) {
 
-					var diff = moment(newDate).diff(moment().format('YYYY-MM-DD'), 'days');
+					var diff = moment(data.date).diff(moment().format('YYYY-MM-DD'), 'days');
 
 					transform = -diff * 1000 * dayWidth / 1000;
 					current = diff * 48;
 
 					_scroll();
 				}
-			}, true);
+			});
 
 			$rootScope.$on('schedule:changePosition', function(event, data) {
 
@@ -191,7 +193,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				});
 			}
 
-			function _calculate() {
+			function _preCalculate() {
 
 				if (!itemWidth) {
 
@@ -224,6 +226,13 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 						odd = !odd;
 					});
 				}
+			}
+
+			function _postCalculate() {
+
+				var dates = _.keys($scope.orders);
+
+				totalItems = dates.length * 48;
 			}
 
 			function _scroll() {
@@ -388,27 +397,24 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 			function _changePosition(delta) {
 
 				var shifting = shift * (-delta);
+				var prev = current;
 
 				transform = Math.min(transform + parseFloat(shifting), 0);
 				transform = Math.max(transform, -totalWidth + options.items * itemWidth);
 
 				current += options.scrollItems * (delta);
-				current = Math.min(Math.max(current, 0), _.keys($scope.orders).length * 48);
+				current = Math.min(Math.max(current, 0), totalItems);
 
+				if (current % 48 === 0 && delta > 0) {
 
-				/*if ((current - options.items) % 48 === 0) {
+					$scope.currentDate = moment($scope.currentDate).add(1, 'days').format('YYYY-MM-DD');
+					$scope.$emit('schedule:changeDate', {date: $scope.currentDate});
+				}
+				else if (prev !== 0 && prev % 48 === 0 && delta < 0) {
 
-					var diff = (current - options.items) / 48;
-
-					if (delta > 0) {
-
-						console.log(moment().add(diff + 1, 'days').format('YYYY-MM-DD'));
-					}
-					else {
-
-						console.log(moment().add(diff, 'days').format('YYYY-MM-DD'));
-					}
-				}*/
+					$scope.currentDate = moment($scope.currentDate).subtract(1, 'days').format('YYYY-MM-DD');
+					$scope.$emit('schedule:changeDate', {date: $scope.currentDate});
+				}
 
 				$scope.$emit('schedule:changePosition', {id: $scope.roomId, position: current});
 			}

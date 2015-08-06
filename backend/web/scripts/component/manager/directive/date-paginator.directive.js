@@ -39,7 +39,7 @@ function DatePaginator($rootScope, $compile, $window) {
 		transclude: true,
 		template: '<div class="date clear"></div>',
 		scope: {
-			selectDate: '&selectDate'
+
 		},
 		controller: function($scope, $element) {
 
@@ -83,7 +83,7 @@ function DatePaginator($rootScope, $compile, $window) {
 				return data;
 			};
 
-			this.setSelectedDate = function(selectedDate) {
+			this.setSelectedDate = function(selectedDate, scroll) {
 
 				if ((!selectedDate.isSame(options.selectedDate.format(options.selectedDateFormat))) &&
 					(!selectedDate.isBefore(options.startDate.format(options.selectedDateFormat))) &&
@@ -91,7 +91,7 @@ function DatePaginator($rootScope, $compile, $window) {
 
 					options.selectedDate = selectedDate.startOf('day');
 
-					$scope.selectDate({date: selectedDate.clone()});
+					$scope.$emit('date-paginator:changeDate', {date: selectedDate.clone(), scroll: scroll});
 				}
 			};
 		},
@@ -118,17 +118,17 @@ function DatePaginator($rootScope, $compile, $window) {
 
 				if (classList.indexOf('dp-nav-left') != -1) {
 
-					controller.setSelectedDate(options.selectedDate.clone().subtract(1, 'days'));
+					controller.setSelectedDate(options.selectedDate.clone().subtract(1, 'days'), true);
 					render();
 				}
 				else if (classList.indexOf('dp-nav-right') != -1) {
 
-					controller.setSelectedDate(options.selectedDate.clone().add(1, 'days'));
+					controller.setSelectedDate(options.selectedDate.clone().add(1, 'days'), true);
 					render();
 				}
 				else if (classList.indexOf('dp-item') != -1) {
 
-					controller.setSelectedDate(moment(target.attr('data-moment'), options.selectedDateFormat));
+					controller.setSelectedDate(moment(target.attr('data-moment'), options.selectedDateFormat), true);
 					render();
 				}
 			});
@@ -194,6 +194,12 @@ function DatePaginator($rootScope, $compile, $window) {
 
 				$datepaginator.append($items);
 			}
+
+			$rootScope.$on('schedule:changeDate', function(event, data) {
+
+				controller.setSelectedDate(moment(data.date, options.selectedDateFormat), false);
+				render();
+			});
 		}
 	}
 }
