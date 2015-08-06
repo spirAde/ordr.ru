@@ -1,6 +1,7 @@
 <?php
 namespace common\components;
 
+use console\models\BathhouseSchedule;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -10,13 +11,53 @@ class ApiHelpers
     const LAST_TIME_ID = 144;
     const STEP = 3;
 
-    public static function checkOrder($model)
+    public static function checkOrder($model,$min_duration = self::STEP)
     {
+
+        if($model->start_date == $model->end_date)
+        {
+            $freetime_for_day = BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->start_date]);
+            $freetime_for_day = ($freetime_for_day) ? json_decode($freetime_for_day->schedule) : [];
+        }
         return true;
     }
 
-    public static function reformScheduleForDay($room_id, $start_date, $end_date)
+    public static function reformScheduleForDay($room_id, $start_date, $end_date, $min_daration = self::STEP)
     {
+        $dates = [$start_date, $end_date];
+        foreach($dates as $date)
+        {
+            $all_bookings = \api\modules\closed\models\BathhouseBooking::find()
+                ->select('start_period,end_period,start_date,end_date')
+                ->where('start_date = :start_date OR end_date = :end_date AND room_id = :room_id', [
+                    ':start_date' => $date,
+                    ':end_date' => $date,
+                    ':room_id' => $room_id,
+                ])
+                ->all();
+
+            $busy_periods = [];
+
+            foreach ($all_bookings as $book_item)
+            {
+                //заявка, пришедшая с прошлого дня
+                if ($book_item->end_date == $date and $book_item->start_date != $date)
+                    $busy_periods[] = [0, $book_item->end_period];
+                //заявка с переходом на следующий день
+                elseif ($book_item->end_date != $date and $book_item->start_date == $date)
+                    $busy_periods[] = [$book_item->start_period, 144];
+                else
+                    $busy_periods[] = [$book_item->start_period, $book_item->end_period];
+            }
+            $free_period_for_date = ApiHelpers::getFreeTime($busy_periods,$room['bathhouseRoomSettings']['min_duration']);
+
+            yii::$app->db->createCommand()
+                ->update('bathhouse_schedule', [
+                    'schedule'  => json_encode($free_period_for_date)],
+                    'date = "'.$date.'" AND room_id = '.$room['id'])
+                ->execute();
+        }
+
         return true;
     }
 

@@ -46,6 +46,7 @@ class BathhouseBooking extends \yii\db\ActiveRecord
         return [
             [['room_id', 'start_date', 'end_date', 'start_period', 'end_period'], 'required'],
             [['bathhouse_id'], 'checkOrderUnique'],
+            [['bathhouse_id'], 'checkBathhouseRoom'],
             [['bathhouse_id', 'room_id', 'start_period', 'end_period', 'guests', 'status_id', 'user_id', 'manager_id'], 'integer'],
             [['start_date', 'end_date', 'created'], 'safe'],
             [['services', 'comment'], 'string'],
@@ -89,21 +90,31 @@ class BathhouseBooking extends \yii\db\ActiveRecord
 
     public function checkOrderUnique()
     {
-        return (BathhouseBooking::findOne('
-                            bathhouse_id = :bathhouse_id
-                            AND room_id = :room_id
-                            AND start_date = :start_date
-                            AND end_date = :end_date
-                            AND start_period = :start_period
-                            AND end_period = :end_period'
-                ,[
-                    ':bathhouse_id'     => $this->bathhouse_id,
-                    ':room_id'          => $this->room_id,
-                    ':start_date'       => $this->start_date,
-                    ':end_date'         => $this->end_date,
-                    ':start_period'     => $this->start_period,
-                    ':end_period'       => $this->end_period
-                ]) == null);
+        if(BathhouseBooking::findOne([
+                    'bathhouse_id'     => $this->bathhouse_id,
+                    'room_id'          => $this->room_id,
+                    'start_date'       => $this->start_date,
+                    'end_date'         => $this->end_date,
+                    'start_period'     => $this->start_period,
+                    'end_period'       => $this->end_period
+                ]) != null)
+            $this->addError('bathhouse_id', 'Order already exist');
+    }
+
+    public function checkBathhouseRoom()
+    {
+        if(BathhouseRoom::findOne(['bathhouse_id' => $this->bathhouse_id, 'id' => $this->room_id]) == null)
+            $this->addError('bathhouse_id', 'Bathhouse - room mismatch');
+    }
+
+    public function getBathhouse()
+    {
+        return $this->hasOne(Bathhouse::className(), ['id' => 'bathhouse_id']);
+    }
+
+    public function getRoom()
+    {
+        return $this->hasOne(BathhouseRoom::className(), ['id' => 'room_id']);
     }
 
 }
