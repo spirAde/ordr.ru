@@ -27,6 +27,7 @@ return [
                 'class' => 'api\controllers\ApiController'
             ]
         ],*/
+
         'response' => [
             'class' => 'yii\web\Response',
             'format' => yii\web\Response::FORMAT_JSON,
@@ -76,12 +77,12 @@ return [
                 // end open api routes
                 // closed api routes
                 'closed/login'  => 'closed/login/index',
-
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'closed/room',
                     'patterns' => [
                         'GET '                   => 'index',
+                        'OPTIONS'                => 'options',
                         'GET <id:\d+>'           => 'index',
                     ]
                 ],
@@ -91,7 +92,8 @@ return [
                     'patterns' => [
                         'GET'                   => 'index',
                         'POST'                  => 'create',
-                        'DELETE <id:\d+>'           => 'delete',
+                        'OPTIONS'               => 'options',
+                        'DELETE <id:\d+>'       => 'delete',
                     ]
                 ],
                 // end closed api routes

@@ -1,36 +1,17 @@
 <?php
-/**
- * @link http://www.yiiframework.com/
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
 
-namespace yii\rest;
+namespace api\components\actions;
 
 use Yii;
+use yii\rest\OptionsAction;
 
-/**
- * OptionsAction responds to the OPTIONS request by sending back an `Allow` header.
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- * @since 2.0
- */
-class OptionsAction extends \yii\base\Action
+class FixedOptionsAction extends OptionsAction
 {
-    /**
-     * @var array the HTTP verbs that are supported by the collection URL
-     */
+
     public $collectionOptions = ['GET', 'POST', 'HEAD', 'OPTIONS'];
-    /**
-     * @var array the HTTP verbs that are supported by the resource URL
-     */
     public $resourceOptions = ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
 
-
-    /**
-     * Responds to the OPTIONS request.
-     * @param string $id
-     */
+    
     public function run($id = null)
     {
         if (Yii::$app->getRequest()->getMethod() !== 'OPTIONS') {

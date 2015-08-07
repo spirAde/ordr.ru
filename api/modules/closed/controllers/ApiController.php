@@ -50,12 +50,13 @@ class ApiController extends ActiveController
             return false;
         }
 
-        if ($action->controller->id === 'login' && $action->id === 'index')
+        if ($action->controller->id === 'login' or Yii::$app->request->getMethod() == 'OPTIONS')
             return true;
 
         $authHeader = yii::$app->getRequest()->getHeaders()->get('Authorization');
 
-        if ($authHeader !== null && preg_match("/^Bearer\\s+(.*?)$/", $authHeader, $matches)) {
+        if ($authHeader !== null && preg_match("/^Bearer\\s+(.*?)$/", $authHeader, $matches))
+        {
 
             $secret = \Yii::$app->params['secret'];
             $user = JWT::decode($matches[1], $secret);
@@ -93,7 +94,10 @@ class ApiController extends ActiveController
             'index' => [
                 'class' => 'api\components\actions\FilterIndexAction',
                 'modelClass' => $this->modelClass,
-            ]
+            ],
+            'options' => [
+                'class' => 'api\components\actions\FixedOptionsAction',
+            ],
         ]);
     }
 
