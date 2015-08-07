@@ -95,13 +95,15 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					if (newDates.length) {
 
+						console.log(newDates);
+
 						var data = _buildData(newDates);
 
 						items = items.concat(data);
 
 						_postCalculate();
-						_renderTime(newDates.length);
 						_renderOrder(data);
+						_renderTime(newDates.length);
 					}
 				}
 			}, true);
@@ -123,8 +125,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 				if (data.id !== $scope.roomId) {
 
-					current = data.position;
-					transform = -(current / options.scrollItems) * 1000 * shift / 1000;
+					_changePosition(data.delta, false);
 
 					_scroll();
 				}
@@ -152,7 +153,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					event.preventDefault();
 
-					_changePosition(delta);
+					_changePosition(delta, true);
 
 					var scroll = _.throttle(_.bind(_scroll, this, delta), 750);
 
@@ -216,15 +217,6 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 				shift = ((itemWidth * 1000 + options.margin * 1000) * options.scrollItems) / 1000;
 
 				dayWidth = ((itemWidth * 1000 + options.margin * 1000) * 48) / 1000;
-			}
-
-			function _postCalculate() {
-
-				var dates = _.keys($scope.orders);
-
-				totalItems = dates.length * 48;
-
-				totalWidth = (_.sum(items, 'itemWidth') + 50).toFixed(3);
 
 				var odd = true;
 
@@ -237,6 +229,15 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					odd = !odd;
 				});
+			}
+
+			function _postCalculate() {
+
+				var dates = _.keys($scope.orders);
+
+				totalItems = dates.length * 48;
+
+				totalWidth = (_.sum(items, 'itemWidth') + 50).toFixed(3);
 
 				lastDate = _.last(dates);
 			}
@@ -401,7 +402,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 				});
 			}
 
-			function _changePosition(delta) {
+			function _changePosition(delta, notify) {
 
 				var shifting = shift * (-delta);
 				var prev = current;
@@ -433,7 +434,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					$scope.$emit('schedule:changeDate', {date: $scope.currentDate});
 				}
 
-				$scope.$emit('schedule:changePosition', {id: $scope.roomId, position: current});
+				if (notify) $scope.$emit('schedule:changePosition', {id: $scope.roomId, delta: delta});
 			}
 
 			function _rejectClosestItems(index) {
@@ -673,7 +674,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 				console.log('_getOrders', lastDate);
 
-				$scope.getOrders({roomId: $scope.roomId, date: lastDate});
+				$scope.getOrders({roomId: $scope.roomId, date: moment(lastDate).add(1, 'days').format('YYYY-MM-DD')});
 			}
 
 			function _resetOrder() {
