@@ -747,10 +747,10 @@ class DataController extends Controller {
 
                 $all_bookings = BathhouseBooking::find()
                     ->select('start_period,end_period,start_date,end_date')
-                    ->where('start_date = :start_date OR end_date = :end_date AND room_id = :room_id',[
+                    ->where('(start_date = :start_date OR end_date = :end_date) AND room_id = :room_id',[
                         ':start_date'   => $date,
                         ':end_date'     => $date,
-                        ':room_id'      => $room['id'],
+                        ':room_id'      => (int)$room['id'],
                     ])
                     ->all();
 

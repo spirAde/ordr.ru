@@ -2,6 +2,7 @@
 
 namespace api\modules\closed\models;
 
+use common\components\ApiHelpers;
 use Yii;
 
 
@@ -47,6 +48,9 @@ class BathhouseBooking extends \yii\db\ActiveRecord
             [['room_id', 'start_date', 'end_date', 'start_period', 'end_period'], 'required'],
             [['bathhouse_id'], 'checkOrderUnique'],
             [['bathhouse_id'], 'checkBathhouseRoom'],
+            [['end_date'], 'checkDates'],
+            [['start_period'], 'checkPeriods'],
+            [['start_period','end_period'], 'in', 'range' => range(ApiHelpers::FIRST_TIME_ID, ApiHelpers::LAST_TIME_ID)],
             [['bathhouse_id', 'room_id', 'start_period', 'end_period', 'guests', 'status_id', 'user_id', 'manager_id'], 'integer'],
             [['start_date', 'end_date', 'created'], 'safe'],
             [['services', 'comment'], 'string'],
@@ -57,7 +61,7 @@ class BathhouseBooking extends \yii\db\ActiveRecord
             ['guests', 'default', 'value' => 1,'on' => 'insert'],
             ['services', 'default', 'value' => json_encode(array())],
             ['user_id', 'default', 'value' => 0],
-            ['manager_id', 'default', 'value' => (Yii::$app->user->identity->id) ? :null],
+            ['manager_id', 'default', 'value' => (Yii::$app->user->identity->id) ? : 0],
             ['status_id', 'default', 'value' => 1],
             ['created', 'default', 'value' => date('Y-m-d H:i:s'),'on' => 'insert'],
             [['cost_period', 'cost_services', 'cost_guests', 'total'], 'number']
@@ -105,6 +109,18 @@ class BathhouseBooking extends \yii\db\ActiveRecord
     {
         if(BathhouseRoom::findOne(['bathhouse_id' => $this->bathhouse_id, 'id' => $this->room_id]) == null)
             $this->addError('bathhouse_id', 'Bathhouse - room mismatch');
+    }
+
+    public function checkDates()
+    {
+        if($this->start_date != $this->end_date and $this->end_date != date('Y-m-d',strtotime("+1 day", strtotime($this->start_date))))
+            $this->addError('end_date', 'End_date should be next day of start_day');
+    }
+
+    public function checkPeriods()
+    {
+        if($this->end_period < $this->start_period and $this->start_date == $this->end_date)
+            $this->addError('end_period','When end_period is less than start_period, start and end dates should be different');
     }
 
     public function getBathhouse()

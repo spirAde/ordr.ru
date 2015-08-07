@@ -94,7 +94,7 @@ return [
                     'controller' => 'closed/room',
                     'patterns' => [
                         'GET '                   => 'index',
-                        'GET <id:\d+>'          => 'index',
+                        'GET <id:\d+>'           => 'index',
                     ]
                 ],
                 [
@@ -102,8 +102,8 @@ return [
                     'controller' => 'closed/order',
                     'patterns' => [
                         'GET'                   => 'index',
-                        'GET sorted'            => 'sorted',
                         'POST'                  => 'create',
+                        'DELETE {id}'           => 'delete',
                     ]
                 ],
                 // end closed api routes
