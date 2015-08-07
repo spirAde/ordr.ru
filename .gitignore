@@ -1,7 +1,9 @@
 .idea
 frontend/web/build
 backend/web/build
-node_modules
+node_modules/*
+!node_modules/hamsterjs
+!node_modules/ng-dialog
 frontend/config/main-local.php
 backend/config/main-local.php
 **/.DS_Store

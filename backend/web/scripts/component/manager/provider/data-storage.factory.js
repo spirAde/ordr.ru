@@ -38,7 +38,7 @@ function dataStorage($rootScope, $http, $q, localStorage) {
 
 		var endDate = moment(date).add(1, 'days').format('YYYY-MM-DD');
 
-		return $http.get('http://api.ordr.ru/closed/orders/sorted?limit=1000&room_id=' + id + '&start=' + date + '&end=' + endDate)
+		return $http.get('http://api.ordr.ru/closed/orders?limit=1000&room_id=' + id + '&start=' + date + '&end=' + endDate)
 			.then(function(response) {
 
 				return response.data;
