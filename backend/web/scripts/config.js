@@ -9,7 +9,7 @@ function appConfig($compileProvider, $httpProvider, $provide, ngDialogProvider) 
 		plain: false,
 		showClose: false,
 		closeByDocument: false,
-		closeByEscape: true,
+		closeByEscape: false,
 		disableAnimation: true
 	});
 
