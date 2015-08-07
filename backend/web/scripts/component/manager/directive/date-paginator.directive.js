@@ -41,9 +41,33 @@ function DatePaginator($rootScope, $compile, $window) {
 		scope: {
 
 		},
-		controller: function($scope, $element) {
+		link: function($scope, $element) {
 
-			this.buildData = function() {
+			var $wrap, $datepaginator, $items;
+
+			$rootScope.$on('schedule:changeDate', function(event, data) {
+
+				_setSelectedDate(moment(data.date, options.selectedDateFormat), false);
+				_render();
+			});
+
+			_initialize();
+			_subscribe();
+			_render();
+
+			function _initialize() {
+
+				$wrap = angular.element('<div class="wrap clear"></div>');
+				$datepaginator = angular.element('<div class="datepaginator"></div>');
+				$items = angular.element('<ul class="pagination"></ul>');
+
+				$wrap.append($datepaginator);
+
+				$element.append($wrap);
+				$compile($wrap)($scope);
+			}
+
+			function _buildData() {
 
 				var viewWidth = ($element.parent()[0].offsetWidth - ((options.selectedItemWidth - options.itemWidth) + (options.navItemWidth * 2)));
 				var units = Math.floor(viewWidth / options.itemWidth);
@@ -81,65 +105,13 @@ function DatePaginator($rootScope, $compile, $window) {
 				}
 
 				return data;
-			};
+			}
 
-			this.setSelectedDate = function(selectedDate, scroll) {
-
-				if ((!selectedDate.isSame(options.selectedDate.format(options.selectedDateFormat))) &&
-					(!selectedDate.isBefore(options.startDate.format(options.selectedDateFormat))) &&
-					(!selectedDate.isAfter(options.endDate.format(options.selectedDateFormat)))) {
-
-					options.selectedDate = selectedDate.startOf('day');
-
-					$scope.$emit('date-paginator:changeDate', {date: selectedDate.clone(), scroll: scroll});
-				}
-			};
-		},
-
-		link: function($scope, $element, $attrs, controller) {
-
-			var $wrap = angular.element('<div class="wrap clear"></div>');
-			var $datepaginator = angular.element('<div class="datepaginator"></div>');
-			var $items = angular.element('<ul class="pagination"></ul>');
-
-			render();
-
-			$wrap.append($datepaginator);
-
-			$element.append($wrap);
-			$compile($wrap)($scope);
-
-			$wrap.bind('click', function(e) {
-
-				e.preventDefault();
-
-				var target = angular.element(e.target);
-				var classList = target.attr('class');
-
-				if (classList.indexOf('dp-nav-left') != -1) {
-
-					controller.setSelectedDate(options.selectedDate.clone().subtract(1, 'days'), true);
-					render();
-				}
-				else if (classList.indexOf('dp-nav-right') != -1) {
-
-					controller.setSelectedDate(options.selectedDate.clone().add(1, 'days'), true);
-					render();
-				}
-				else if (classList.indexOf('dp-item') != -1) {
-
-					controller.setSelectedDate(moment(target.attr('data-moment'), options.selectedDateFormat), true);
-					render();
-				}
-			});
-
-			angular.element($window).bind('resize', _.throttle(render, 100));
-
-			function render() {
+			function _render() {
 
 				$items.empty();
 
-				var data = controller.buildData();
+				var data = _buildData();
 
 				$items.append('' +
 				'<li>' +
@@ -195,11 +167,46 @@ function DatePaginator($rootScope, $compile, $window) {
 				$datepaginator.append($items);
 			}
 
-			$rootScope.$on('schedule:changeDate', function(event, data) {
+			function _setSelectedDate(selectedDate, scroll) {
 
-				controller.setSelectedDate(moment(data.date, options.selectedDateFormat), false);
-				render();
-			});
+				if ((!selectedDate.isSame(options.selectedDate.format(options.selectedDateFormat))) &&
+					(!selectedDate.isBefore(options.startDate.format(options.selectedDateFormat))) &&
+					(!selectedDate.isAfter(options.endDate.format(options.selectedDateFormat)))) {
+
+					options.selectedDate = selectedDate.startOf('day');
+
+					$scope.$emit('date-paginator:changeDate', {date: selectedDate.clone(), scroll: scroll});
+				}
+			}
+
+			function _subscribe() {
+
+				$wrap.bind('click', function(e) {
+
+					e.preventDefault();
+
+					var target = angular.element(e.target);
+					var classList = target.attr('class');
+
+					if (classList.indexOf('dp-nav-left') != -1) {
+
+						_setSelectedDate(options.selectedDate.clone().subtract(1, 'days'), true);
+						_render();
+					}
+					else if (classList.indexOf('dp-nav-right') != -1) {
+
+						_setSelectedDate(options.selectedDate.clone().add(1, 'days'), true);
+						_render();
+					}
+					else if (classList.indexOf('dp-item') != -1) {
+
+						_setSelectedDate(moment(target.attr('data-moment'), options.selectedDateFormat), true);
+						_render();
+					}
+				});
+
+				angular.element($window).bind('resize', _.throttle(_render, 100));
+			}
 		}
 	}
 }
