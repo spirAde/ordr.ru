@@ -76,6 +76,7 @@ return [
                 // end open api routes
                 // closed api routes
                 'closed/login'  => 'closed/login/index',
+
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'closed/room',
@@ -90,7 +91,7 @@ return [
                     'patterns' => [
                         'GET'                   => 'index',
                         'POST'                  => 'create',
-                        'DELETE <id:\d+>'       => 'delete',
+                        'DELETE <id:\d+>'           => 'delete',
                     ]
                 ],
                 // end closed api routes
