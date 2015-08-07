@@ -191,8 +191,9 @@ class OrderController extends ApiController
                 'status' => 422,
                 'type'  => '',
             ];
+        $min_duration = $model->room->bathhouseRoomSettings->min_duration;
 
-        if(ApiHelpers::checkTimeIsFree($model, $model->room->bathhouseRoomSettings->min_duration))
+        if(ApiHelpers::checkTimeIsFree($model, $min_duration))
         {
             $transaction = BathhouseBooking::getDb()->beginTransaction();
             $model->manager_id      = Yii::$app->user->identity->id;
@@ -211,7 +212,7 @@ class OrderController extends ApiController
             {
                 return $model;
             }
-            if(ApiHelpers::reformScheduleForDay($model->room_id, $model->start_date, $model->end_date))
+            if(ApiHelpers::reformScheduleForDay($model->room_id, $model->start_date, $model->end_date, $min_duration))
             {
                 $transaction->commit();
 
@@ -252,24 +253,48 @@ class OrderController extends ApiController
 
     public function actionDelete($id)
     {
+
         $model = $this->findModel($id);
+
         if($model->bathhouse_id != yii::$app->user->identity->organization_id or $model->manager_id == 0)
         {
             throw new UnauthorizedHttpException('Unauthorized request');
         }
-        if ($model->delete() === false) {
+
+        $room_id        = $model->room_id;
+        $start_date     = $model->start_date;
+        $end_date       = $model->end_date;
+        $min_duration   = $model->room->bathhouseRoomSettings->min_duration;
+
+        $transaction    = BathhouseBooking::getDb()->beginTransaction();
+
+        if ($model->delete() === false)
+        {
+            $transaction->rollBack();
             throw new ServerErrorHttpException('Failed to delete the object for unknown reason.');
         }
+        else
+        {
+            if(ApiHelpers::reformScheduleForDay($room_id, $start_date, $end_date, $min_duration))
+            {
+                $transaction->commit();
 
-        Yii::$app->getResponse()->setStatusCode(204);
-        return [
-            'result' => 'success',
-            'data'  => [],
-            'name' => 'Success operation',
-            'code' => 0,
-            'status' => 204,
-            'type'  => '',
-        ];
+                Yii::$app->getResponse()->setStatusCode(201);
+                return [
+                    'result' => 'success',
+                    'data' => [],
+                    'name' => 'Success operation',
+                    'code' => 0,
+                    'status' => 201,
+                    'type' => '',
+                ];
+            }
+            else
+            {
+                $transaction->rollBack();
+                throw new ServerErrorHttpException('Schedule forming error. Order not deleted');
+            }
+        }
     }
 
 }

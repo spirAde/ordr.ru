@@ -31,19 +31,6 @@ return [
             'class' => 'yii\web\Response',
             'format' => yii\web\Response::FORMAT_JSON,
             'charset' => 'UTF-8',
-            'on beforeSend' => function($event) {
-
-                // Вынужденная мера для работы angular && cors && Yii2
-                if (\Yii::$app->request->getMethod() === 'OPTIONS') {
-                    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']) &&
-                        ($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] === 'GET' ||
-                        $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] === 'POST' ||
-                        $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] === 'DELETE')) {
-                        header('Access-Control-Allow-Headers: X-Requested-With, Content-Type, Authorization');
-                    }
-                    exit;
-                }
-            }
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -103,7 +90,7 @@ return [
                     'patterns' => [
                         'GET'                   => 'index',
                         'POST'                  => 'create',
-                        'DELETE {id}'           => 'delete',
+                        'DELETE <id:\d+>'       => 'delete',
                     ]
                 ],
                 // end closed api routes

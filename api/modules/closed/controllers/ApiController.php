@@ -46,8 +46,7 @@ class ApiController extends ActiveController
     public function beforeAction($action)
     {
 
-        if (!parent::beforeAction($action))
-        {
+        if (!parent::beforeAction($action)) {
             return false;
         }
 
@@ -56,31 +55,25 @@ class ApiController extends ActiveController
 
         $authHeader = yii::$app->getRequest()->getHeaders()->get('Authorization');
 
-        if ($authHeader !== null && preg_match("/^Bearer\\s+(.*?)$/", $authHeader, $matches))
-        {
+        if ($authHeader !== null && preg_match("/^Bearer\\s+(.*?)$/", $authHeader, $matches)) {
 
             $secret = \Yii::$app->params['secret'];
             $user = JWT::decode($matches[1], $secret);
 
-            if ($user)
-            {
-                if(isset($user->tokenLifetime) and !empty($user->tokenLifetime) and ($user->tokenLifetime - time()) > 0)
-                {
+            if ($user) {
+                if (isset($user->tokenLifetime) and !empty($user->tokenLifetime) and ($user->tokenLifetime - time()) > 0) {
                     $manager = Managers::findIdentity($user->id);
 
-                    if($manager == null)
+                    if ($manager == null)
                         throw new UnauthorizedHttpException('Undefined user');
-                    else
-                    {
+                    else {
                         Yii::$app->user->login($manager);
 
                         return true;
                     }
-                }
-                else
+                } else
                     throw new UnauthorizedHttpException('Token expired');
-            }
-            else
+            } else
                 throw new UnauthorizedHttpException('Undefined user');
         }
 
@@ -96,7 +89,7 @@ class ApiController extends ActiveController
 
     public function actions()
     {
-        return ArrayHelper::merge(parent::actions(),[
+        return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'class' => 'api\components\actions\FilterIndexAction',
                 'modelClass' => $this->modelClass,
@@ -104,4 +97,23 @@ class ApiController extends ActiveController
         ]);
     }
 
+    public function findModel($id)
+    {
+        $modelClass = $this->modelClass;
+        $keys = $modelClass::primaryKey();
+        if(count($keys) > 1)
+        {
+            $values = explode(',', $id);
+            if (count($keys) === count($values))
+                $model = $modelClass::findOne(array_combine($keys, $values));
+        }
+        elseif($id !== null)
+            $model = $modelClass::findOne($id);
+
+
+        if (isset($model))
+            return $model;
+        else
+            throw new NotFoundHttpException("Object not found: $id");
+    }
 }
