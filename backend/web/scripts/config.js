@@ -1,8 +1,17 @@
 'use strict';
 
-appConfig.$inject = ['$compileProvider', '$httpProvider', '$provide'];
+appConfig.$inject = ['$compileProvider', '$httpProvider', '$provide', 'ngDialogProvider'];
 
-function appConfig($compileProvider, $httpProvider, $provide) {
+function appConfig($compileProvider, $httpProvider, $provide, ngDialogProvider) {
+
+	ngDialogProvider.setDefaults({
+		className: 'ngdialog-theme-default',
+		plain: false,
+		showClose: false,
+		closeByDocument: false,
+		closeByEscape: true,
+		disableAnimation: true
+	});
 
 	$httpProvider.interceptors.push('httpInterceptor');
 

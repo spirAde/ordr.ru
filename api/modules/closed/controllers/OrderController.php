@@ -114,7 +114,7 @@ class OrderController extends ApiController
                     'startDate'         => $order['start_date'],
                     'endDate'           => ($oneDay) ? $order['end_date'] : $order['start_date'],
                     'startPeriod'       => (int)$order['start_period'],
-                    'endPeriod'         => (int)($oneDay) ? $order['end_period'] : OrdrHelper::LAST_TIME_ID,
+                    'endPeriod'         => ($oneDay) ? (int)$order['end_period'] : (int)OrdrHelper::LAST_TIME_ID,
                     'services'          => $order['services'],
                     'guests'            => (int)$order['guests'],
                     'comment'           => $order['comment'],

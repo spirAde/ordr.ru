@@ -35,14 +35,14 @@
                     <div class="wrap">
 
                         <schedule
-                            room-id="room.room_id"
+                            room-id="room.id"
                             orders="room.orders"
-                            min-duration="room.min_duration"
-                            change-position="slideData"
+                            min-duration="room.settings.minDuration"
+                            current-date="currentDate"
 
                             show-order="showOrder(roomId, orderId, callback);"
-                            new-order="newOrder(order, callback);"
-                            get-orders="getOrders(roomId, startDate, endDate);">
+                            create-order="createOrder(order, callback);"
+                            get-orders="getOrders(roomId, date);">
                         </schedule>
 
                     </div>
@@ -69,32 +69,3 @@
 
     <div class="md-overlay" ng-show="overlay"></div>
 </div>
-
-<script>
-
-    $(document).ready(function() {
-
-        /*$('.scroll').perfectScrollbar({
-            suppressScrollX: true
-        });*/
-
-
-        /*$('.md-close').click(function(){
-            $('.md-modal').removeClass('md-show');
-            $('body').removeClass('body-overlay');
-            $('.md-overlay').hide();
-        });
-
-        $('.md-overlay').click(function(){
-            $('.md-close').click();
-        });*/
-
-        $('body').delegate('.time .item', 'click', function(){
-            $('body').addClass('body-overlay');
-            $('#modal-1').addClass('md-show');
-            $('.md-overlay').show();
-            return false;
-        });
-    });
-
-</script>

@@ -653,7 +653,7 @@ class DataController extends Controller {
             ]
         ];
         $first_date = date('Y-m-d', strtotime('now'));
-        $end_date = date('Y-m-d', strtotime('now', strtotime('+7 days')));
+        $end_date = date('Y-m-d', strtotime('now', strtotime('+30 days')));
         $dates_range = OrdrHelper::datesRange($first_date, $end_date);
         $rooms = BathhouseRoom::find()
             ->joinWith(['bathhouseRoomSettings'])

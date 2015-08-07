@@ -1,5 +1,5 @@
 <div class="md-title clear">
-    <h2>Данные заказа №{{currOrder.id}}</h2>
+    <h2>Данные заказа №{{order.id}}</h2>
 </div>
 <!--<div class="messages done">
     <p>Done</p>
@@ -8,7 +8,7 @@
     <p>Error</p>
 </div>-->
 <div class="form">
-    <p>Время: {{currOrder.date_from}} {{currOrder.time_from | periodToTime}} - {{currOrder.date_to}} {{currOrder.time_to | periodToTime}}</p>
+    <p>Время: {{order.startDate}} {{order.startTime}} - {{order.endDate}} {{order.endTime}}</p>
     <!--<div class="field">
         <input labeltext="Имя" />
     </div>

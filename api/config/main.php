@@ -31,7 +31,7 @@ return [
             'class' => 'yii\web\Response',
             'format' => yii\web\Response::FORMAT_JSON,
             'charset' => 'UTF-8',
-            /*'on beforeSend' => function($event) {
+            'on beforeSend' => function($event) {
 
                 // Вынужденная мера для работы angular && cors && Yii2
                 if (\Yii::$app->request->getMethod() === 'OPTIONS') {
@@ -43,7 +43,7 @@ return [
                     }
                     exit;
                 }
-            }*/
+            }
         ],
         'user' => [
             'identityClass' => 'common\models\User',
