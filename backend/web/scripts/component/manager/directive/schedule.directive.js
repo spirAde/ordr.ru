@@ -109,6 +109,14 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 			$rootScope.$on('date-paginator:changeDate', function(event, data) {
 
+				if (moment(data.date).isAfter(lastDate)) {
+
+					var startDate = moment(lastDate).add(1, 'days').format('YYYY-MM-DD');
+					var endDate = moment(data.date).add(1, 'days').format('YYYY-MM-DD');
+
+					_getOrders(startDate, endDate);
+				}
+
 				if (data.scroll) {
 
 					var diff = moment(data.date).diff(moment().format('YYYY-MM-DD'), 'days');
@@ -492,7 +500,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					
 					if (moment(lastDate).diff(moment(currentDate), 'days') === 0) {
 
-						_getOrders();
+						_getOrders(moment(lastDate).add(1, 'days').format('YYYY-MM-DD'));
 					}
 				}
 				else if (prev !== 0 && prev % 48 === 0 && delta < 0) {
@@ -739,11 +747,9 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 				}
 			}
 
-			function _getOrders() {
+			function _getOrders(startDate, endDate) {
 
-				console.log('_getOrders', lastDate);
-
-				$scope.getOrders({roomId: $scope.roomId, date: moment(lastDate).add(1, 'days').format('YYYY-MM-DD')});
+				$scope.getOrders({roomId: $scope.roomId, startDate: startDate, endDate: endDate});
 			}
 
 			function _resetOrder() {

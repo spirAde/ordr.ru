@@ -34,11 +34,11 @@ function dataStorage($rootScope, $http, $q, localStorage) {
 			});
 	}
 
-	function loadOrders(id, date) {
+	function loadOrders(id, startDate, endDate) {
 
-		var endDate = moment(date).add(1, 'days').format('YYYY-MM-DD');
+		endDate = endDate || moment(startDate).add(1, 'days').format('YYYY-MM-DD');
 
-		return $http.get('http://api.ordr.ru/closed/orders?limit=1000&room_id=' + id + '&start=' + date + '&end=' + endDate)
+		return $http.get('http://api.ordr.ru/closed/orders?limit=1000&room_id=' + id + '&start=' + startDate + '&end=' + endDate)
 			.then(function(response) {
 
 				return response.data;
