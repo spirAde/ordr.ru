@@ -191,6 +191,7 @@ class OrderController extends ApiController
                 'status' => 422,
                 'type'  => '',
             ];
+
         $min_duration = $model->room->bathhouseRoomSettings->min_duration;
 
         if(ApiHelpers::checkTimeIsFree($model, $min_duration))
