@@ -62,6 +62,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 			var current = 0;        // current single item position
 			var totalItems = 0;     // total count of items
 			var lastDate = '';
+			var currentDate = '';
 
 			var items = [];         // each cells with data
 			var timeLineItems = [];
@@ -95,8 +96,6 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					if (newDates.length) {
 
-						console.log(newDates);
-
 						var data = _buildData(newDates);
 
 						items = items.concat(data);
@@ -116,6 +115,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					transform = -diff * 1000 * dayWidth / 1000;
 					current = diff * 48;
+					currentDate = data.date;
 
 					_scroll();
 				}
@@ -229,6 +229,8 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					odd = !odd;
 				});
+
+				currentDate = moment().format('YYYY-MM-DD');
 			}
 
 			function _postCalculate() {
@@ -315,7 +317,8 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 									itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * orderDuration) / 1000).toFixed(3),
 									lessMinDuration: lessMinDuration,
 									throughSite: order.throughSite,
-									orderId: order.id
+									orderId: order.id,
+									oneDay: order.oneDay
 								});
 							}
 							else {
@@ -327,7 +330,8 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 									itemWidth: ((parseFloat(itemWidth * 1000) + parseInt(options.margin * 1000)) / 1000).toFixed(3),
 									lessMinDuration: lessMinDuration,
 									throughSite: null,
-									orderId: null
+									orderId: null,
+									oneDay: null
 								});
 							}
 						}
@@ -400,6 +404,71 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					$itemOuter.append($itemOrder);
 					$stageOrder.append($itemOuter);
 				});
+
+				if (!data[0].oneDay) {
+
+					var allItemsLength = $stageOrder[0].childNodes.length;
+					var newDatesItemsLength = data.length;
+
+					if (allItemsLength !== newDatesItemsLength) {
+
+						var needMergedElements = [
+							$stageOrder[0].childNodes[allItemsLength - newDatesItemsLength - 1],
+							$stageOrder[0].childNodes[allItemsLength - newDatesItemsLength]
+						];
+
+						var needMergedItems = [
+							items[allItemsLength - newDatesItemsLength - 1],
+							items[allItemsLength - newDatesItemsLength]
+						];
+
+						var item = {
+							periodId: needMergedItems[0].periodId,
+							date: needMergedItems[0].date,
+							merge: _.sum(needMergedItems, 'merge'),
+							itemWidth: _.sum(needMergedItems, 'itemWidth'),
+							lessMinDuration: needMergedItems[0].lessMinDuration,
+							throughSite: needMergedItems[0].throughSite,
+							orderId: needMergedItems[0].orderId,
+							oneDay: needMergedItems[0].oneDay
+						};
+
+						_.forEach(needMergedElements, function(element) {
+
+							element.parentNode.removeChild(element);
+						});
+
+						_.pullAt(items, allItemsLength - newDatesItemsLength - 1);
+
+						var $itemOrder = angular.element(template.itemOrder);
+						var $itemOuter = angular.element(template.itemOuter);
+
+						$itemOuter[0].style.width = item.itemWidth + 'px';
+
+						var classes = [];
+
+						if (item.orderId) $itemOrder.attr('data-order', item.orderId);
+
+						if (!_.isNull(item.throughSite)) {
+
+							item.throughSite ? classes.push('item service-order') : classes.push('item manager-order');
+						}
+
+						if (item.lessMinDuration) classes.push('disabled');
+
+						$itemOrder
+							.attr('data-period', item.periodId)
+							.attr('data-merge', item.merge);
+
+						$itemOrder.addClass(classes.join(' '));
+
+						$itemOuter.append($itemOrder);
+
+						$stageOrder[0].insertBefore($itemOuter[0], $stageOrder[0].children[allItemsLength - newDatesItemsLength - 1]);
+
+						items[allItemsLength - newDatesItemsLength - 1] = item;
+					}
+				}
 			}
 
 			function _changePosition(delta, notify) {
@@ -418,10 +487,10 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					console.log('change on next date');
 
-					$scope.currentDate = moment($scope.currentDate).add(1, 'days').format('YYYY-MM-DD');
-					$scope.$emit('schedule:changeDate', {date: $scope.currentDate});
+					currentDate = moment(currentDate).add(1, 'days').format('YYYY-MM-DD');
+					$scope.$emit('schedule:changeDate', {date: currentDate});
 					
-					if (moment(lastDate).diff(moment($scope.currentDate), 'days') === 0) {
+					if (moment(lastDate).diff(moment(currentDate), 'days') === 0) {
 
 						_getOrders();
 					}
@@ -430,8 +499,8 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					console.log('change on prev date');
 
-					$scope.currentDate = moment($scope.currentDate).subtract(1, 'days').format('YYYY-MM-DD');
-					$scope.$emit('schedule:changeDate', {date: $scope.currentDate});
+					currentDate = moment(currentDate).subtract(1, 'days').format('YYYY-MM-DD');
+					$scope.$emit('schedule:changeDate', {date: currentDate});
 				}
 
 				if (notify) $scope.$emit('schedule:changePosition', {id: $scope.roomId, delta: delta});
@@ -689,6 +758,21 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					startIndex: undefined,
 					endIndex: undefined
 				};
+			}
+
+
+			// Smth
+
+			function _check() {
+
+				var summ = 0;
+
+				_.forEach(_.toArray($stageOrder[0].childNodes), function(node) {
+					summ += Number(node.style.width.slice(0, -2));
+				});
+
+				console.log('summ elements', summ);
+				console.log('summ items', _.sum(items, 'itemWidth'));
 			}
 		}
 	}

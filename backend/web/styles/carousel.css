@@ -62,6 +62,7 @@
 }
 .schedule-carousel .order-stage {
   position: relative;
+  height: 42px;
   -ms-touch-action: pan-Y;
 }
 .schedule-carousel .order-stage:after {
@@ -75,6 +76,7 @@
 .schedule-carousel .schedule-stage-outer {
   position: relative;
   overflow: hidden;
+  height: 87px;
   /* fix for flashing background */
   -webkit-transform: translate3d(0px, 0px, 0px);
 }
