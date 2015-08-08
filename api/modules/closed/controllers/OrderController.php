@@ -222,6 +222,8 @@ class OrderController extends ApiController
                     'result' => 'success',
                     'data'  => [
                         'id'                => (int)$model->id,
+                        'startDate'         => $model->start_date,
+                        'endDate'           => $model->end_date,
                         'startPeriod'       => $model->start_period,
                         'endPeriod'         => $model->end_period,
                         'services'          => $model->services,

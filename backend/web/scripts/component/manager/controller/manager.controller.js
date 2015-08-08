@@ -108,6 +108,26 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 							// created
 							if (response.status === 201) {
 
+								var room = _.find($scope.rooms, {id: response.data.roomId});
+								var properties = response.data;
+
+								if (properties.oneDay) {
+
+									room.orders[properties.startDate].push(properties);
+								}
+								else {
+
+									room.orders[properties.startDate].push(_.assign(properties, {
+										endDate: properties.startDate,
+										endPeriod: _.last(_.keys(CONSTANTS.periods))
+									}));
+
+									room.orders[properties.endDate].push(_.assign(properties, {
+										startDate: properties.startDate,
+										startPeriod: _.first(_.keys(CONSTANTS.periods))
+									}));
+								}
+
 								callback({status: 'success', result: response.data});
 							}
 							else {
