@@ -21,7 +21,7 @@ function dataStorage($rootScope, $http, $q, localStorage) {
 
 	function loadData() {
 
-		return $http.get('http://api.ordr.ru/closed/rooms?bathhouseId=' + user.organizationId + '&limit=100&expand=settings,schedule')
+		return $http.get('http://api.ordr.ru/closed/rooms?bathhouseId=' + user.organizationId + '&limit=100&expand=settings')
 			.then(function(response) {
 
 				storage.rooms = response.data.items;
