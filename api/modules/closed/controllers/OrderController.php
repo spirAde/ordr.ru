@@ -101,6 +101,7 @@ class OrderController extends ApiController
             }
             $query->limit = $limit;
             $query->offset = $offset;
+            $query->orderBy(['bathhouse_booking.start_date' => SORT_ASC, 'bathhouse_booking.start_period' => SORT_ASC]);
             $orders = $query->indexBy('id')->asArray()->all();
 
             $orders_sorted = [];
