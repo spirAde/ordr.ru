@@ -640,7 +640,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 				}
 			}
 
-			function _mergeItems() {
+			function _mergeItems(orderId) {
 
 				var duration = order.endIndex - order.startIndex + 1;
 
@@ -651,7 +651,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * duration) / 1000).toFixed(3),
 					lessMinDuration: false,
 					throughSite: false,
-					orderId: null
+					orderId: orderId
 				};
 
 				_.forEach(_.range(order.startIndex, order.endIndex + 1), function() {
@@ -732,9 +732,9 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					$scope.createOrder({order: order, callback: function(data) {
 
-						if (data.status === 'created') {
+						if (data.status === 'success') {
 
-							_mergeItems();
+							_mergeItems(data.result.id);
 							_checkClosestItemsAfterMerge(order.startIndex);
 						}
 						else {

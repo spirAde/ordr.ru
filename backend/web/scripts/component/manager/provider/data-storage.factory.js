@@ -54,7 +54,7 @@ function dataStorage($rootScope, $http, $q, localStorage) {
 		return $http.post('http://api.ordr.ru/closed/orders', order)
 			.then(function(response) {
 
-				console.log(response);
+				return response.data;
 			})
 			.catch(function(response) {
 

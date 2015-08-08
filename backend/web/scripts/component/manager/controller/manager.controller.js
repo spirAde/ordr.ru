@@ -102,14 +102,27 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 					var data = _.pick(order, ['roomId', 'startDate', 'endDate', 'startPeriod', 'endPeriod']);
 
-					dataStorage.createOrder(data).then(function(data) {
+					dataStorage.createOrder(data)
+						.then(function(response) {
 
-						console.log(data);
-					});
+							// created
+							if (response.status === 201) {
 
-					ngDialog.close();
+								callback({status: 'success', result: response.data});
+							}
+							else {
 
-					callback({status: 'created'});
+								callback({status: 'error', result: null});
+							}
+
+							ngDialog.close();
+						})
+						.catch(function(response) {
+
+							callback({status: 'error', result: null});
+
+							ngDialog.close();
+						});
 				}
 			}]
 		});
