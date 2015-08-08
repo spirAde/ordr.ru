@@ -21,13 +21,15 @@ class ApiHelpers
     public static function checkTimeIsFree($model,$min_duration = self::STEP)
     {
 
-        $oneDay = $model->start_date == $model->end_date;
+        $oneDay = $model->start_date === $model->end_date;
+
         $free_time_for_days =
             [
                 'start_date'    => BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->start_date]),
                 'end_date'      => ($oneDay) ? [] : BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->end_date])
             ];
-        if($oneDay)
+
+        if ($oneDay)
             $required_interval =
                 [
                     'start_date'    => range($model->start_period, $model->end_period, self::STEP),
@@ -44,11 +46,12 @@ class ApiHelpers
             $item = ($item) ? json_decode($item->schedule) : [0 => [self::FIRST_TIME_ID, self::LAST_TIME_ID]];
 
             foreach($item as $i => $subItem)
-                if((max($subItem) - min($subItem)) <= $min_duration)
+                if((max($subItem) - min($subItem)) < $min_duration)
                     unset($item[$i]);
 
             $item = ArrayHelper::flatten(array_map('self::createRange',$item));
         }
+
         //сначала ищем пересечения свободного времени и требуемого для каждого дня,
         //елси полностью пересекаются то array_diff вернет пустой массив
         $result_start_day = array_diff($required_interval['start_date'],
