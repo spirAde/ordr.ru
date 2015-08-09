@@ -93,6 +93,7 @@ return [
                         'GET'                   => 'index',
                         'POST'                  => 'create',
                         'OPTIONS'               => 'options',
+                        'OPTIONS <id:\d+>'      => 'options',
                         'DELETE <id:\d+>'       => 'delete',
                     ]
                 ],
