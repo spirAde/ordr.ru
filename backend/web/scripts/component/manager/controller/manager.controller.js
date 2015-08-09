@@ -12,6 +12,10 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 	$scope.user = _.pick(localStorage.getData(), ['fullName', 'organizationName']);
 
+	dataStorage.loadBathhouse().then(function(data) {
+		console.log(data);
+	});
+
 	dataStorage.loadData().then(function(rooms) {
 
 		$scope.rooms = rooms;

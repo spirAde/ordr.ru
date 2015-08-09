@@ -11,6 +11,7 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 
 	var storage = {
 		rooms: [],
+		loadBathhouse: loadBathhouse,
 		loadData: loadData,
 		loadOrders: loadOrders,
 		createOrder: createOrder,
@@ -23,6 +24,19 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 
 	return storage;
 
+
+	function loadBathhouse() {
+
+		return $http.get('http://api.ordr.ru/closed/bathhouses/1?expand=services')
+			.then(function(response) {
+
+				return response.data.items;
+			})
+			.catch(function(response) {
+
+				return $q.reject(response);
+			});
+	}
 
 	function loadData() {
 
