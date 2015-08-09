@@ -5,8 +5,10 @@
  * @license http://www.yiiframework.com/license/
  */
 
-namespace yii\helpers;
+namespace common\components;
 
+
+use yii\helpers\BaseArrayHelper;
 
 /**
  * ArrayHelper provides additional array functionality that you can use in your

@@ -96,6 +96,13 @@ return [
                         'DELETE <id:\d+>'       => 'delete',
                     ]
                 ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'closed/bathhouse',
+                    'patterns' => [
+                        'GET <id:\d+>'          => 'view',
+                    ]
+                ],
                 // end closed api routes
             ],
         ]

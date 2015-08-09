@@ -3,13 +3,13 @@ namespace api\modules\closed\controllers;
 
 use common\components\ApiHelpers;
 use Yii;
-use yii\helpers\JWT;
+use common\components\JWT;
 use yii\rest\ActiveController;
 use yii\web\UnauthorizedHttpException;
 use api\modules\closed\models\Managers;
 use yii\rest\Controller;
 use yii\filters\Cors;
-use yii\helpers\ArrayHelper;
+use common\components\ArrayHelper;
 
 class LoginController extends \yii\web\Controller
 {
