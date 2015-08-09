@@ -101,6 +101,7 @@ return [
                     'controller' => 'closed/bathhouse',
                     'patterns' => [
                         'GET <id:\d+>'          => 'view',
+                        'OPTIONS'               => 'options',
                     ]
                 ],
                 // end closed api routes
