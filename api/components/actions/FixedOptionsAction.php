@@ -15,6 +15,7 @@ class FixedOptionsAction extends OptionsAction
         }
         $options = ['GET', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
         Yii::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Headers', 'accept, content-Type, authorization');
+        Yii::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Methods', implode(', ', $options));
         Yii::$app->getResponse()->getHeaders()->set('Allow', implode(', ', $options));
     }
     
