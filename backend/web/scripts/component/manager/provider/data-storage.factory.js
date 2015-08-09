@@ -64,7 +64,7 @@ function dataStorage($rootScope, $http, $q, localStorage) {
 
 	function removeOrder(id) {
 
-		return $http.delete('http://api.ordr.ru/closed/orders', id)
+		return $http.delete('http://api.ordr.ru/closed/orders/' + id)
 			.then(function(response) {
 
 				console.log(response);
