@@ -1,7 +1,7 @@
 <?php
 namespace api\modules\open\controllers;
 
-use yii\helpers\ArrayHelper;
+use common\components\ArrayHelper;
 use yii\rest\ActiveController;
 use Yii;
 use yii\filters\auth\CompositeAuth;

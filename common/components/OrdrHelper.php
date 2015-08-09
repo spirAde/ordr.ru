@@ -1,114 +1,14 @@
 <?php
+
 namespace common\components;
 
-use console\models\BathhouseSchedule;
 use Yii;
-use yii\base\Exception;
 
-class ApiHelpers
-{
+class OrdrHelper {
+
     const FIRST_TIME_ID = 0;
     const LAST_TIME_ID = 144;
     const STEP = 3;
-
-    public static function createRange($n)
-    {
-        return range(min($n),max($n),self::STEP);
-    }
-
-    public static function checkTimeIsFree($model,$min_duration = self::STEP)
-    {
-
-        $oneDay = $model->start_date == $model->end_date;
-        $free_time_for_days =
-            [
-                'start_date'    => BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->start_date]),
-                'end_date'      => ($oneDay) ? [] : BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->end_date])
-            ];
-        if($oneDay)
-            $required_interval =
-                [
-                    'start_date'    => range($model->start_period, $model->end_period, self::STEP),
-                    'end_date'      => []
-                ];
-        else
-            $required_interval =
-                [
-                    'start_date'    => range($model->start_period, self::LAST_TIME_ID, self::STEP),
-                    'end_date'      => range(self::FIRST_TIME_ID, $model->end_period, self::STEP)
-                ];
-
-        foreach($free_time_for_days as &$item)
-        {
-            $item = ($item) ? json_decode($item->schedule) : [0 => [self::FIRST_TIME_ID, self::LAST_TIME_ID]];
-            die(vaR_dump($item));
-            foreach($item as $i => $subItem)
-                if((max($subItem) - min($subItem)) <= $min_duration)
-                    unset($item[$i]);
-
-            $item = ArrayHelper::flatten(array_map('self::createRange',$item));
-        }
-        //сначала ищем пересечения свободного времени и требуемого для каждого дня,
-        //елси полностью пересекаются то array_diff вернет пустой массив
-        $result_start_day = array_diff($required_interval['start_date'],
-            array_intersect($free_time_for_days['start_date'],$required_interval['start_date']));
-
-        $result_start_end = array_diff($required_interval['end_date'],
-            array_intersect($free_time_for_days['end_date'],$required_interval['end_date']));
-
-        return (empty($result_start_day) && empty($result_start_end));
-
-    }
-
-    public static function reformScheduleForDay($room_id, $start_date, $end_date, $min_duration = self::STEP)
-    {
-        $dates = [$start_date, ($end_date== $start_date) ? null : $end_date];
-        foreach($dates as $date)
-        {
-            if($date == null)
-                continue;
-
-            $all_bookings = \api\modules\closed\models\BathhouseBooking::find()
-                ->select('start_period,end_period,start_date,end_date, room_id')
-                ->where('(start_date = :start_date OR end_date = :end_date) AND room_id = :room_id', [
-                    ':start_date' => $date,
-                    ':end_date' => $date,
-                    ':room_id' => (int)$room_id,
-                ])
-                ->all();
-
-            $busy_periods = [];
-
-            foreach ($all_bookings as $book_item)
-            {
-                //заявка, пришедшая с прошлого дня
-                if ($book_item->end_date == $date and $book_item->start_date != $date)
-                    $busy_periods[] = [0, $book_item->end_period];
-                //заявка с переходом на следующий день
-                elseif ($book_item->end_date != $date and $book_item->start_date == $date)
-                    $busy_periods[] = [$book_item->start_period, 144];
-                else
-                    $busy_periods[] = [$book_item->start_period, $book_item->end_period];
-            }
-
-            $free_period_for_date = ApiHelpers::getFreeTime($busy_periods, $min_duration);
-
-            try
-            {
-                yii::$app->db->createCommand()
-                    ->update('bathhouse_schedule', [
-                        'schedule' => json_encode($free_period_for_date)],
-                        'date = "' . $date . '" AND room_id = ' . (int)$room_id)
-                    ->execute();
-            }
-            catch(Exception $e)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     // Возвращает свободные промежутки времени для записи, исходя из занятых периодов и
     // минимально возможного времени на запись
@@ -169,12 +69,12 @@ class ApiHelpers
 
     public static function writeFreeTime($periods)
     {
-        return json_encode($periods);
+        return base64_encode(serialize($periods));
     }
 
     public static function readFreeTime($periods)
     {
-        return json_decode($periods,true);
+        return unserialize(base64_decode($periods));
     }
 
     public static function getTime($time_id)
@@ -502,6 +402,7 @@ class ApiHelpers
     public static function getFreeTimeDecomposition($free_time = [], $step = 3)
     {
         $result = [];
+
         // Делим общий массив периодов по 30 минут, в дальнейшем добавим делитель, в зависимости от времени минимальной
         // заявки для разного типа организаций
         $divide_periods = range(self::FIRST_TIME_ID, self::LAST_TIME_ID, $step);
@@ -509,16 +410,17 @@ class ApiHelpers
         $tmp = [];
 
         // Выстраиваем все времена, исходя из концевых для каждого периода свободного времени
-            $tmp[] = array_values(range($free_time[0], $free_time[1], self::STEP));
-
+        foreach ($free_time as $time) {
+            $tmp[] = array_values(range($time[0], $time[1], self::STEP));
+        }
 
         $tmp_flatten = ArrayHelper::flatten($tmp);
 
         // Находим диапазоны, которые заняты
         $diff = array_diff($divide_periods, $tmp_flatten);
+
         // Преобразуем в человекопонятный вид и указываем доступноть времени
-        foreach ($tmp_flatten as $time_id)
-        {
+        foreach ($tmp_flatten as $time_id) {
             $result[$time_id] = [
                 'time' => self::getTime($time_id),
                 'enable' => true,
@@ -534,7 +436,7 @@ class ApiHelpers
 
         ksort($result);
 
-        //if (isset($result[self::LAST_TIME_ID])) unset($result[self::LAST_TIME_ID]);
+        if (isset($result[self::LAST_TIME_ID])) unset($result[self::LAST_TIME_ID]);
 
         return $result;
     }
@@ -564,28 +466,4 @@ class ApiHelpers
 
         return $dates;
     }
-
-    public static function decamelize($word) {
-        return $word = preg_replace_callback(
-            "/(^|[a-z])([A-Z])/",
-            function($m)
-            {
-                return strtolower(strlen($m[1]) ? "$m[1]_$m[2]" : "$m[2]");
-            },
-            $word
-        );   
-    }
-
-    public static function camelize($word) {
-        return $word = preg_replace_callback(
-            "/(^|_)([a-z])/",
-            function($m)
-            {
-                return strtoupper("$m[2]");
-            },
-            $word
-        );
-
-    }
-
 }

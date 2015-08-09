@@ -8,9 +8,9 @@ use console\models\BathhouseBooking;
 use console\models\BathhouseRoom;
 use Yii;
 use yii\console\Controller;
-use yii\helpers\ArrayHelper;
+use common\components\ArrayHelper;
 use yii\helpers\VarDumper;
-use yii\helpers\OrdrHelper;
+use common\components\OrdrHelper;
 use yii\db\Query;
 
 class DataController extends Controller {
@@ -565,9 +565,11 @@ class DataController extends Controller {
             foreach ($dates_range as $date)
             {
 
-                $full_free_time = json_encode(array(
-                    0   => 0,
-                    1   => 144
+                $full_free_time = json_encode(array(0 =>
+                    array(
+                        0   => 0,
+                        1   => 144
+                    )
                 ));
                 $connection->createCommand()
                     ->insert('bathhouse_schedule', [

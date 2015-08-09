@@ -2,8 +2,8 @@
 namespace api\modules\closed\controllers;
 
 use Yii;
-use yii\helpers\JWT;
-use yii\helpers\ArrayHelper;
+use common\components\JWT;
+use common\components\ArrayHelper;
 use yii\rest\ActiveController;
 use api\modules\closed\models\Managers;
 
