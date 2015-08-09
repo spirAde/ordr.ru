@@ -20,10 +20,30 @@ function SelectServices($compile) {
 
 			_initialize();
 
+			if (!_.isEmpty($scope.list)) {
+
+				_render();
+				_subscribe();
+			}
+
 			function _initialize() {
 
 				$captionSelectBox = angular.element('<p class="caption-select-box"></p>');
 				$emptyLabel = angular.element('<label><i></i></label>');
+
+				if (_.isEmpty($scope.list)) {
+
+					$placeholderSpan = angular.element('<span class="placeholder">Дополнительные услуги отсутствуют</span>');
+
+					$captionSelectBox.append($placeholderSpan);
+				}
+				else {
+
+					$placeholderSpan = angular.element('<span class="placeholder">Дополнительные услуги и удобства</span>');
+
+					$captionSelectBox.append($placeholderSpan);
+					$captionSelectBox.append($emptyLabel);
+				}
 
 				$element.append($captionSelectBox);
 
@@ -34,21 +54,25 @@ function SelectServices($compile) {
 
 				var $optionsContainer, $optionElement;
 
-				if (_.isEmpty($scope.list)) {
+				_.forEach($scope.list, function(services, category) {
 
-					$placeholderSpan = angular.element('<span class="placeholder">Дополнительные услуги отсутствуют</span>');
-				}
-				else {
+					$optionElement = angular.element('<li class="disabled"><span><i></i></span><label>' + category + '</label></li>');
 
-					_.forEach($scope.list, function(services, category) {
+					$optionsContainer.append($optionElement);
 
-						$optionElement = angular.element('<li class="disabled"><span><i></i></span><label>' + category + '</label></li>');
+					_.forEach(services, function(service) {
+
+						$optionElement = angular.element(
+							'<li class=""><span><i></i></span><label><span class="main-text">'+
+							service.name + '</span><span class="option-cost">' + service.price + '</span></label></li>');
+
+						$optionElement.attr('data-service', service.id);
 
 						$optionsContainer.append($optionElement);
-
-
 					});
-				}
+				});
+
+				$captionSelectBox.append($optionsContainer);
 			}
 
 			function _setText() {}
