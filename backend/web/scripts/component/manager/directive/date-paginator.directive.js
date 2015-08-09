@@ -148,7 +148,7 @@ function DatePaginator($rootScope, $compile, $window) {
 
 					var $inner = angular.element('<a style="width: ' + item.itemWidth + 'px"></a>');
 
-					$inner.attr('data-moment', item.m).attr('title', item.hint);
+					$inner.attr('data-moment', item.m);
 
 					$inner.addClass(classes.join(' '));
 

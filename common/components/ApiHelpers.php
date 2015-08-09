@@ -4,6 +4,8 @@ namespace common\components;
 use console\models\BathhouseSchedule;
 use Yii;
 use yii\base\Exception;
+use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 
 class ApiHelpers
 {
@@ -19,13 +21,15 @@ class ApiHelpers
     public static function checkTimeIsFree($model,$min_duration = self::STEP)
     {
 
-        $oneDay = $model->start_date == $model->end_date;
+        $oneDay = $model->start_date === $model->end_date;
+
         $free_time_for_days =
             [
                 'start_date'    => BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->start_date]),
                 'end_date'      => ($oneDay) ? [] : BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->end_date])
             ];
-        if($oneDay)
+
+        if ($oneDay)
             $required_interval =
                 [
                     'start_date'    => range($model->start_period, $model->end_period, self::STEP),
@@ -38,16 +42,16 @@ class ApiHelpers
                     'end_date'      => range(self::FIRST_TIME_ID, $model->end_period, self::STEP)
                 ];
 
-        foreach($free_time_for_days as &$item)
-        {
+        foreach($free_time_for_days as &$item) {
             $item = ($item) ? json_decode($item->schedule) : [0 => [self::FIRST_TIME_ID, self::LAST_TIME_ID]];
-            die(vaR_dump($item));
+
             foreach($item as $i => $subItem)
-                if((max($subItem) - min($subItem)) <= $min_duration)
+                if((max($subItem) - min($subItem)) < $min_duration)
                     unset($item[$i]);
 
             $item = ArrayHelper::flatten(array_map('self::createRange',$item));
         }
+
         //сначала ищем пересечения свободного времени и требуемого для каждого дня,
         //елси полностью пересекаются то array_diff вернет пустой массив
         $result_start_day = array_diff($required_interval['start_date'],
@@ -62,33 +66,56 @@ class ApiHelpers
 
     public static function reformScheduleForDay($room_id, $start_date, $end_date, $min_duration = self::STEP)
     {
-        $dates = [$start_date, ($end_date== $start_date) ? null : $end_date];
+        $dates = [$start_date, ($end_date === $start_date) ? null : $end_date];
+
         foreach($dates as $date)
         {
             if($date == null)
                 continue;
 
-            $all_bookings = \api\modules\closed\models\BathhouseBooking::find()
+            $curr_bookings = \api\modules\closed\models\BathhouseBooking::find()
                 ->select('start_period,end_period,start_date,end_date, room_id')
-                ->where('(start_date = :start_date OR end_date = :end_date) AND room_id = :room_id', [
+                ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
                     ':start_date' => $date,
                     ':end_date' => $date,
                     ':room_id' => (int)$room_id,
                 ])
+                ->orderBy('start_period')
                 ->all();
+
+            $prev_booking = \api\modules\closed\models\BathhouseBooking::find()
+                ->select('start_period,end_period,start_date,end_date, room_id')
+                ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
+                    ':start_date' => date('Y-m-d', strtotime('-1 day', strtotime($date))),
+                    ':end_date' => $date,
+                    ':room_id' => (int)$room_id,
+                ])
+                ->orderBy('start_period')
+                ->one();
+
+            $next_booking = \api\modules\closed\models\BathhouseBooking::find()
+                ->select('start_period,end_period,start_date,end_date, room_id')
+                ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
+                    ':start_date' => $date,
+                    ':end_date' => date('Y-m-d', strtotime('+1 day', strtotime($date))),
+                    ':room_id' => (int)$room_id,
+                ])
+                ->orderBy('start_period')
+                ->one();
 
             $busy_periods = [];
 
-            foreach ($all_bookings as $book_item)
+            foreach ($curr_bookings as $book_item)
             {
-                //заявка, пришедшая с прошлого дня
-                if ($book_item->end_date == $date and $book_item->start_date != $date)
-                    $busy_periods[] = [0, $book_item->end_period];
-                //заявка с переходом на следующий день
-                elseif ($book_item->end_date != $date and $book_item->start_date == $date)
-                    $busy_periods[] = [$book_item->start_period, 144];
-                else
-                    $busy_periods[] = [$book_item->start_period, $book_item->end_period];
+                $busy_periods[] = [$book_item->start_period, $book_item->end_period];
+            }
+
+            if (!empty($prev_booking)) {
+                array_unshift($busy_periods, [self::FIRST_TIME_ID, $prev_booking->end_period]);
+            }
+
+            if (!empty($next_booking)) {
+                $busy_periods[] = [$next_booking->start_period, self::LAST_TIME_ID];
             }
 
             $free_period_for_date = ApiHelpers::getFreeTime($busy_periods, $min_duration);
@@ -509,13 +536,15 @@ class ApiHelpers
         $tmp = [];
 
         // Выстраиваем все времена, исходя из концевых для каждого периода свободного времени
-            $tmp[] = array_values(range($free_time[0], $free_time[1], self::STEP));
-
+        foreach ($free_time as $time) {
+            $tmp[] = array_values(range($time[0], $time[1], self::STEP));
+        }
 
         $tmp_flatten = ArrayHelper::flatten($tmp);
 
         // Находим диапазоны, которые заняты
         $diff = array_diff($divide_periods, $tmp_flatten);
+
         // Преобразуем в человекопонятный вид и указываем доступноть времени
         foreach ($tmp_flatten as $time_id)
         {
@@ -533,8 +562,6 @@ class ApiHelpers
         }
 
         ksort($result);
-
-        //if (isset($result[self::LAST_TIME_ID])) unset($result[self::LAST_TIME_ID]);
 
         return $result;
     }

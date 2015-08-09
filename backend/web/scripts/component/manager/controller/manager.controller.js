@@ -22,6 +22,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 		_.forEach(rooms, function(room) {
 
 			room.orders = {};
+			room.services = [];
 
 			dataStorage.loadOrders(room.id, moment().format('YYYY-MM-DD')).then(function(orders) {
 
@@ -48,11 +49,10 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 			scope: $scope,
 			controller: ['$scope', function($scope) {
 
-				$scope.order = _.pick(orders[0], ['id', 'roomId', 'startDate', 'startPeriod']);
-
-				$scope.order = _.assign($scope.order, {
+				$scope.order = _.assign(orders[0], {
 					startTime: CONSTANTS.periods[orders[0].startPeriod],
 					endDate: orders.length > 1 ? orders[1].endDate : orders[0].endDate,
+					endPeriod: orders.length > 1 ? orders[1].endPeriod : orders[0].endPeriod,
 					endTime: orders.length > 1 ? CONSTANTS.periods[orders[1].endPeriod] : CONSTANTS.periods[orders[0].endPeriod]
 				});
 
@@ -77,50 +77,99 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 	function createOrder(order, callback) {
 
+		var room = _.find($scope.rooms, {id: order.roomId});
+
 		ngDialog.open({
 			template: templates.createOrder,
 			scope: $scope,
 			controller: ['$scope', function($scope) {
 
-				$scope.order = _.pick(order, ['roomId', 'startDate', 'endDate']);
-
-				$scope.order = _.assign($scope.order, {
-					startTime: CONSTANTS.periods[order.startPeriod],
-					endTime: CONSTANTS.periods[order.endPeriod],
+				$scope.order = _.assign(order, {
+					costPeriod: dataStorage.calculateOrderOfPeriods(room.prices, _.omit(order, ['roomId'])),
+					costServices: 0,
+					costGuests: 0,
+					total: 0,
 					comment: '',
-					summ: 0
+					startTime: CONSTANTS.periods[order.startPeriod],
+					endTime: CONSTANTS.periods[order.endPeriod]
 				});
 
-				$scope.cancelOrder = function() {
+				$scope.$watchGroup(['order.costPeriod', 'order.costServices', 'order.costGuests'], function (newVal, oldVal) {
+					$scope.order.total = _.sum(newVal);
+				});
+
+				$scope.cancelOrder = function () {
 
 					ngDialog.close();
 
 					callback({status: 'canceled'});
-				};
+				}
 
-				$scope.saveOrder = function() {
+				$scope.saveOrder = function () {
 
-					var data = _.pick(order, ['roomId', 'startDate', 'endDate', 'startPeriod', 'endPeriod']);
+					var data = _.omit($scope.order, ['startTime', 'endTime']);
 
-					dataStorage.createOrder(data).then(function(data) {
+					dataStorage.createOrder(data)
+						.then(function (response) {
 
-						console.log(data);
-					});
+							// created
+							if (response.status === 201) {
 
-					ngDialog.close();
+								var properties = response.data;
 
-					callback({status: 'created'});
+								if (properties.oneDay) {
+
+									room.orders[properties.startDate].push(properties);
+								}
+								else {
+
+									room.orders[properties.startDate].push(_.assign(properties, {
+										endDate: properties.startDate,
+										endPeriod: _.last(_.keys(CONSTANTS.periods))
+									}));
+
+									room.orders[properties.endDate].push(_.assign(properties, {
+										startDate: properties.startDate,
+										startPeriod: _.first(_.keys(CONSTANTS.periods))
+									}));
+								}
+
+								callback({status: 'success', result: response.data});
+							}
+							else {
+
+								callback({status: 'error', result: null});
+							}
+
+							ngDialog.close();
+						})
+						.catch(function () {
+
+							callback({status: 'error', result: null});
+
+							ngDialog.close();
+						});
+				}
+
+				$scope.selectServices = function (services) {
+
+					//$scope.order.costServices = dataStorage.calculateOrderOfServices([], []);
+				}
+
+				$scope.selectGuests = function (count) {
+
+					//$scope.order.costGuests = dataStorage.calculateOrderOfGuests(count);
 				}
 			}]
 		});
 
 	}
 
-	function getOrders(roomId, date) {
+	function getOrders(roomId, startDate, endDate) {
 
-		console.log('getOrder', date);
+		endDate = endDate || moment(startDate).add(1, 'days').format('YYYY-MM-DD');
 
-		dataStorage.loadOrders(roomId, date).then(function(orders) {
+		dataStorage.loadOrders(roomId, startDate, endDate).then(function(orders) {
 
 			var room = _.find($scope.rooms, {id: roomId});
 

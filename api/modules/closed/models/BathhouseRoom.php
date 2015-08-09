@@ -131,6 +131,10 @@ class BathhouseRoom extends ActiveRecord
                             'guestPrice'            => $settings->guest_price,
                         ];
                     },
+                    'prices'    => function()
+                    {
+                        return $this->getPrices();
+                    }
                 ];
             };
             case 'view':
@@ -289,5 +293,30 @@ class BathhouseRoom extends ActiveRecord
         }
 
         return $result;
+    }
+
+    public function getPrices()
+    {
+        $prices = (new Query())
+            ->select(
+                'bathhouse_room_price.start_period,
+                bathhouse_room_price.end_period,
+                bathhouse_room_price.price,
+                bathhouse_room_price.day_id')
+            ->from('bathhouse_room_price')
+            ->where('bathhouse_room_price.room_id = :room_id', [':room_id' => $this->id])
+            ->all();
+
+        $prices_day_index = [];
+
+        foreach ($prices as $price)
+        {
+            $prices_day_index[$price['day_id']][] = [
+                'period' => [(int)$price['start_period'], (int)$price['end_period']],
+                'price'  => (float)$price['price']
+            ];
+        }
+
+        return $prices_day_index;
     }
 }

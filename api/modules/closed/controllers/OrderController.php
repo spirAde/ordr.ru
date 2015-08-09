@@ -101,6 +101,7 @@ class OrderController extends ApiController
             }
             $query->limit = $limit;
             $query->offset = $offset;
+            $query->orderBy(['bathhouse_booking.start_date' => SORT_ASC, 'bathhouse_booking.start_period' => SORT_ASC]);
             $orders = $query->indexBy('id')->asArray()->all();
 
             $orders_sorted = [];
@@ -191,6 +192,7 @@ class OrderController extends ApiController
                 'status' => 422,
                 'type'  => '',
             ];
+
         $min_duration = $model->room->bathhouseRoomSettings->min_duration;
 
         if(ApiHelpers::checkTimeIsFree($model, $min_duration))
@@ -220,8 +222,10 @@ class OrderController extends ApiController
                     'result' => 'success',
                     'data'  => [
                         'id'                => (int)$model->id,
-                        'startPeriod'       => $model->start_period,
-                        'endPeriod'         => $model->end_period,
+                        'startDate'         => $model->start_date,
+                        'endDate'           => $model->end_date,
+                        'startPeriod'       => (int)$model->start_period,
+                        'endPeriod'         => (int)$model->end_period,
                         'services'          => $model->services,
                         'guests'            => (int)$model->guests,
                         'comment'           => $model->comment,
@@ -232,7 +236,7 @@ class OrderController extends ApiController
                         'statusId'          => (int)$model->status_id,
                         'roomId'            => (int)$model->room_id,
                         'bathhouseId'       => (int)$model->bathhouse_id,
-                        'oneDay'            => (boolean)($model->start_date == $model->end_date),
+                        'oneDay'            => (boolean)($model->start_date === $model->end_date),
                         'throughService'    => (boolean)($model->manager_id > 0)
                     ],
                     'name' => 'Success operation',

@@ -14,7 +14,7 @@
         />
     </div>
     <div class="field">
-        <select-services list="bathhouse.services" calculate="calculateServices(services);"></select-services>
+        <select-services selectServices="selectServices(services);"></select-services>
     </div>
     <div class="field-comment">
         <textarea class="order-comment" ng-model="order.comment"></textarea>
@@ -24,7 +24,7 @@
             <p>Итого: </p>
         </div>
         <div class="result-summ">
-            <input type="text" readonly="readonly" ng-model="order.summ" />
+            <input type="text" readonly="readonly" ng-model="order.total" />
         </div>
     </div>
 </div>
