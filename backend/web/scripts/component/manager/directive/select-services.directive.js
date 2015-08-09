@@ -42,6 +42,10 @@ function SelectServices($compile) {
 
 					_.forEach($scope.list, function(services, category) {
 
+						$optionElement = angular.element('<li class="disabled"><span><i></i></span><label>' + category + '</label></li>');
+
+						$optionsContainer.append($optionElement);
+
 
 					});
 				}
