@@ -43,7 +43,7 @@ class LoginController extends \yii\web\Controller
                 $manager_result['id'] = $manager->id;
                 $manager_result['username'] = $manager->username;
                 $manager_result['type'] = $manager->type;
-                $manager_result['full_name'] = $manager->full_name;
+                $manager_result['fullName'] = $manager->full_name;
                 $manager_result['phone'] = $manager->phone;
                 $manager_result['organizationId'] = $manager->organization_id;
                 $manager_result['organizationName'] = $bathhouse->name;

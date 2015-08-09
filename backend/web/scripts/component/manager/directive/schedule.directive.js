@@ -4,9 +4,9 @@ var _ = require('lodash');
 var moment = require('moment');
 var Hamster = require('hamsterjs');
 
-Schedule.$inject = ['$rootScope', '$document', '$window', '$compile', 'CONSTANTS'];
+Schedule.$inject = ['$rootScope', '$document', '$compile', 'CONSTANTS'];
 
-function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
+function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 	var ESC_KEY = 27;
 
@@ -111,15 +111,15 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 				if (moment(data.date).isAfter(lastDate)) {
 
-					var startDate = moment(lastDate).add(1, 'days').format('YYYY-MM-DD');
-					var endDate = moment(data.date).add(1, 'days').format('YYYY-MM-DD');
+					var startDate = moment(lastDate).add(1, 'days').format(CONSTANTS.format);
+					var endDate = moment(data.date).add(1, 'days').format(CONSTANTS.format);
 
 					_getOrders(startDate, endDate);
 				}
 
 				if (data.scroll) {
 
-					var diff = moment(data.date).diff(moment().format('YYYY-MM-DD'), 'days');
+					var diff = moment(data.date).diff(moment().format(CONSTANTS.format), 'days');
 
 					transform = -diff * 1000 * dayWidth / 1000;
 					current = diff * 48;
@@ -177,19 +177,22 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					var index = _.indexOf(this.children, target.parentElement);
 
-					if (_.indexOf(classList, 'disabled') === -1) {
+					if (index !== -1) {
 
-						if (_.indexOf(classList, orderItemClasses.service) !== -1) {
+						if (_.indexOf(classList, 'disabled') === -1) {
 
-							_showOrder(target.dataset.order, index);
-						}
-						else if (_.indexOf(classList, orderItemClasses.manager) !== -1) {
+							if (_.indexOf(classList, orderItemClasses.service) !== -1) {
 
-							_showOrder(target.dataset.order, index);
-						}
-						else {
+								_showOrder(target.dataset.order, index);
+							}
+							else if (_.indexOf(classList, orderItemClasses.manager) !== -1) {
 
-							_createOrder(index);
+								_showOrder(target.dataset.order, index);
+							}
+							else {
+
+								_createOrder(index);
+							}
 						}
 					}
 				});
@@ -238,7 +241,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					odd = !odd;
 				});
 
-				currentDate = moment().format('YYYY-MM-DD');
+				currentDate = moment().format(CONSTANTS.format);
 			}
 
 			function _postCalculate() {
@@ -286,10 +289,10 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 						var startOrderIndex = _.indexOf(startPeriodsId, periodId);
 
-						// Данная ячейка не относится к заказу
+						// Current this cell does not belong to the order
 						if (skip === 0) {
 
-							// Данная ячейка является началом заказа
+							// Current cell is start of order
 							if (startOrderIndex !== -1) {
 
 								lessMinDuration = false;
@@ -299,7 +302,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 								if (!order.oneDay && date !== _.last(dates) && order.startPeriod !== 0) {
 
-									var nextDay = moment(date).add(1, 'days').format('YYYY-MM-DD');
+									var nextDay = moment(date).add(1, 'days').format(CONSTANTS.format);
 
 									var endNextDayOrderPeriod = parseInt($scope.orders[nextDay][0].endPeriod);
 
@@ -324,7 +327,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 									merge: orderDuration,
 									itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * orderDuration) / 1000).toFixed(3),
 									lessMinDuration: lessMinDuration,
-									throughSite: order.throughSite,
+									throughService: order.throughService,
 									orderId: order.id,
 									oneDay: order.oneDay
 								});
@@ -337,7 +340,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 									merge: 1,
 									itemWidth: ((parseFloat(itemWidth * 1000) + parseInt(options.margin * 1000)) / 1000).toFixed(3),
 									lessMinDuration: lessMinDuration,
-									throughSite: null,
+									throughService: null,
 									orderId: null,
 									oneDay: null
 								});
@@ -396,9 +399,9 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					if (item.orderId) $itemOrder.attr('data-order', item.orderId);
 
-					if (!_.isNull(item.throughSite)) {
+					if (!_.isNull(item.throughService)) {
 
-						item.throughSite ? classes.push('item service-order') : classes.push('item manager-order');
+						item.throughService ? classes.push('item service-order') : classes.push('item manager-order');
 					}
 
 					if (item.lessMinDuration) classes.push('disabled');
@@ -413,7 +416,8 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					$stageOrder.append($itemOuter);
 				});
 
-				if (!data[0].oneDay) {
+				// Check if last order of previous date is 2days order, then merge
+				if (!!data[0].oneDay) {
 
 					var allItemsLength = $stageOrder[0].childNodes.length;
 					var newDatesItemsLength = data.length;
@@ -436,7 +440,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 							merge: _.sum(needMergedItems, 'merge'),
 							itemWidth: _.sum(needMergedItems, 'itemWidth'),
 							lessMinDuration: needMergedItems[0].lessMinDuration,
-							throughSite: needMergedItems[0].throughSite,
+							throughService: needMergedItems[0].throughService,
 							orderId: needMergedItems[0].orderId,
 							oneDay: needMergedItems[0].oneDay
 						};
@@ -457,9 +461,9 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 						if (item.orderId) $itemOrder.attr('data-order', item.orderId);
 
-						if (!_.isNull(item.throughSite)) {
+						if (!_.isNull(item.throughService)) {
 
-							item.throughSite ? classes.push('item service-order') : classes.push('item manager-order');
+							item.throughService ? classes.push('item service-order') : classes.push('item manager-order');
 						}
 
 						if (item.lessMinDuration) classes.push('disabled');
@@ -493,21 +497,17 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 				// TODO: incorrect for fast scrolling, doesn't switch date in datepaginator
 				if (current % 48 === 0 && delta > 0) {
 
-					console.log('change on next date');
-
-					currentDate = moment(currentDate).add(1, 'days').format('YYYY-MM-DD');
+					currentDate = moment(currentDate).add(1, 'days').format(CONSTANTS.format);
 					$scope.$emit('schedule:changeDate', {date: currentDate});
 					
 					if (moment(lastDate).diff(moment(currentDate), 'days') === 0) {
 
-						_getOrders(moment(lastDate).add(1, 'days').format('YYYY-MM-DD'));
+						_getOrders(moment(lastDate).add(1, 'days').format(CONSTANTS.format));
 					}
 				}
 				else if (prev !== 0 && prev % 48 === 0 && delta < 0) {
 
-					console.log('change on prev date');
-
-					currentDate = moment(currentDate).subtract(1, 'days').format('YYYY-MM-DD');
+					currentDate = moment(currentDate).subtract(1, 'days').format(CONSTANTS.format);
 					$scope.$emit('schedule:changeDate', {date: currentDate});
 				}
 
@@ -650,7 +650,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 					merge: duration,
 					itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * duration) / 1000).toFixed(3),
 					lessMinDuration: false,
-					throughSite: false,
+					throughService: false,
 					orderId: orderId
 				};
 
@@ -672,9 +672,9 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 				if (item.orderId) $itemOrder.attr('data-order', item.orderId);
 
-				if (!_.isNull(item.throughSite)) {
+				if (!_.isNull(item.throughService)) {
 
-					item.throughSite ? classes.push('item service-order') : classes.push('item manager-order');
+					item.throughService ? classes.push('item service-order') : classes.push('item manager-order');
 				}
 
 				if (item.lessMinDuration) classes.push('disabled');

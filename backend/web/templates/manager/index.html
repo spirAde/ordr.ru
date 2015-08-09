@@ -8,7 +8,7 @@
             <a ng-click="openMessages();" ng-class="{true: 'item-noty icons new', false: 'item-noty icons'}[newMessages]">Сообщения</a>
         </div>
         <div class="user">
-            <a href="#" class="username">{{::user.name}}</a>
+            <a href="#" class="username">{{::user.fullName}}</a>
             <a href="#" class="logout icons" ng-click="logout();"></a>
         </div>
     </div>
@@ -16,7 +16,7 @@
     <div class="main">
         <div class="content">
             <div class="title clear">
-                <h1>{{::user.bathhouse}}</h1>
+                <h1>{{::user.organizationName}}</h1>
             </div>
 
             <date-paginator></date-paginator>

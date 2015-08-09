@@ -18,7 +18,7 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 
 		calculateOrderOfPeriods: calculateOrderOfPeriods,
 		calculateOrderOfServices: calculateOrderOfServices,
-		calculateOrderOfGuests: calculateOrderOfGuests,
+		calculateOrderOfGuests: calculateOrderOfGuests
 	};
 
 	return storage;
@@ -41,7 +41,7 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 
 	function loadOrders(id, startDate, endDate) {
 
-		endDate = endDate || moment(startDate).add(1, 'days').format('YYYY-MM-DD');
+		endDate = endDate || moment(startDate).add(1, 'days').format(CONSTANTS.format);
 
 		return $http.get('http://api.ordr.ru/closed/orders?limit=1000&room_id=' + id + '&start=' + startDate + '&end=' + endDate)
 			.then(function(response) {

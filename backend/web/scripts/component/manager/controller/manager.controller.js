@@ -10,10 +10,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 	$scope.rooms = [];
 	$scope.orders = [];
 
-	$scope.user = {
-		name: 'Петухова Ольга',
-		bathhouse: 'Бани на Малиновой'
-	};
+	$scope.user = _.pick(localStorage.getData(), ['fullName', 'organizationName']);
 
 	dataStorage.loadData().then(function(rooms) {
 
@@ -24,7 +21,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 			room.orders = {};
 			room.services = [];
 
-			dataStorage.loadOrders(room.id, moment().format('YYYY-MM-DD')).then(function(orders) {
+			dataStorage.loadOrders(room.id, moment().format(CONSTANTS.format)).then(function(orders) {
 
 				room.orders = orders;
 			});
@@ -45,7 +42,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 		var orders = _.where(_.flatten(_.toArray(room.orders)), {id: parseInt(orderId)}); // maybe 2days order
 
 		ngDialog.open({
-			template: templates.showManagerOrder,
+			template: orders[0].throughService ? templates.showServiceOrder : templates.showManagerOrder,
 			scope: $scope,
 			controller: ['$scope', function($scope) {
 
@@ -94,18 +91,18 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 					endTime: CONSTANTS.periods[order.endPeriod]
 				});
 
-				$scope.$watchGroup(['order.costPeriod', 'order.costServices', 'order.costGuests'], function (newVal, oldVal) {
-					$scope.order.total = _.sum(newVal);
+				$scope.$watchGroup(['order.costPeriod', 'order.costServices', 'order.costGuests'], function(values) {
+					$scope.order.total = _.sum(values);
 				});
 
-				$scope.cancelOrder = function () {
+				$scope.cancelOrder = function() {
 
 					ngDialog.close();
 
 					callback({status: 'canceled'});
-				}
+				};
 
-				$scope.saveOrder = function () {
+				$scope.saveOrder = function() {
 
 					var data = _.omit($scope.order, ['startTime', 'endTime']);
 
@@ -149,25 +146,24 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 							ngDialog.close();
 						});
-				}
+				};
 
-				$scope.selectServices = function (services) {
+				$scope.selectServices = function(services) {
 
 					//$scope.order.costServices = dataStorage.calculateOrderOfServices([], []);
-				}
+				};
 
-				$scope.selectGuests = function (count) {
+				$scope.selectGuests = function(count) {
 
 					//$scope.order.costGuests = dataStorage.calculateOrderOfGuests(count);
-				}
+				};
 			}]
 		});
-
 	}
 
 	function getOrders(roomId, startDate, endDate) {
 
-		endDate = endDate || moment(startDate).add(1, 'days').format('YYYY-MM-DD');
+		endDate = endDate || moment(startDate).add(1, 'days').format(CONSTANTS.format);
 
 		dataStorage.loadOrders(roomId, startDate, endDate).then(function(orders) {
 
@@ -188,7 +184,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 	var templates = {
 		createOrder: 'templates/partials/createOrder.html',
 		showManagerOrder: 'templates/partials/showManagerOrder.html',
-		showSiteOrder: 'templates/partials/showServiceOrder.html'
+		showServiceOrder: 'templates/partials/showServiceOrder.html'
 	};
 }
 

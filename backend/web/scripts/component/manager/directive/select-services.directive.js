@@ -10,6 +10,7 @@ function SelectServices($compile) {
 		transclude: true,
 		template: '<div class="select-services"></div>',
 		scope: {
+			list: '=list',
 
 			selectServices: '&selectServices'
 		},
@@ -23,12 +24,27 @@ function SelectServices($compile) {
 
 				$captionSelectBox = angular.element('<p class="caption-select-box"></p>');
 				$emptyLabel = angular.element('<label><i></i></label>');
-				$placeholderSpan = angular.element('<span class="placeholder">Дополнительные услуги и удобства</span>');
 
-				$captionSelectBox.append($placeholderSpan);
 				$element.append($captionSelectBox);
 
 				$compile($captionSelectBox)($scope);
+			}
+
+			function _render() {
+
+				var $optionsContainer, $optionElement;
+
+				if (_.isEmpty($scope.list)) {
+
+					$placeholderSpan = angular.element('<span class="placeholder">Дополнительные услуги отсутствуют</span>');
+				}
+				else {
+
+					_.forEach($scope.list, function(services, category) {
+
+
+					});
+				}
 			}
 
 			function _setText() {}
