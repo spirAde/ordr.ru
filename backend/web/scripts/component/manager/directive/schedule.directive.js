@@ -730,7 +730,7 @@ function Schedule($rootScope, $document, $window, $compile, CONSTANTS) {
 
 					order.endIndex = index;
 
-					$scope.createOrder({order: order, callback: function(data) {
+					$scope.createOrder({order: _.pick(order, ['roomId', 'startDate', 'endDate', 'startPeriod', 'endPeriod']), callback: function(data) {
 
 						if (data.status === 'success') {
 

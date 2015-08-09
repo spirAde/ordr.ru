@@ -9,13 +9,13 @@
 </div>-->
 <div class="form">
     <p>Время: {{::order.startDate}} {{::order.startTime}} - {{::order.endDate}} {{::order.endTime}}</p>
-    <p>Количество чел-к: {{order.guests}}</p>
+    <p>Количество чел-к: {{::order.guests}}</p>
     <p>Услуги: </p>
-    <p>Комментарий: {{order.comment}}</p>
-    <p>Сумма за время: {{order.cost_per_time}}</p>
-    <p>Сумма за услуги: {{order.cost_services}}</p>
-    <p>Сумма за гостей: {{order.cost_extra_guests}}</p>
-    <p>Общая сумма: {{order.summ}}</p>
+    <p>Комментарий: {{::order.comment}}</p>
+    <p>Сумма за время: {{::order.costPeriod}}</p>
+    <p>Сумма за услуги: {{::order.costServices}}</p>
+    <p>Сумма за гостей: {{::order.costGuests}}</p>
+    <p>Общая сумма: {{::order.total}}</p>
     <!--<div class="field">
         <input labeltext="Имя" />
     </div>
