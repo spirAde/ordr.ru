@@ -8,6 +8,7 @@ use yii\helpers\Json;
 use common\components\OrdrHelper;
 use yii\helpers\Url;
 use api\modules\closed\models\BathhouseBooking;
+use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\HttpException;
@@ -260,10 +261,10 @@ class OrderController extends ApiController
 
         $model = $this->findModel($id);
 
-        if($model->bathhouse_id != yii::$app->user->identity->organization_id or $model->manager_id == 0)
+        /*if($model->bathhouse_id != yii::$app->user->identity->organization_id or $model->manager_id == 0)
         {
             throw new UnauthorizedHttpException('Unauthorized request');
-        }
+        }*/
 
         $room_id        = $model->room_id;
         $start_date     = $model->start_date;

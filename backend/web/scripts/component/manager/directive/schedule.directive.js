@@ -702,7 +702,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 				$scope.showOrder({roomId: $scope.roomId, orderId: id, callback: function(data) {
 
-					if (data.status === 'removed') {
+					if (data.status === 'success') {
 
 						_unmergeItems(index, data.order);
 					}

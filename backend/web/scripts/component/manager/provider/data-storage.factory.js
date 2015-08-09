@@ -12,7 +12,7 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 	var storage = {
 		rooms: [],
 		loadBathhouse: loadBathhouse,
-		loadData: loadData,
+		loadRooms: loadRooms,
 		loadOrders: loadOrders,
 		createOrder: createOrder,
 		removeOrder: removeOrder,
@@ -30,7 +30,7 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 		return $http.get('http://api.ordr.ru/closed/bathhouses/1?expand=services')
 			.then(function(response) {
 
-				return response.data.items;
+				return response.data;
 			})
 			.catch(function(response) {
 
@@ -38,7 +38,7 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 			});
 	}
 
-	function loadData() {
+	function loadRooms() {
 
 		return $http.get('http://api.ordr.ru/closed/rooms?bathhouseId=' + user.organizationId + '&limit=100&expand=settings,prices')
 			.then(function(response) {
@@ -86,7 +86,7 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 		return $http.delete('http://api.ordr.ru/closed/orders/' + id)
 			.then(function(response) {
 
-				console.log(response);
+				return response.data;
 			})
 			.catch(function(response) {
 
@@ -164,7 +164,7 @@ function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
 
 	function calculateOrderOfServices(services, selected) {
 
-		var flatten = _.flatten(_.pluck(services, 'services'));
+		var flatten = _.flatten(_.values(services));
 
 		return _.reduce(selected, function(sum, serviceId) {
 

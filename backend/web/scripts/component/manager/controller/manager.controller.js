@@ -7,27 +7,29 @@ ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'localS
 
 function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dataStorage, CONSTANTS) {
 
+	$scope.bathhouse = {};
 	$scope.rooms = [];
 	$scope.orders = [];
 
 	$scope.user = _.pick(localStorage.getData(), ['fullName', 'organizationName']);
 
 	dataStorage.loadBathhouse().then(function(data) {
-		console.log(data);
-	});
 
-	dataStorage.loadData().then(function(rooms) {
+		$scope.bathhouse = data;
 
-		$scope.rooms = rooms;
+		dataStorage.loadRooms().then(function(rooms) {
 
-		_.forEach(rooms, function(room) {
+			$scope.rooms = rooms;
 
-			room.orders = {};
-			room.services = [];
+			_.forEach(rooms, function(room) {
 
-			dataStorage.loadOrders(room.id, moment().format(CONSTANTS.format)).then(function(orders) {
+				room.orders = {};
+				room.services = [];
 
-				room.orders = orders;
+				dataStorage.loadOrders(room.id, moment().format(CONSTANTS.format)).then(function(orders) {
+
+					room.orders = orders;
+				});
 			});
 		});
 	});
@@ -63,9 +65,16 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 				$scope.removeOrder = function() {
 
-					dataStorage.removeOrder(orders[0].id).then(function(data) {
+					dataStorage.removeOrder(orders[0].id).then(function(response) {
 
-						console.log(data);
+						if (response.result === 'success') {
+
+							callback({status: 'success'});
+						}
+						else {
+
+							// notify
+						}
 					});
 
 					ngDialog.close();
@@ -96,6 +105,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 				});
 
 				$scope.$watchGroup(['order.costPeriod', 'order.costServices', 'order.costGuests'], function(values) {
+
 					$scope.order.total = _.sum(values);
 				});
 
@@ -111,7 +121,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 					var data = _.omit($scope.order, ['startTime', 'endTime']);
 
 					dataStorage.createOrder(data)
-						.then(function (response) {
+						.then(function(response) {
 
 							// created
 							if (response.status === 201) {
@@ -154,7 +164,9 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 				$scope.selectServices = function(services) {
 
-					//$scope.order.costServices = dataStorage.calculateOrderOfServices([], []);
+					$timeout(function() {
+						$scope.order.costServices = dataStorage.calculateOrderOfServices($scope.bathhouse.services, services);
+					}, 0);
 				};
 
 				$scope.selectGuests = function(count) {

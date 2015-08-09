@@ -12,7 +12,7 @@ require('../../../node_modules/moment/locale/ru.js');
 var jwt = require('./common/provider/jwt.factory');
 var localStorage = require('./common/provider/localstorage.factory');
 var httpInterceptor = require('./common/provider/http-interceptor.factory');
-var periodToTime = require('./common/filter/period-to-time');
+var rusify = require('./common/filter/rusify.filter');
 
 var TemplatesModule = require('./common/templates.module');
 
@@ -33,7 +33,7 @@ var app = angular.module('controlApp', [
 app.factory('jwt', jwt);
 app.factory('localStorage', localStorage);
 app.factory('httpInterceptor', httpInterceptor);
-app.filter('periodToTime', periodToTime);
+app.filter('rusify', rusify);
 
 var appConfig = require('./config.js');
 var appRoute = require('./route.js');
