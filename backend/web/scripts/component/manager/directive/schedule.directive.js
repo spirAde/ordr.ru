@@ -16,6 +16,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 		scrollItems: 3
 	};
 
+	var firstPeriod = _.first(_.keys(CONSTANTS.periods));
+	var lastPeriod = _.last(_.keys(CONSTANTS.periods));
+
 	var template = {
 
 		panel: '<div class="schedule-panel schedule-carousel schedule-loaded"></div>',
@@ -142,6 +145,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 			// DOM manipulation
 
+			/**
+			 * Initializes the carousel.
+			 */
 			function _initialize() {
 
 				$stageOuter = angular.element(template.stageOuter);
@@ -155,6 +161,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				$compile($stageOuter)($scope);
 			}
 
+			/**
+			 * Subscribe the carousel on scroll, click, etc.
+			 */
 			function _subscribe() {
 
 				Hamster($element[0]).wheel(function(event, delta) {
@@ -210,6 +219,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				});
 			}
 
+			/**
+			 * First initial determination of the parameters carousel
+			 */
 			function _preCalculate() {
 
 				var viewPort = $element.parent()[0].offsetWidth;
@@ -231,7 +243,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 				var odd = true;
 
-				_.forEach(_.range(0, 144, 3), function(periodId) {
+				_.forEach(_.range(0, lastPeriod, 3), function(periodId) {
 
 					timeLineItems.push({
 						time: odd ? CONSTANTS.periods[periodId] : null,
@@ -244,6 +256,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				currentDate = moment().format(CONSTANTS.format);
 			}
 
+			/**
+			 * Second initial determination of the parameters carousel each times after load new data
+			 */
 			function _postCalculate() {
 
 				var dates = _.keys($scope.orders);
@@ -255,6 +270,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				lastDate = _.last(dates);
 			}
 
+			/**
+			 * Shift carousel
+			 */
 			function _scroll() {
 
 				$stageOuter.css({
@@ -263,6 +281,11 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				});
 			}
 
+			/**
+			 * Build carousel structure for new dates. Create item with parameters for rendering
+			 * @param {Array.<String>} [dates] - New dates
+			 * @returns {Array.<Object>} - Array of items with calculated parameters
+			 */
 			function _buildData(dates) {
 
 				var data = [];
@@ -285,7 +308,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 						.map(function(periodId) { return periodId - 3; })
 						.value();
 
-					_.forEach(_.range(0, 144, 3), function(periodId) {
+					_.forEach(_.range(0, lastPeriod, 3), function(periodId, idx) {
 
 						var startOrderIndex = _.indexOf(startPeriodsId, periodId);
 
@@ -297,21 +320,8 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 								lessMinDuration = false;
 
-								var order = _.find(orders, function(order) { return parseInt(order.startPeriod) === periodId});
-								var orderDuration;
-
-								if (!order.oneDay && date !== _.last(dates) && order.startPeriod !== 0) {
-
-									var nextDay = moment(date).add(1, 'days').format(CONSTANTS.format);
-
-									var endNextDayOrderPeriod = parseInt($scope.orders[nextDay][0].endPeriod);
-
-									orderDuration = (144 - parseInt(startPeriodsId[startOrderIndex]) + parseInt(endNextDayOrderPeriod)) / 3;
-								}
-								else {
-
-									orderDuration = (parseInt(endPeriodsId[startOrderIndex]) - parseInt(startPeriodsId[startOrderIndex]) + 3) / 3;
-								}
+								var order = _.find(orders, {startPeriod: periodId});
+								var orderDuration = (endPeriodsId[startOrderIndex] - startPeriodsId[startOrderIndex] + 3) / 3;
 
 								skip = orderDuration - 1;
 
@@ -326,7 +336,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 									date: date,
 									merge: orderDuration,
 									itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * orderDuration) / 1000).toFixed(3),
-									lessMinDuration: lessMinDuration,
+									lessMinDuration: null,
 									throughService: order.throughService,
 									orderId: order.id,
 									oneDay: order.oneDay
@@ -356,6 +366,10 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				return data;
 			}
 
+			/**
+			 * Rendering line with time items
+			 * @param {Number} [repeat] - repeat count
+			 */
 			function _renderTime(repeat) {
 
 				_.forEach(_.range(0, repeat), function() {
@@ -384,105 +398,73 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				});
 			}
 
+			/**
+			 * Rendering line of items
+			 * @param {Array.<Object>} [data] - data for rendering
+			 */
 			function _renderOrder(data) {
+
+				var glueOrderIndexes = [];
 
 				$stageOuter[0].style.width = totalWidth + 'px';
 
 				_.forEach(data, function(item) {
 
-					var $itemOrder = angular.element(template.itemOrder);
-					var $itemOuter = angular.element(template.itemOuter);
+					var $item = _renderItem(item);
+					$stageOrder.append($item);
 
-					$itemOuter[0].style.width = item.itemWidth + 'px';
+					if (!item.oneDay && !_.isNull(item.oneDay) && item.periodId === 0) {
 
-					var classes = [];
+						var index = _.indexOf($stageOrder[0].children, $item[0]);
 
-					if (item.orderId) $itemOrder.attr('data-order', item.orderId);
-
-					if (!_.isNull(item.throughService)) {
-
-						item.throughService ? classes.push('item service-order') : classes.push('item manager-order');
+						if (index) {
+							glueOrderIndexes.push(index);
+						}
 					}
-
-					if (item.lessMinDuration) classes.push('disabled');
-
-					$itemOrder
-						.attr('data-merge', item.merge)
-						.attr('data-period', item.periodId);
-
-					$itemOrder.addClass(classes.join(' '));
-
-					$itemOuter.append($itemOrder);
-					$stageOrder.append($itemOuter);
 				});
 
-				// Check if last order of previous date is 2days order, then merge
-				if (!!data[0].oneDay) {
-
-					var allItemsLength = $stageOrder[0].childNodes.length;
-					var newDatesItemsLength = data.length;
-
-					if (allItemsLength !== newDatesItemsLength) {
-
-						var needMergedElements = [
-							$stageOrder[0].childNodes[allItemsLength - newDatesItemsLength - 1],
-							$stageOrder[0].childNodes[allItemsLength - newDatesItemsLength]
-						];
-
-						var needMergedItems = [
-							items[allItemsLength - newDatesItemsLength - 1],
-							items[allItemsLength - newDatesItemsLength]
-						];
-
-						var item = {
-							periodId: needMergedItems[0].periodId,
-							date: needMergedItems[0].date,
-							merge: _.sum(needMergedItems, 'merge'),
-							itemWidth: _.sum(needMergedItems, 'itemWidth'),
-							lessMinDuration: needMergedItems[0].lessMinDuration,
-							throughService: needMergedItems[0].throughService,
-							orderId: needMergedItems[0].orderId,
-							oneDay: needMergedItems[0].oneDay
-						};
-
-						_.forEach(needMergedElements, function(element) {
-
-							element.parentNode.removeChild(element);
-						});
-
-						_.pullAt(items, allItemsLength - newDatesItemsLength - 1);
-
-						var $itemOrder = angular.element(template.itemOrder);
-						var $itemOuter = angular.element(template.itemOuter);
-
-						$itemOuter[0].style.width = item.itemWidth + 'px';
-
-						var classes = [];
-
-						if (item.orderId) $itemOrder.attr('data-order', item.orderId);
-
-						if (!_.isNull(item.throughService)) {
-
-							item.throughService ? classes.push('item service-order') : classes.push('item manager-order');
-						}
-
-						if (item.lessMinDuration) classes.push('disabled');
-
-						$itemOrder
-							.attr('data-period', item.periodId)
-							.attr('data-merge', item.merge);
-
-						$itemOrder.addClass(classes.join(' '));
-
-						$itemOuter.append($itemOrder);
-
-						$stageOrder[0].insertBefore($itemOuter[0], $stageOrder[0].children[allItemsLength - newDatesItemsLength - 1]);
-
-						items[allItemsLength - newDatesItemsLength - 1] = item;
-					}
-				}
+				_glueOrderItems(glueOrderIndexes);
 			}
 
+			/**
+			 * Creating DOM structure for one item
+			 * @param {Object} [item] - data of item
+			 * @returns {HTMLElement} - the item container
+			 */
+			function _renderItem(item) {
+
+				var $itemOrder = angular.element(template.itemOrder);
+				var $itemOuter = angular.element(template.itemOuter);
+
+				$itemOuter[0].style.width = item.itemWidth + 'px';
+
+				var classes = [];
+
+				if (item.orderId) $itemOrder.attr('data-order', item.orderId);
+
+				if (!_.isNull(item.throughService)) {
+
+					item.throughService ? classes.push('item service-order') : classes.push('item manager-order');
+				}
+
+				if (item.lessMinDuration) classes.push('disabled');
+
+				$itemOrder
+					.attr('data-merge', item.merge)
+					.attr('data-period', item.periodId);
+
+				$itemOrder.addClass(classes.join(' '));
+
+				$itemOuter.append($itemOrder);
+
+				return $itemOuter;
+			}
+
+			/**
+			 * Calculate new position of carousel
+			 * @param {Number} [delta] - 1 || -1 - mouse scroll direction
+			 * @param {Boolean} [notify] - need or not emit event for other carousels
+			 */
 			function _changePosition(delta, notify) {
 
 				var shifting = shift * (-delta);
@@ -514,6 +496,10 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				if (notify) $scope.$emit('schedule:changePosition', {id: $scope.roomId, delta: delta});
 			}
 
+			/**
+			 * Deny closest cells to order, if duration between closest orders less then minDuration
+			 * @param {Number} [index] - index of item
+			 */
 			function _rejectClosestItems(index) {
 
 				var from = Math.max(index - ($scope.minDuration / 3) + 1, 0);
@@ -541,6 +527,10 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				});
 			}
 
+			/**
+			 * Allow closest cells to order, if duration between closest orders more then minDuration
+			 * @param {Number} [index] - index of item
+			 */
 			function _resolveClosestItems(index) {
 
 				var from = Math.max(index - ($scope.minDuration / 3) + 1, 0);
@@ -568,6 +558,10 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				});
 			}
 
+			/**
+			 * Check closest cells after merge
+			 * @param {Number} [index] - index of item
+			 */
 			function _checkClosestItemsAfterMerge(index) {
 
 				var from = Math.max(index - ($scope.minDuration / 3), 0);
@@ -640,6 +634,54 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				}
 			}
 
+			/**
+			 * If order is 2days, then merge half of order
+			 * @param {Array} [indexes] - indexes of orders, which need to paste together
+			 */
+			function _glueOrderItems(indexes) {
+
+				_.forEach(indexes, function(index) {
+
+					var needMergedElements = [
+						$stageOrder[0].childNodes[index - 1],
+						$stageOrder[0].childNodes[index]
+					];
+
+					var needMergedItems = [
+						items[index - 1],
+						items[index]
+					];
+
+					var item = {
+						periodId: needMergedItems[0].periodId,
+						date: needMergedItems[0].date,
+						merge: _.sum(needMergedItems, 'merge'),
+						itemWidth: _.sum(needMergedItems, 'itemWidth'),
+						lessMinDuration: needMergedItems[0].lessMinDuration,
+						throughService: needMergedItems[0].throughService,
+						orderId: needMergedItems[0].orderId,
+						oneDay: needMergedItems[0].oneDay
+					};
+
+					_.forEach(needMergedElements, function(element) {
+
+						element.parentNode.removeChild(element);
+					});
+
+					_.pullAt(items, index - 1);
+
+					var $item = _renderItem(item);
+
+					$stageOrder[0].insertBefore($item[0], $stageOrder[0].children[index - 1]);
+
+					items[index - 1] = item;
+				});
+			}
+
+			/**
+			 * Merge items to one order
+			 * @param {Number} [orderId] - order id
+			 */
 			function _mergeItems(orderId) {
 
 				var duration = order.endIndex - order.startIndex + 1;
@@ -663,36 +705,57 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 				_.pullAt(items, _.range(order.startIndex, order.endIndex));
 
-				var $itemOrder = angular.element(template.itemOrder);
-				var $itemOuter = angular.element(template.itemOuter);
+				var $item = _renderItem(item);
 
-				$itemOuter[0].style.width = item.itemWidth + 'px';
-
-				var classes = [];
-
-				if (item.orderId) $itemOrder.attr('data-order', item.orderId);
-
-				if (!_.isNull(item.throughService)) {
-
-					item.throughService ? classes.push('item service-order') : classes.push('item manager-order');
-				}
-
-				if (item.lessMinDuration) classes.push('disabled');
-
-				$itemOrder
-					.attr('data-merge', item.merge);
-
-				$itemOrder.addClass(classes.join(' '));
-
-				$itemOuter.append($itemOrder);
-
-				$stageOrder[0].insertBefore($itemOuter[0], $stageOrder[0].children[order.startIndex]);
+				$stageOrder[0].insertBefore($item[0], $stageOrder[0].children[order.startIndex]);
 
 				items[order.startIndex] = item;
 			}
 
+			/**
+			 * Split order
+			 * @param {Number} [index] - index of item
+			 * @param {Object} [order] - order parameters
+			 */
 			function _unmergeItems(index, order) {
 
+				var node = $stageOrder[0].childNodes[index];
+				var data = {};
+
+				node.parentNode.removeChild(node);
+
+				_.pullAt(items, index);
+
+				if (order.oneDay) {
+					data[order.startDate] = _.range(order.startPeriod, order.endPeriod, 3);
+				}
+				else {
+					data[order.endDate] = _.range(firstPeriod, order.endPeriod, 3);
+					data[order.startDate] = _.range(order.startPeriod, lastPeriod, 3);
+				}
+
+				_.forEach(data, function(periods, date) {
+
+					_.forEach(periods, function(period, idx) {
+
+						var item = {
+							periodId: period,
+							date: date,
+							merge: 1,
+							itemWidth: ((parseFloat(itemWidth * 1000) + parseInt(options.margin * 1000)) / 1000).toFixed(3),
+							lessMinDuration: false,
+							throughService: null,
+							orderId: null,
+							oneDay: null
+					  };
+
+						items.splice(index + idx, 0, item);
+
+						var $item = _renderItem(item);
+
+						$stageOrder[0].insertBefore($item[0], $stageOrder[0].children[index + idx]);
+					});
+				});
 			}
 
 
@@ -704,7 +767,15 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 					if (data.status === 'success') {
 
-						_unmergeItems(index, data.order);
+						_unmergeItems(index, data.result);
+
+						_resolveClosestItems(index);
+
+						var delta = data.result.oneDay ?
+							(data.result.endPeriod - data.result.startPeriod) / 3 :
+							(lastPeriod - data.result.startPeriod + data.result.endPeriod) / 3;
+
+						_resolveClosestItems(index + delta);
 					}
 				}});
 			}

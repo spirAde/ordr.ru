@@ -7,8 +7,8 @@ use console\models\BathhouseService;
 use console\models\BathhouseBooking;
 use console\models\BathhouseRoom;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\console\Controller;
-use common\components\ArrayHelper;
 use yii\helpers\VarDumper;
 use common\components\OrdrHelper;
 use yii\db\Query;
@@ -630,7 +630,7 @@ class DataController extends Controller {
                 'cost_guests'   => mt_rand(1,9) * 1000,
                 'total'         => mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000,
                 'comment'       => 'Vse pychkom'
-            ]/*,
+            ],
             [
                 'start_date'    => 'current',
                 'end_date'      => 'next',
@@ -652,7 +652,7 @@ class DataController extends Controller {
                 'cost_guests'   => mt_rand(1,9) * 1000,
                 'total'         => mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000 + mt_rand(1,9) * 1000,
                 'comment'       => 'Vse pychkom'
-            ]*/
+            ]
         ];
         $first_date = date('Y-m-d', strtotime('now'));
         $end_date = date('Y-m-d', strtotime('now', strtotime('+30 days')));

@@ -69,11 +69,11 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 						if (response.result === 'success') {
 
-							callback({status: 'success'});
+							callback({status: 'success', result: _.pick($scope.order, ['startDate', 'endDate', 'startPeriod', 'endPeriod', 'oneDay'])});
 						}
 						else {
 
-							// notify
+							// need notify
 						}
 					});
 
@@ -150,6 +150,8 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 							else {
 
 								callback({status: 'error', result: null});
+
+								// need notify
 							}
 
 							ngDialog.close();
@@ -157,6 +159,8 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 						.catch(function () {
 
 							callback({status: 'error', result: null});
+
+							// need notify
 
 							ngDialog.close();
 						});
