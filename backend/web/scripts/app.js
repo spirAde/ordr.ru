@@ -3,7 +3,9 @@
 var angular = require('angular');
 var uiRouter = require('angular-ui-router');
 var ngTouch = require('angular-touch');
+var ngAnimate = require('angular-animate');
 var ngDialog = require('ng-dialog');
+var toastr = require('angular-toastr');
 
 var moment = require('moment');
 
@@ -13,6 +15,8 @@ var jwt = require('./common/provider/jwt.factory');
 var localStorage = require('./common/provider/localstorage.factory');
 var httpInterceptor = require('./common/provider/http-interceptor.factory');
 var rusify = require('./common/filter/rusify.filter');
+var formatDate = require('./common/filter/format-date.filter');
+var formatTime = require('./common/filter/format-time.filter');
 
 var TemplatesModule = require('./common/templates.module');
 
@@ -22,7 +26,9 @@ var ManagerModule = require('./component/manager');
 var app = angular.module('controlApp', [
 	uiRouter,
 	ngTouch,
+	ngAnimate,
 	ngDialog,
+	toastr,
 
 	TemplatesModule.name,
 
@@ -34,6 +40,8 @@ app.factory('jwt', jwt);
 app.factory('localStorage', localStorage);
 app.factory('httpInterceptor', httpInterceptor);
 app.filter('rusify', rusify);
+app.filter('formatDate', formatDate);
+app.filter('formatTime', formatTime);
 
 var appConfig = require('./config.js');
 var appRoute = require('./route.js');

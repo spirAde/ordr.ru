@@ -10,7 +10,7 @@
 <div class="form">
     <div class="field">
         <input type="text" readonly="readonly"
-           value="{{order.startDate}} {{::order.startTime}} - {{::order.endDate}} {{::order.endTime}}"
+           value="{{order.startDate | formatDate}} {{::order.startPeriod | formatTime}} - {{::order.endDate | formatDate}} {{::order.endPeriod | formatTime}}"
         />
     </div>
     <div class="field">

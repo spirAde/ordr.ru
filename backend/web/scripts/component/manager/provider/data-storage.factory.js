@@ -3,9 +3,9 @@
 var _ = require('lodash');
 var moment = require('moment');
 
-dataStorage.$inject = ['$rootScope', '$http', '$q', 'localStorage', 'CONSTANTS'];
+dataStorage.$inject = ['$http', '$q', 'localStorage', 'CONSTANTS'];
 
-function dataStorage($rootScope, $http, $q, localStorage, CONSTANTS) {
+function dataStorage($http, $q, localStorage, CONSTANTS) {
 
 	var user = localStorage.getData();
 

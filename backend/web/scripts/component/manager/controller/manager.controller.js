@@ -3,9 +3,9 @@
 var _ = require('lodash');
 var moment = require('moment');
 
-ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'localStorage', 'dataStorage', 'CONSTANTS'];
+ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'toastr', 'localStorage', 'dataStorage', 'CONSTANTS'];
 
-function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dataStorage, CONSTANTS) {
+function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStorage, dataStorage, CONSTANTS) {
 
 	$scope.bathhouse = {};
 	$scope.rooms = [];
@@ -53,10 +53,8 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 			controller: ['$scope', function($scope) {
 
 				$scope.order = _.assign(orders[0], {
-					startTime: CONSTANTS.periods[orders[0].startPeriod],
 					endDate: orders.length > 1 ? orders[1].endDate : orders[0].endDate,
-					endPeriod: orders.length > 1 ? orders[1].endPeriod : orders[0].endPeriod,
-					endTime: orders.length > 1 ? CONSTANTS.periods[orders[1].endPeriod] : CONSTANTS.periods[orders[0].endPeriod]
+					endPeriod: orders.length > 1 ? orders[1].endPeriod : orders[0].endPeriod
 				});
 
 				$scope.cancelOrder = function() {
@@ -100,8 +98,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 					costGuests: 0,
 					total: 0,
 					comment: '',
-					startTime: CONSTANTS.periods[order.startPeriod],
-					endTime: CONSTANTS.periods[order.endPeriod]
+					services: []
 				});
 
 				$scope.$watchGroup(['order.costPeriod', 'order.costServices', 'order.costGuests'], function(values) {
@@ -118,9 +115,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 
 				$scope.saveOrder = function() {
 
-					var data = _.omit($scope.order, ['startTime', 'endTime']);
-
-					dataStorage.createOrder(data)
+					dataStorage.createOrder($scope.order)
 						.then(function(response) {
 
 							// created
@@ -169,6 +164,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, localStorage, dat
 				$scope.selectServices = function(services) {
 
 					$timeout(function() {
+						$scope.order.services = services;
 						$scope.order.costServices = dataStorage.calculateOrderOfServices($scope.bathhouse.services, services);
 					}, 0);
 				};
