@@ -8,7 +8,6 @@ use yii\helpers\Json;
 use common\components\OrdrHelper;
 use yii\helpers\Url;
 use api\modules\closed\models\BathhouseBooking;
-use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\HttpException;
@@ -26,7 +25,7 @@ class OrderController extends ApiController
     public function actions()
     {
         $actions = parent::actions();
-        unset($actions['create'],$actions['index'],$actions['delete']);
+        unset($actions['create'],$actions['index'],$actions['delete'],$actions['update']);
         return $actions;
     }
 
@@ -172,53 +171,80 @@ class OrderController extends ApiController
         }
     }
 
-    public function actionCreate()
+    public function actionCreate($id = null)
     {
-        $model = new BathhouseBooking();
+        if($id == null)
+        {
+            Yii::info('Getting create request','order');
+            $model = new BathhouseBooking();
+        }
+        else
+        {
+            Yii::info('Getting update request, id = '.$id,'order');
+            $model = $this->findModel($id);
+        }
+
         $params = Yii::$app->getRequest()->getBodyParams();
+
+        Yii::info('Received params: '.Json::encode($params),'order');
+
         foreach($params as $id => $value)
             if($model->isAttributeSafe(ApiHelpers::decamelize($id)))
                 $model->setAttribute(ApiHelpers::decamelize($id),$value);
 
+        if(isset($params['services']))
+            $model->services = json_encode($params['services']);
+
         $model->bathhouse_id = yii::$app->user->identity->organization_id;
+        $model->manager_id      = Yii::$app->user->identity->id;
+
+        Yii::info('Getting attributes: '.Json::encode($model->attributes),'order');
 
         if(!$model->validate())
+        {
+            Yii::info('Getting following validation errors: '.Json::encode($model->getErrors()),'order');
             return [
                 'result' => 'fail',
-                'data'  => array_merge([],
+                'data' => array_merge([],
                     $model->getErrors()
                 ),
                 'name' => 'Data Validation Failed',
                 'code' => 0,
                 'status' => 422,
-                'type'  => '',
+                'type' => '',
             ];
+        }
 
+        Yii::info('Validation success','order');
         $min_duration = $model->room->bathhouseRoomSettings->min_duration;
 
+        Yii::info('Checking time is free','order');
         if(ApiHelpers::checkTimeIsFree($model, $min_duration))
         {
+            Yii::info('Checking success, saving ...','order');
             $transaction = BathhouseBooking::getDb()->beginTransaction();
-            $model->manager_id      = Yii::$app->user->identity->id;
-            $model->bathhouse_id    = Yii::$app->user->identity->organization_id;
 
             if ($model->save(false))
             {
+                Yii::info('Saving success','order');
                 $response = Yii::$app->getResponse();
                 $response->setStatusCode(201);
             }
             elseif (!$model->hasErrors())
             {
+                Yii::info('Unknown error while saving','order');
                 throw new ServerErrorHttpException('Failed to create the object for unknown reason.');
             }
             else
             {
+                Yii::info('Validation errors while saving: '.Json::encode($model->getErrors()),'order');
                 return $model;
             }
+            Yii::info('Reforming schedule for day(days)','order');
             if(ApiHelpers::reformScheduleForDay($model->room_id, $model->start_date, $model->end_date, $min_duration))
             {
                 $transaction->commit();
-
+                Yii::info('Reforming success. Operation successfully ended.','order');
                 return [
                     'result' => 'success',
                     'data'  => [
@@ -248,23 +274,29 @@ class OrderController extends ApiController
             }
             else
             {
+                Yii::info('Reforming fail. Operation rolled back. See schedule log.','order');
                 $transaction->rollBack();
                 throw new ServerErrorHttpException('Schedule forming error. Order not saved');
             }
         }
         else
+        {
+            Yii::info('Checking fail.','order');
             throw new BadRequestHttpException('Order time is busy');
+        }
     }
 
     public function actionDelete($id)
     {
-
+        Yii::info('Getting delete request, id = '.$id,'order');
         $model = $this->findModel($id);
 
-        /*if($model->bathhouse_id != yii::$app->user->identity->organization_id or $model->manager_id == 0)
+        if($model->bathhouse_id != yii::$app->user->identity->organization_id or ($model->manager_id == 0 and $model->user_id != 0))
         {
+            Yii::info('Access error, is_user_order = '.(($model->manager_id == 0 and $model->user_id != 0) ? 'true' : 'false').
+                        ', bath_error = '.(($model->bathhouse_id != yii::$app->user->identity->organization_id) ? 'true' : 'false'),'order');
             throw new UnauthorizedHttpException('Unauthorized request');
-        }*/
+        }
 
         $room_id        = $model->room_id;
         $start_date     = $model->start_date;
@@ -275,31 +307,40 @@ class OrderController extends ApiController
 
         if ($model->delete() === false)
         {
+            Yii::info('Deleting failed for unknown reason.','order');
             $transaction->rollBack();
             throw new ServerErrorHttpException('Failed to delete the object for unknown reason.');
         }
         else
         {
+            Yii::info('Deleting success. Reforming schedule for day','order');
             if(ApiHelpers::reformScheduleForDay($room_id, $start_date, $end_date, $min_duration))
             {
+                Yii::info('Reforming success. Operation successfully ended.','order');
                 $transaction->commit();
 
-                Yii::$app->getResponse()->setStatusCode(201);
+                Yii::$app->getResponse()->setStatusCode(204);
                 return [
                     'result' => 'success',
                     'data' => [],
                     'name' => 'Success operation',
                     'code' => 0,
-                    'status' => 201,
+                    'status' => 204,
                     'type' => '',
                 ];
             }
             else
             {
+                Yii::info('Reforming fail. Operation rolled back. See schedule log.','order');
                 $transaction->rollBack();
                 throw new ServerErrorHttpException('Schedule forming error. Order not deleted');
             }
         }
+    }
+
+    public function actionUpdate($id)
+    {
+        $this->actionCreate($id);
     }
 
 }

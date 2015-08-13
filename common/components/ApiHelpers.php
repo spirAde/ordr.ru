@@ -5,6 +5,7 @@ use console\models\BathhouseSchedule;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\helpers\VarDumper;
 
 class ApiHelpers
@@ -66,8 +67,9 @@ class ApiHelpers
 
     public static function reformScheduleForDay($room_id, $start_date, $end_date, $min_duration = self::STEP)
     {
+        Yii::info('Getting reforming schedule request','schedule');
         $dates = [$start_date, ($end_date === $start_date) ? null : $end_date];
-
+        Yii::info('Reforming schedule for dates = '.Json::encode($dates).', room_id = '.$room_id,'schedule');
         foreach($dates as $date)
         {
             if($date == null)
@@ -117,11 +119,16 @@ class ApiHelpers
             if (!empty($next_booking)) {
                 $busy_periods[] = [$next_booking->start_period, self::LAST_TIME_ID];
             }
+            Yii::info('For date = '.$date.', we get following busy periods = '.Json::encode($busy_periods),'schedule');
 
             $free_period_for_date = ApiHelpers::getFreeTime($busy_periods, $min_duration);
 
+            Yii::info('For date = '.$date.', we get following freetime periods = '.Json::encode($free_period_for_date),'schedule');
+
             try
             {
+                Yii::info('Saving schedule for date = '.$date,'schedule');
+
                 yii::$app->db->createCommand()
                     ->update('bathhouse_schedule', [
                         'schedule' => json_encode($free_period_for_date)],
@@ -130,10 +137,11 @@ class ApiHelpers
             }
             catch(Exception $e)
             {
+                Yii::info('Catching exception while saving '.Json::encode($e),'schedule');
                 return false;
             }
         }
-
+        Yii::info('Schedule successfully reforming','schedule');
         return true;
     }
 

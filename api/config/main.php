@@ -39,11 +39,29 @@ return [
             'enableAutoLogin' => false,
         ],
         'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
+            'traceLevel' => 0,
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['info'],
+                    'categories' => ['order'],
+                    'logVars' => [],
+                    'logFile' => '@api/runtime/logs/orders/order.log',
+                    'maxFileSize' => 1024 * 2,
+                    'maxLogFiles' => 20,
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['info'],
+                    'categories' => ['schedule'],
+                    'logVars' => [],
+                    'logFile' => '@api/runtime/logs/schedule/schedule.log',
+                    'maxFileSize' => 1024 * 2,
+                    'maxLogFiles' => 20,
                 ],
             ],
         ],
@@ -92,6 +110,8 @@ return [
                     'patterns' => [
                         'GET'                   => 'index',
                         'POST'                  => 'create',
+                        'PUT <id:\d+>'          => 'update',
+                        'PATCH <id:\d+>'        => 'update',
                         'OPTIONS'               => 'options',
                         'OPTIONS <id:\d+>'      => 'options',
                         'DELETE <id:\d+>'       => 'delete',
