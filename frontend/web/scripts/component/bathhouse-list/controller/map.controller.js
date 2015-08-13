@@ -37,7 +37,7 @@ function MapController($scope, $rootScope, $stateParams, $timeout, $compile, lea
 			baselayers: {
 				city: {
 					name: 'OpenStreetMap (XYZ)',
-					url: 'https://{s}.tiles.mapbox.com/v3/examples.map-i87786ca/{z}/{x}/{y}.png',
+					url: 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=' + L.mapbox.accessToken,
 					type: 'xyz',
 					layerOptions: {
 						attribution: '<a href="https://www.mapbox.com/">Mapbox</a> - We love it =)'

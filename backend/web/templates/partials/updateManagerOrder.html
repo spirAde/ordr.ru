@@ -1,0 +1,34 @@
+<div class="md-title clear">
+    <h2>Обновление заказа №{{::order.id}}</h2>
+</div>
+<!--<div class="messages done">
+    <p>Done</p>
+</div>
+<div class="messages error">
+    <p>Error</p>
+</div>-->
+<div class="form">
+    <div class="field">
+        <input type="text" readonly="readonly"
+               value="{{order.startDate | formatDate}} {{::order.startPeriod | formatTime}} - {{::order.endDate | formatDate}} {{::order.endPeriod | formatTime}}"
+                />
+    </div>
+    <div class="field">
+        <select-services selected-list="order.services" selected-services="selectServices(services);"></select-services>
+    </div>
+    <div class="field-comment">
+        <textarea class="order-comment" ng-model="order.comment"></textarea>
+    </div>
+    <div class="result">
+        <div class="result-text">
+            <p>Итого: </p>
+        </div>
+        <div class="result-summ">
+            <input type="text" readonly="readonly" ng-model="order.total" />
+        </div>
+    </div>
+</div>
+<div class="buttons clear">
+    <a ng-click="close()">Отмена</a>
+    <a ng-click="updateOrder()">Обновить</a>
+</div>

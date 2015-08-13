@@ -64,10 +64,10 @@ html,body {
 /* Help */
 .help span {display: inline-block;margin-left: 20px;position: relative;padding-left: 15px;}
 .help span:before {content: '';display: inline-block;width: 10px;height: 10px;position: absolute;left: -4px;top: 50%;margin-top: -7px;background-color: #7f8c9d;border:2px solid #fff;}
-.help .enabled:before {background-color:#e5e9ec; color:#E5E9EC;}
-.help .reserved-site:before {background-color:#F4740C; color:#fff;}
+.help .enabled:before {background-color:#E5E9EC; color:#E5E9EC;}
+.help .reserved-service:before {background-color:#F4740C; color:#fff;}
 .help .disabled:before {background-color: #7f8c9d; color: #fff ;}
-.help .reserved-not-site:before {background-color: #18B2AD; color:#fff ;}
+.help .reserved-manager:before {background-color: #18B2AD; color:#fff ;}
 
 /* Rooms */
 .room {position: relative;margin-bottom: 40px;}
@@ -82,6 +82,7 @@ html,body {
 .schedule-panel .order-item.service-order {background-color:#F4740C;border-color:#F4740C;color:#fff;}
 .schedule-panel .order-item.disabled {background-color: #7f8c9d; color: #fff ;}
 .schedule-panel .order-item.manager-order {background-color: #18B2AD;border-color:#18B2AD ; color:#fff ;}
+.schedule-panel .order-item.changed {background-color: #9ECBCA;border-color:#9ECBCA ; color:#fff ;}
 
 .owl-orders .owl-item {height: 62px;}
 .owl-orders .owl-stage-outer {height: 62px;}
@@ -138,6 +139,12 @@ html,body {
 .buttons {padding: 30px 40px;background-color: #F4740C;}
 .buttons a {border: 1px solid #fff;padding: 10px 15px;margin-right:5px;color: #fff;display: inline-block;font-family: 'proxima_bold', Arial, sans-serif;}
 .buttons a:hover {color: #F4740C;background-color: #fff;}
+.buttons .dropdown {position: relative;display: inline-block;margin-left: 4px;}
+.buttons .dropdown .dropdown-menu {position: absolute;top: 100%;display: none;list-style: none;width: 100%;padding: 0;  }
+.buttons .dropdown:hover .dropdown-menu {display: block;}
+.buttons .dropdown button {background: #F4740C;font-size: 16px;border: 1px solid #fff;padding: 10px 15px;margin: 0 5px 0 0;color: #fff;font-family: 'proxima_bold', Arial, sans-serif;  }
+.buttons .dropdown a {display: block;text-decoration: none;background-color: #F4740C;color: #fff;}
+.buttons .dropdown a:hover {color: #F4740C;background-color: #fff;}
 
 .body-overlay {overflow:hidden;position:fixed;width:100%;height:100%;}
 

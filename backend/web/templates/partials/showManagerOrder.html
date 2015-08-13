@@ -27,7 +27,14 @@
     </div>-->
 </div>
 <div class="buttons clear">
-    <a ng-click="cancelOrder();">Закрыть</a>
+    <a ng-click="closeThisDialog();">Закрыть</a>
     <a ng-click="removeOrder();">Удалить</a>
-    <a ng-click="updateOrder();">Изменить</a>
+
+    <div class="dropdown">
+        <button>Изменить</button>
+        <ul class="dropdown-menu">
+            <li><a ng-click="updateOrder('schedule');">Время</a></li>
+            <li><a ng-click="updateOrder('other');">Другое</a></li>
+        </ul>
+    </div>
 </div>

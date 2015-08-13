@@ -16,6 +16,7 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 		loadOrders: loadOrders,
 		createOrder: createOrder,
 		removeOrder: removeOrder,
+		updateOrder: updateOrder,
 
 		calculateOrderOfPeriods: calculateOrderOfPeriods,
 		calculateOrderOfServices: calculateOrderOfServices,
@@ -92,6 +93,11 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 
 				return $q.reject(response);
 			});
+	}
+
+	function updateOrder(order) {
+
+		return true;
 	}
 
 

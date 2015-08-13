@@ -13,7 +13,8 @@ function SelectServices($compile, $filter) {
 		transclude: true,
 		template: '<div class="select-services"></div>',
 		scope: {
-			selectedServices: '&selectedServices'
+			selectedServices: '&selectedServices',
+			selectedList: '=selectedList'
 		},
 		link: function($scope, $element) {
 
@@ -22,7 +23,7 @@ function SelectServices($compile, $filter) {
 			var $captionSelectBox, $emptyLabel, $placeholderSpan, $optionsWrapper, $optionsContainer, $scroll;
 			var boxIsOpen = false;
 			var text = [];
-			var selected = [];
+			var selected = $scope.selectedList || [];
 
 			_initialize();
 
@@ -76,6 +77,14 @@ function SelectServices($compile, $filter) {
 						$optionElement = angular.element(
 							'<li class=""><span><i></i></span><label><span class="main-text">'+
 							service.name + '</span><span class="option-cost">' + service.price + '</span></label></li>');
+
+						if (_.indexOf(selected, service.id) !== -1) {
+
+							$optionElement.addClass('selected');
+							text.push(service.name);
+
+							_setText();
+						}
 
 						$optionElement.attr('data-service', service.id);
 

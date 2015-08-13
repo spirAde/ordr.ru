@@ -50,7 +50,8 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 			showOrder: '&showOrder',
 			getOrders: '&getOrders',
-			createOrder: '&createOrder'
+			createOrder: '&createOrder',
+			updateOrder: '&updateOrder'
 		},
 		link: function($scope, $element) {
 
@@ -80,6 +81,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				startIndex: undefined,
 				endIndex: undefined
 			};
+			var updatedOrder = {};
 
 			$scope.$watch('orders', function(newVal, oldVal) {
 
@@ -404,8 +406,6 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 			 */
 			function _renderOrder(data) {
 
-				var glueOrderIndexes = [];
-
 				$stageOuter[0].style.width = totalWidth + 'px';
 
 				_.forEach(data, function(item) {
@@ -418,12 +418,10 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 						var index = _.indexOf($stageOrder[0].children, $item[0]);
 
 						if (index) {
-							glueOrderIndexes.push(index);
+							_glueOrderItems(index);
 						}
 					}
 				});
-
-				_glueOrderItems(glueOrderIndexes);
 			}
 
 			/**
@@ -636,46 +634,43 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 			/**
 			 * If order is 2days, then merge half of order
-			 * @param {Array} [indexes] - indexes of orders, which need to paste together
+			 * @param {Number} [index] - index of orders, which need to paste together
 			 */
-			function _glueOrderItems(indexes) {
+			function _glueOrderItems(index) {
 
-				_.forEach(indexes, function(index) {
+				var needMergedElements = [
+					$stageOrder[0].childNodes[index - 1],
+					$stageOrder[0].childNodes[index]
+				];
 
-					var needMergedElements = [
-						$stageOrder[0].childNodes[index - 1],
-						$stageOrder[0].childNodes[index]
-					];
+				var needMergedItems = [
+					items[index - 1],
+					items[index]
+				];
 
-					var needMergedItems = [
-						items[index - 1],
-						items[index]
-					];
+				var item = {
+					periodId: needMergedItems[0].periodId,
+					date: needMergedItems[0].date,
+					merge: _.sum(needMergedItems, 'merge'),
+					itemWidth: _.sum(needMergedItems, 'itemWidth'),
+					lessMinDuration: needMergedItems[0].lessMinDuration,
+					throughService: needMergedItems[0].throughService,
+					orderId: needMergedItems[0].orderId,
+					oneDay: needMergedItems[0].oneDay
+				};
 
-					var item = {
-						periodId: needMergedItems[0].periodId,
-						date: needMergedItems[0].date,
-						merge: _.sum(needMergedItems, 'merge'),
-						itemWidth: _.sum(needMergedItems, 'itemWidth'),
-						lessMinDuration: needMergedItems[0].lessMinDuration,
-						throughService: needMergedItems[0].throughService,
-						orderId: needMergedItems[0].orderId,
-						oneDay: needMergedItems[0].oneDay
-					};
+				_.forEach(needMergedElements, function(element) {
 
-					_.forEach(needMergedElements, function(element) {
-
-						element.parentNode.removeChild(element);
-					});
-
-					_.pullAt(items, index - 1);
-
-					var $item = _renderItem(item);
-
-					$stageOrder[0].insertBefore($item[0], $stageOrder[0].children[index - 1]);
-
-					items[index - 1] = item;
+					element.parentNode.removeChild(element);
 				});
+
+				_.pullAt(items, index - 1);
+
+				var $item = _renderItem(item);
+
+				$stageOrder[0].insertBefore($item[0], $stageOrder[0].children[index - 1]);
+
+				items[index - 1] = item;
 			}
 
 			/**
@@ -763,19 +758,39 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 			function _showOrder(id, index) {
 
+				var delta = 0;
+
 				$scope.showOrder({roomId: $scope.roomId, orderId: id, callback: function(data) {
 
 					if (data.status === 'success') {
 
-						_unmergeItems(index, data.result);
+						if (data.action === 'remove') {
 
-						_resolveClosestItems(index);
+							_unmergeItems(index, data.result);
 
-						var delta = data.result.oneDay ?
-							(data.result.endPeriod - data.result.startPeriod) / 3 :
-							(lastPeriod - data.result.startPeriod + data.result.endPeriod) / 3;
+							_resolveClosestItems(index);
 
-						_resolveClosestItems(index + delta);
+							delta = _orderDuration(data.result);
+
+							_resolveClosestItems(index + delta);
+						}
+						else if (data.action === 'update') {
+
+							updatedOrder = data.result;
+
+							var startIndex = _.findIndex(items, {periodId: updatedOrder.startPeriod, date: updatedOrder.startDate});
+
+							delta = _orderDuration(updatedOrder);
+
+							updatedOrder.startIndex = startIndex;
+							updatedOrder.endIndex = startIndex + delta - 1;
+
+							_unmergeItems(index, data.result);
+
+							_resolveClosestItems(index);
+
+							_resolveClosestItems(index + delta);
+						}
 					}
 				}});
 			}
@@ -801,20 +816,47 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 					order.endIndex = index;
 
-					$scope.createOrder({order: _.pick(order, ['roomId', 'startDate', 'endDate', 'startPeriod', 'endPeriod']), callback: function(data) {
+					if (!_.isEmpty(updatedOrder)) {
 
-						if (data.status === 'success') {
+						$scope.updateOrder({order: _.omit(order, ['startIndex', 'endIndex']), callback: function(data) {
 
-							_mergeItems(data.result.id);
-							_checkClosestItemsAfterMerge(order.startIndex);
-						}
-						else {
+							if (data.status === 'success') {
 
-							_resolveClosestItems(order.startIndex);
-						}
+								_mergeItems(data.result.id);
+								_checkClosestItemsAfterMerge(order.startIndex);
+							}
+							else {
 
-						_resetOrder();
-					}});
+								_resolveClosestItems(order.startIndex);
+
+								order = updatedOrder;
+
+								_mergeItems(order.id);
+								_checkClosestItemsAfterMerge(order.startIndex);
+							}
+
+							updatedOrder = {};
+
+							_resetOrder();
+						}});
+					}
+					else {
+
+						$scope.createOrder({order: _.omit(order, ['startIndex', 'endIndex']), callback: function(data) {
+
+							if (data.status === 'success') {
+
+								_mergeItems(data.result.id);
+								_checkClosestItemsAfterMerge(order.startIndex);
+							}
+							else {
+
+								_resolveClosestItems(order.startIndex);
+							}
+
+							_resetOrder();
+						}});
+					}
 				}
 			}
 
@@ -835,6 +877,11 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					startIndex: undefined,
 					endIndex: undefined
 				};
+			}
+
+			function _orderDuration(order) {
+
+				return order.oneDay ? (order.endPeriod - order.startPeriod) / 3 : (lastPeriod - order.startPeriod + order.endPeriod) / 3;
 			}
 
 

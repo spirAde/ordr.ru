@@ -26,10 +26,10 @@
                     <div class="clear">
                         <h2>{{::room.name}}</h2>
                         <div class="help">
-                            <span class="item-1 past">Занято</span>
-                            <span class="item-2 reserve">Занято</span>
-                            <span class="item-3 reserve2">Занято</span>
-                            <span class="item-4 reserve3">Занято</span>
+                            <span class="item-1 enabled">Доступное время</span>
+                            <span class="item-2 disabled">Недоступное время</span>
+                            <span class="item-3 reserved-manager">Создано администратором</span>
+                            <span class="item-4 reserved-service">Создано через сервис</span>
                         </div>
                     </div>
                     <div class="wrap">
@@ -42,6 +42,7 @@
 
                             show-order="showOrder(roomId, orderId, callback);"
                             create-order="createOrder(order, callback);"
+                            update-order="updateOrder(order, callback);"
                             get-orders="getOrders(roomId, startDate, endDate);">
                         </schedule>
 
