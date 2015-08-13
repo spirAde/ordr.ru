@@ -3,9 +3,9 @@
  */
 .schedule-carousel .animated {
   -webkit-animation-duration: 1000ms;
-  animation-duration: 1000ms;
+          animation-duration: 1000ms;
   -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
+          animation-fill-mode: both;
 }
 .schedule-carousel .schedule-animated-in {
   z-index: 0;
@@ -15,7 +15,7 @@
 }
 .schedule-carousel .fadeOut {
   -webkit-animation-name: fadeOut;
-  animation-name: fadeOut;
+          animation-name: fadeOut;
 }
 
 @-webkit-keyframes fadeOut {
@@ -42,10 +42,10 @@
  */
 .schedule-height {
   -webkit-transition: height 500ms ease-in-out;
-  -moz-transition: height 500ms ease-in-out;
-  -ms-transition: height 500ms ease-in-out;
-  -o-transition: height 500ms ease-in-out;
-  transition: height 500ms ease-in-out;
+     -moz-transition: height 500ms ease-in-out;
+      -ms-transition: height 500ms ease-in-out;
+       -o-transition: height 500ms ease-in-out;
+          transition: height 500ms ease-in-out;
 }
 
 /* 
@@ -101,9 +101,9 @@
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 .schedule-carousel .schedule-item img {
   display: block;
@@ -112,16 +112,16 @@
 }
 .schedule-carousel.schedule-text-select-on .schedule-item {
   -webkit-user-select: auto;
-  -moz-user-select: auto;
-  -ms-user-select: auto;
-  user-select: auto;
+     -moz-user-select: auto;
+      -ms-user-select: auto;
+          user-select: auto;
 }
 .schedule-carousel .schedule-grab {
   cursor: move;
   cursor: -webkit-grab;
-  cursor: -o-grab;
-  cursor: -ms-grab;
-  cursor: grab;
+  cursor:      -o-grab;
+  cursor:     -ms-grab;
+  cursor:         grab;
 }
 .schedule-carousel.schedule-rtl {
   direction: rtl;
@@ -141,10 +141,10 @@
 .schedule-carousel .schedule-item .schedule-lazy {
   opacity: 0;
   -webkit-transition: opacity 400ms ease;
-  -moz-transition: opacity 400ms ease;
-  -ms-transition: opacity 400ms ease;
-  -o-transition: opacity 400ms ease;
-  transition: opacity 400ms ease;
+     -moz-transition: opacity 400ms ease;
+      -ms-transition: opacity 400ms ease;
+       -o-transition: opacity 400ms ease;
+          transition: opacity 400ms ease;
 }
 .schedule-carousel .schedule-item img {
   transform-style: preserve-3d;
