@@ -1,45 +1,22 @@
-<div class="container w-xxl w-auto-xs">
-    <a href class="navbar-brand block m-t">control.ordr.ru</a>
-    <div class="m-b-lg">
+<form name="loginForm" class="login-form"
+      method="post"
+      ng-submit="login(credentials)"
+      novalidate form-autofill-fix>
 
-        <div class="wrapper text-center">
-            <strong>Вход в панель управления</strong>
-        </div>
+    <h1>Control.ordr.ru</h1>
 
-        <form name="loginForm" class="form-validation"
-              method="post"
-              ng-submit="login(credentials)"
-              novalidate form-autofill-fix>
+    <input class="form-control no-border"
+           type="text"
+           placeholder="Логин"
+           id="username"
+           ng-model="credentials.username">
 
-            <div class="text-danger wrapper text-center">
+    <input class="form-control no-border"
+           placeholder="Пароль"
+           type="password"
+           id="password"
+           ng-model="credentials.password">
 
-            </div>
+    <button>Войти</button>
 
-            <div class="list-group list-group-sm">
-                <div class="list-group-item">
-                    <input class="form-control no-border"
-                           type="text"
-                           placeholder="Логин"
-                           id="username"
-                           ng-model="credentials.username">
-                </div>
-                <div class="list-group-item">
-                    <input class="form-control no-border"
-                           placeholder="Пароль"
-                           type="password"
-                           id="password"
-                           ng-model="credentials.password">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-lg btn-primary btn-block">Войти</button>
-
-        </form>
-
-    </div>
-    <div class="text-center">
-        <p>
-            <small class="text-muted">ordr.ru &copy; 2015</small>
-        </p>
-    </div>
-</div>
+</form>

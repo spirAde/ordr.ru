@@ -199,57 +199,69 @@ a.dp-nav-right{border-left-style: hidden!important;}
 .date .dp-selected {background-color: #FFF !important;color: #F4740C !important;font-family: 'proxima_bold', Arial, sans-serif !important;}
 .date .dp-divider {border: none !important;}
 
-.ngdialog,
-.ngdialog *,
-.ngdialog *:before,
-.ngdialog *:after {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+/* Login Page */
+.login-form {
+    font-family: 'proxima_bold', Arial, sans-serif;
+    background-color: #fff;
+    border: 2px solid #f0f0f0;
+    border-radius: 5px;
+    left: 50%;
+    margin-left: -160px;
+    margin-top: -160px;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 320px;
 }
 
-.ngdialog {
-    position: fixed;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    z-index: 10000;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+.login-form h1 {
+    color: #9e9e9e;
+    font-size: 16px;
+    letter-spacing: 1px;
+    margin-top: 35px;
+    text-transform: uppercase;
 }
 
-.ngdialog-overlay {
-    position: fixed;
-    background: rgba(0, 0, 0, 0.4);
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    -webkit-backface-visibility: hidden;
-    -webkit-animation: ngdialog-fadein 0.5s;
-    animation: ngdialog-fadein 0.5s;
+.login-form input {
+    border: 2px solid #f0f0f0;
+    border-radius: 5px;
+    color: #9e9e9e;
+    font-size: 12px;
+    height: 40px;
+    letter-spacing: 2px;
+    margin-top: 20px;
+    outline: medium none;
+    padding-left: 20px;
+    text-transform: uppercase;
+    width: 250px;
 }
 
-.ngdialog.ngdialog-closing .ngdialog-overlay {
-    -webkit-backface-visibility: hidden;
-    -webkit-animation: ngdialog-fadeout 0.5s;
-    animation: ngdialog-fadeout 0.5s;
+.login-form button {
+    background: #F4740C none repeat scroll 0 0;
+    border: 0 none;
+    border-radius: 5px;
+    box-shadow: 0 2px 0 0 #dd6e62;
+    cursor: pointer;
+    color: #fff;
+    font-family: Arial,sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    height: 50px;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    margin-top: 55px;
+    padding-top: 5px;
+    text-shadow: 0 2px 0 #dd6e62;
+    text-transform: uppercase;
+    width: 275px;
 }
 
-.ngdialog-content {
-    background: white;
-    -webkit-backface-visibility: hidden;
-    -webkit-animation: ngdialog-fadein 0.5s;
-    animation: ngdialog-fadein 0.5s;
+.login-form button:hover, input:hover {
+
+    transition: all 0.9s ease 0s;
 }
 
-.ngdialog.ngdialog-closing .ngdialog-content {
-    -webkit-backface-visibility: hidden;
-    -webkit-animation: ngdialog-fadeout 0.5s;
-    animation: ngdialog-fadeout 0.5s;
-}
-
-body.ngdialog-open {
-    overflow:hidden;position:fixed;width:100%;height:100%;
+.login-form input:hover {
+    border: 2px solid #F4740C;
+    color: #F4740C;
 }
