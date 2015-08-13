@@ -1,6 +1,7 @@
 <?php
 namespace api\modules\closed\controllers;
 
+use api\modules\closed\models\BathhouseBooking;
 use Yii;
 use common\components\JWT;
 use common\components\ArrayHelper;
@@ -114,10 +115,13 @@ class ApiController extends ActiveController
         elseif($id !== null)
             $model = $modelClass::findOne($id);
 
-
         if (isset($model))
             return $model;
         else
+        {
+            if($modelClass instanceof BathhouseBooking)
+                Yii::info('Fail to load model, id = '.$id,'order');
             throw new NotFoundHttpException("Object not found: $id");
+        }
     }
 }

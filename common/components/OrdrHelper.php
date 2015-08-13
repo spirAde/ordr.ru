@@ -296,7 +296,8 @@ class OrdrHelper {
             $summ = 0;
             $price_period_indexes = [];
 
-            foreach ($day_periods as $idx => $price_period) {
+            foreach ($day_periods as $idx => $price_period)
+            {
                 // Ищем в каких ценовых промежутках находятся наши свободные промежутки времени
                 if (($price_period[0] <= $time_period[0] && $time_period[0] < $price_period[1]) ||
                     ($price_period[0] < $time_period[1] && $time_period[1] <= $price_period[1])) {

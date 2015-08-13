@@ -3,7 +3,9 @@
 namespace api\modules\closed\models;
 
 use common\components\ApiHelpers;
+use common\components\OrdrHelper;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 
 class BathhouseBooking extends \yii\db\ActiveRecord
@@ -46,13 +48,19 @@ class BathhouseBooking extends \yii\db\ActiveRecord
     {
         return [
             [['room_id', 'start_date', 'end_date', 'start_period', 'end_period'], 'required'],
-            [['bathhouse_id'], 'checkOrderUnique'],
-            [['bathhouse_id'], 'checkBathhouseRoom'],
-            [['end_date'], 'checkDates'],
-            [['start_period'], 'checkPeriods'],
+            [['bathhouse_id'],  'checkOrderUnique'],
+            [['bathhouse_id'],  'checkBathhouseRoom'],
+            [['end_date'],      'checkDates'],
+            [['start_period'],  'checkPeriods'],
+            [['cost_period'],   'checkCostPeriod'],
+            [['cost_services'], 'checkCostServices'],
+            [['cost_guests'],   'checkCostGuests'],
+            [['total'],         'checkTotal'],
             [['start_period','end_period'], 'in', 'range' => range(ApiHelpers::FIRST_TIME_ID, ApiHelpers::LAST_TIME_ID)],
             [['bathhouse_id', 'room_id', 'start_period', 'end_period', 'guests', 'status_id', 'user_id', 'manager_id'], 'integer'],
-            [['start_date', 'end_date', 'created'], 'safe'],
+            [['start_date', 'end_date', 'start_period', 'end_period',
+                'cost_period', 'cost_services','cost_guests','total',
+                'comment'], 'safe'],
             [['services', 'comment'], 'string'],
             ['cost_period', 'default', 'value' => 0,'on' => 'insert'],
             ['cost_services', 'default', 'value' => 0,'on' => 'insert'],
@@ -115,6 +123,51 @@ class BathhouseBooking extends \yii\db\ActiveRecord
     {
         if($this->start_date != $this->end_date and $this->end_date != date('Y-m-d',strtotime("+1 day", strtotime($this->start_date))))
             $this->addError('end_date', 'End_date should be next day of start_day');
+    }
+
+    public function checkTotal()
+    {
+        if((float)$this->total != (float)($this->cost_period + $this->cost_services + $this->cost_guests))
+            $this->addError('total', 'Total sum is incorrect');
+    }
+
+    public function checkCostPeriod()
+    {
+        $prices = BathhouseRoom::findOne($this->room_id)->getPrices();
+
+        if($this->start_date == $this->end_date)
+            $day_time[$this->start_date] = [$this->start_period, $this->end_period];
+        else
+        {
+            $day_time[$this->start_date]    = [$this->start_period, ApiHelpers::LAST_TIME_ID];
+            $day_time[$this->end_date]      = [ApiHelpers::FIRST_TIME_ID, $this->end_period];
+        }
+
+        $sum = OrdrHelper::getSumBathOrder($day_time, $prices);
+
+        if((float)array_sum($sum) != (float)$this->cost_period)
+            $this->addError('cost_period', 'Cost_period sum is incorrect');
+
+    }
+
+    public function checkCostServices()
+    {
+        $services = json_decode(($this->services), true);
+        if(!empty($services))
+        {
+            $services_prices = ArrayHelper::map(BathhouseService::findAll(['id'=>$services]), 'id', 'price');
+            if((float)$this->cost_services != (float)array_sum($services_prices))
+                $this->addError('cost_services', 'Cost_services sum is incorrect');
+        }
+        else
+            if($this->cost_services != 0)
+                $this->addError('cost_services', 'Cost_services sum is incorrect');
+    }
+
+    public function checkCostGuests()
+    {
+        if($this->cost_guests != 0)
+            $this->addError('cost_guests', 'Cost_guests sum is incorrect');
     }
 
     public function checkPeriods()
