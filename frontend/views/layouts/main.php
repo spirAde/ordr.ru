@@ -31,11 +31,11 @@
 
     <script>var _PRELOAD = <?php echo $content?>;</script>
 
-    <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle-libs.js"></script>
     <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle.js"></script>
-    <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/templates.js"></script>
+    <script async src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle-libs.js"></script>
+    <script async src="<?php echo \Yii::$app->request->baseUrl; ?>/build/templates.js"></script>
 
-    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.2.1/mapbox.js'></script>
+    <script async src='https://api.tiles.mapbox.com/mapbox.js/v2.2.1/mapbox.js'></script>
 
     <?php $this->endBody() ?>
 

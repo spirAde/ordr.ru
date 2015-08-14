@@ -61,35 +61,34 @@ app.constant('CONSTANTS', {
 app.config(appConfig);
 app.config(appRoute);
 
-app.run(function($state, $location, jwt, localStorage) {
+app.run(function($state, $location, $timeout, jwt, localStorage) {
 
 	moment.locale('ru');
 
 	var token = localStorage.getToken();
+	var path = 'login';
 
-	console.log(token);
+	if (token) {
 
-	if ($state.current.name !== 'login' && !token) {
+		if (!jwt.isTokenExpired(token)) {
 
-		$state.go('login');
-	}
-	else {
+			var userData = localStorage.getData();
 
-		var userData = localStorage.getData();
+			if (!userData) {
 
-		if (!userData) {
+				userData = jwt.decodeToken(token);
 
-			userData = jwt.decodeToken(token);
+				localStorage.setData(userData);
+			}
 
-			localStorage.setData(userData);
-
-			$state.go('manager');
-		}
-		else {
-
-			$state.go('manager');
+			path = 'manager';
 		}
 	}
+
+	$timeout(function() {
+		$state.go(path);
+	}, 0);
+
 });
 
 module.exports = app;

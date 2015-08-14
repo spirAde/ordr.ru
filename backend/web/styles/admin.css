@@ -791,7 +791,7 @@ a.dp-nav-right {
   transition: all 0.9s ease 0s;
 }
 
-.login-form input:hover {
+.login-form input:hover, .login-form input:focus{
   border: 2px solid #F4740C;
   color: #F4740C;
 }

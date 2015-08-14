@@ -46,22 +46,22 @@ function jwt() {
 		return JSON.parse(decoded);
 	}
 
-	function getTokenExpirationDate() {
+	function getTokenExpirationDate(token) {
 
 		var decoded;
 		decoded = factory.decodeToken(token);
 
-		if(!decoded.exp) {
+		if (!decoded.tokenLifetime) {
 			return null;
 		}
 
 		var d = new Date(0);
-		d.setUTCSeconds(decoded.exp);
+		d.setUTCSeconds(decoded.tokenLifetime);
 
 		return d;
 	}
 
-	function isTokenExpired() {
+	function isTokenExpired(token) {
 
 		var d = factory.getTokenExpirationDate(token);
 
