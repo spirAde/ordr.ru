@@ -470,7 +470,6 @@ html, body {
 .buttons .dropdown {
   position: relative;
   display: inline-block;
-  margin-left: 4px;
 }
 .buttons .dropdown .dropdown-menu {
   position: absolute;

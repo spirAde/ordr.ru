@@ -55,7 +55,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 		});
 
 		ngDialog.open({
-			template: order.throughService ? templates.showServiceOrder : templates.showManagerOrder,
+			template: order.createdByManager ? templates.showManagerOrder : templates.showServiceOrder,
 			scope: $scope,
 			controller: ['$scope', function($scope) {
 
@@ -65,13 +65,15 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 
 					dataStorage.removeOrder(order.id).then(function(response) {
 
-						if (response.result === 'success') {
+						if (response.status === 204) {
+
+							toastr.success(toastrText.remove.success);
 
 							callback({status: 'success', action: 'remove', result: _.pick($scope.order, ['startDate', 'endDate', 'startPeriod', 'endPeriod', 'oneDay'])});
 						}
 						else {
 
-							// need notify
+							toastr.error(toastrText.remove.error);
 						}
 					});
 
@@ -90,9 +92,16 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 					}
 					else {
 
-						$scope.$parent.updateOrder(order, function() {
+						$scope.$parent.updateOrder(order, function(data) {
 
+							if (data.status === 'success') {
 
+								console.log('other success');
+							}
+							else {
+
+								console.log('other failed');
+							}
 						});
 					}
 				};
@@ -157,24 +166,26 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 									}));
 								}
 
+								toastr.success(toastrText.create.success);
+
 								callback({status: 'success', result: response.data});
 							}
 							else {
 
-								callback({status: 'error', result: null});
+								toastr.error(toastrText.create.error);
 
-								// need notify
+								callback({status: 'error', result: null});
 							}
 
 							ngDialog.close();
 						})
 						.catch(function () {
 
-							callback({status: 'error', result: null});
-
-							// need notify
-
 							ngDialog.close();
+
+							toastr.error(toastrText.create.error);
+
+							callback({status: 'error', result: null});
 						});
 				};
 
@@ -213,33 +224,31 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 					ngDialog.close();
 
 					callback({status: 'canceled'});
-				}
+				};
 
 				$scope.updateOrder = function() {
 
-					/*dataStorage.updateOrder($scope.order)
-						.then(function() {
+					dataStorage.updateOrder($scope.order)
+						.then(function(response) {
 
+							toastr.success(toastrText.update.success);
 
 							updatedOrder = {};
 
 							ngDialog.closeAll();
+
+							callback({status: 'success', result: $scope.order});
 						})
-						.catch(function() {
+						.catch(function(response) {
 
+							toastr.error(toastrText.update.error);
 
 							updatedOrder = {};
 
 							ngDialog.closeAll();
-						});*/
 
-					console.log($scope.order);
-
-					updatedOrder = {};
-
-					ngDialog.closeAll();
-
-					callback({status: 'success', result: $scope.order});
+							callback({status: 'error', result: null});
+						});
 				};
 
 				$scope.$watchGroup(['order.costPeriod', 'order.costServices', 'order.costGuests'], function(values) {
@@ -283,11 +292,27 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 		$state.go('login');
 	}
 
+
 	var templates = {
 		createOrder: 'templates/partials/createOrder.html',
 		showManagerOrder: 'templates/partials/showManagerOrder.html',
 		showServiceOrder: 'templates/partials/showServiceOrder.html',
 		updateManagerOrder: 'templates/partials/updateManagerOrder.html'
+	};
+
+	var toastrText = {
+		create: {
+			success: 'Заказ успешно создан',
+			error: 'Неудачное создание заказа'
+		},
+		update: {
+			success: 'Заказ успешно обновлен',
+			error: 'Неудачное изменение заказа'
+		},
+		remove: {
+			success: 'Заказ успешно удален',
+			error: 'Неудачное удаление заказа'
+		}
 	};
 }
 

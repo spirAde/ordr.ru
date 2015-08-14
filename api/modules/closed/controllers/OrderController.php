@@ -105,6 +105,7 @@ class OrderController extends ApiController
             $orders = $query->indexBy('id')->asArray()->all();
 
             $orders_sorted = [];
+            $dates_range = OrdrHelper::datesRange($date_filters['start'], $date_filters['end']);
 
             foreach($orders as $order)
             {
@@ -127,7 +128,7 @@ class OrderController extends ApiController
                     'roomId'            => (int)$order['room_id'],
                     'bathhouseId'       => (int)$order['bathhouse_id'],
                     'oneDay'            => (boolean)$oneDay,
-                    'throughService'    => (boolean)($order['manager_id'] > 0)
+                    'createdByManager'    => (boolean)($order['manager_id'] > 0)
                 ];
                 if(!$oneDay)
                 {
@@ -152,15 +153,26 @@ class OrderController extends ApiController
                         'roomId'        => (int)$order['room_id'],
                         'bathhouseId'   => (int)$order['bathhouse_id'],
                         'oneDay'        => (boolean)$oneDay,
-                        'throughService'=> (boolean)($order['manager_id'] > 0)
+                        'createdByManager'=> (boolean)($order['manager_id'] > 0)
                     ];
                 }
             }
+
             if($is_active_date_filters)
+            {
                 unset(
                     $orders_sorted[date('Y-m-d',strtotime("-1 day",strtotime($date_filters['start'])))],
                     $orders_sorted[date('Y-m-d',strtotime("+1 day",strtotime($date_filters['end'])))]
                 );
+            }
+
+            foreach($dates_range as $date)
+            {
+                if (!array_key_exists($date, $orders_sorted))
+                {
+                    $orders_sorted[$date] = [];
+                }
+            }
 
             return $orders_sorted;
 
@@ -264,7 +276,7 @@ class OrderController extends ApiController
                         'roomId'            => (int)$model->room_id,
                         'bathhouseId'       => (int)$model->bathhouse_id,
                         'oneDay'            => (boolean)($model->start_date === $model->end_date),
-                        'throughService'    => (boolean)($model->manager_id > 0)
+                        'createdByManager'    => (boolean)($model->manager_id > 0)
                     ],
                     'name' => 'Success operation',
                     'code' => 0,
@@ -291,12 +303,12 @@ class OrderController extends ApiController
         Yii::info('Getting delete request, id = '.$id,'order');
         $model = $this->findModel($id);
 
-        if($model->bathhouse_id != yii::$app->user->identity->organization_id or ($model->manager_id == 0 and $model->user_id != 0))
+        /*if($model->bathhouse_id != yii::$app->user->identity->organization_id or ($model->manager_id == 0 and $model->user_id != 0))
         {
             Yii::info('Access error, is_user_order = '.(($model->manager_id == 0 and $model->user_id != 0) ? 'true' : 'false').
                         ', bath_error = '.(($model->bathhouse_id != yii::$app->user->identity->organization_id) ? 'true' : 'false'),'order');
             throw new UnauthorizedHttpException('Unauthorized request');
-        }
+        }*/
 
         $room_id        = $model->room_id;
         $start_date     = $model->start_date;

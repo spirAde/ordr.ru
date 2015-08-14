@@ -87,7 +87,7 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 		return $http.delete('http://api.ordr.ru/closed/orders/' + id)
 			.then(function(response) {
 
-				return response.data;
+				return response;
 			})
 			.catch(function(response) {
 
@@ -97,7 +97,15 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 
 	function updateOrder(order) {
 
-		return true;
+		return $http.put('http://api.ordr.ru/closed/orders', order)
+			.then(function(response) {
+
+				return response.data;
+			})
+			.catch(function(response) {
+
+				return $q.reject(response);
+			});
 	}
 
 

@@ -339,7 +339,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 									merge: orderDuration,
 									itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * orderDuration) / 1000).toFixed(3),
 									lessMinDuration: null,
-									throughService: order.throughService,
+									createdByManager: order.createdByManager,
 									orderId: order.id,
 									oneDay: order.oneDay
 								});
@@ -352,7 +352,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 									merge: 1,
 									itemWidth: ((parseFloat(itemWidth * 1000) + parseInt(options.margin * 1000)) / 1000).toFixed(3),
 									lessMinDuration: lessMinDuration,
-									throughService: null,
+									createdByManager: null,
 									orderId: null,
 									oneDay: null
 								});
@@ -440,9 +440,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 				if (item.orderId) $itemOrder.attr('data-order', item.orderId);
 
-				if (!_.isNull(item.throughService)) {
+				if (!_.isNull(item.createdByManager)) {
 
-					item.throughService ? classes.push('item service-order') : classes.push('item manager-order');
+					item.createdByManager ? classes.push('item manager-order') : classes.push('item service-order');
 				}
 
 				if (item.lessMinDuration) classes.push('disabled');
@@ -654,7 +654,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					merge: _.sum(needMergedItems, 'merge'),
 					itemWidth: _.sum(needMergedItems, 'itemWidth'),
 					lessMinDuration: needMergedItems[0].lessMinDuration,
-					throughService: needMergedItems[0].throughService,
+					createdByManager: needMergedItems[0].createdByManager,
 					orderId: needMergedItems[0].orderId,
 					oneDay: needMergedItems[0].oneDay
 				};
@@ -687,7 +687,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					merge: duration,
 					itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * duration) / 1000).toFixed(3),
 					lessMinDuration: false,
-					throughService: false,
+					createdByManager: true,
 					orderId: orderId
 				};
 
@@ -739,7 +739,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 							merge: 1,
 							itemWidth: ((parseFloat(itemWidth * 1000) + parseInt(options.margin * 1000)) / 1000).toFixed(3),
 							lessMinDuration: false,
-							throughService: null,
+							createdByManager: null,
 							orderId: null,
 							oneDay: null
 					  };
@@ -819,6 +819,8 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					if (!_.isEmpty(updatedOrder)) {
 
 						$scope.updateOrder({order: _.omit(order, ['startIndex', 'endIndex']), callback: function(data) {
+
+							console.log('schedule directive', data);
 
 							if (data.status === 'success') {
 
