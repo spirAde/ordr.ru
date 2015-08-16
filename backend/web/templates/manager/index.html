@@ -52,7 +52,7 @@
         </div>
     </div>
 
-    <div ng-class="{true: 'history left-block active', false: 'history left-block'}[activateRecords]">
+    <div ng-class="{true: 'history left-block active', false: 'history left-block'}[historyIsActive]">
         <h2>История <span class="icons close" ng-click="activateRecords = false;"></span></h2>
         <div class="content">
             <perfect-scrollbar class="scroll" refresh-on-change="records" wheel-propagation="true" suppress-scroll-x="true">

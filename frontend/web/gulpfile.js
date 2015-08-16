@@ -181,6 +181,8 @@ gulp.task('reload-images', ['images'], function(){
 
 gulp.task('clean', tasks.clean);
 
+gulp.task('penthouse', tasks.penthouse);
+gulp.task('critical', tasks.critical);
 gulp.task('styles', tasks.styles);
 gulp.task('fonts', tasks.fonts);
 gulp.task('images', tasks.images);

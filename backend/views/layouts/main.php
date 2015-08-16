@@ -14,7 +14,7 @@
 
     <?php $this->head() ?>
 
-    <link rel="stylesheet" type="text/css" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle.css" />
+    <link rel="stylesheet" type="text/css" href="build/bundle.css" />
     <link rel="icon" type="image/png" href="<?php echo \Yii::$app->request->baseUrl; ?>/build/images/icons/logo.png">
 
 </head>

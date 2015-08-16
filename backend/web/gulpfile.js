@@ -18,6 +18,7 @@ var watchify = require('watchify');
 var browserify = require('browserify');
 var envify = require('envify/custom');
 var source = require('vinyl-source-stream');
+var autoprefixer = require('gulp-autoprefixer');
 
 var _ = require('lodash');
 
@@ -57,6 +58,10 @@ var tasks = {
 	styles: function() {
 		return gulp.src('./styles/*.css')
 			.pipe(concat('bundle.css'))
+			.pipe(gulpif(production, autoprefixer({
+				browsers: ['last 2 versions'],
+				cascade: false
+			})))
 			.pipe(gulpif(production, minifyCSS()))
 			.pipe(gulp.dest('./build'));
 	},

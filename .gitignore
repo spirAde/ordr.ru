@@ -4,6 +4,7 @@ backend/web/build
 node_modules/*
 !node_modules/hamsterjs
 !node_modules/ng-dialog
+!node_modules/angular-leaflet-directive
 frontend/config/main-local.php
 backend/config/main-local.php
 **/.DS_Store

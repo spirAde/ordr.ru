@@ -43,6 +43,7 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
 /* Leaflet/Mapbox styles */
 .leaflet-popup-content {padding: 15px 0px !important;}
 .leaflet-popup-content .ps-scrollbar-y-rail{right: 5px !important;}
+.leaflet-top .leaflet-control {margin-top: 0px !important;}
 
 /* Main */
 .block {position:relative;}
@@ -194,15 +195,6 @@ li, a, button, span, label, .sauna-more, .sauna-menu {transition: all 0.3s ease 
 .block-filter-prepaid input[type=radio]:checked ~ .check {border: 2px solid #18B2AE;}
 .block-filter-prepaid input[type=radio]:checked ~ .check .inside{display: block;position: relative;background: #18B2AE;border-radius: 100%;height: 70%;width: 70%;top: 14%;margin: auto;}
 .block-filter-prepaid input[type=radio]:checked ~ label{color: #18B2AE;font-family: 'proxima_bold', Arial, sans-serif;}
-
-/*.filter-top {padding: 20px;}
-.opened .filter-top {padding: 20px 20px 0 20px;}
-.filter-bottom {padding: 0 20px 20px 20px;display: none;}
-
-.filter.opened {max-width: 1024px;position: fixed;left: 0;top: 0;box-sizing: border-box;height: 100%;padding-top: 70px;padding-bottom: 100px;}
-.filter.opened .filter-bottom {display: block;}
-.filter.opened .filter-options {display: none;}
-.filter.opened .show-content {display: block;border-top: 1px solid #dce0e0;}*/
 
 .filter-top {display: none;}
 .filter-top.opened {padding: 20px;display: block;}

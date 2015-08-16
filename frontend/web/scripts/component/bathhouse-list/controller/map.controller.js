@@ -145,6 +145,7 @@ function MapController($scope, $rootScope, $stateParams, $timeout, $compile, lea
 	$rootScope.$on('dataStorage:markers', function(event, points) {
 
 		_.forEach(points, function(marker) {
+
 			markers.push({
 				lat: parseFloat(marker.point.latitude),
 				lng: parseFloat(marker.point.longitude),

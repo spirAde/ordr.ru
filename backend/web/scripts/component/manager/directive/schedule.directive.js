@@ -479,7 +479,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 					currentDate = moment(currentDate).add(1, 'days').format(CONSTANTS.format);
 					$scope.$emit('schedule:changeDate', {date: currentDate});
-					
+
 					if (moment(lastDate).diff(moment(currentDate), 'days') === 0) {
 
 						_getOrders(moment(lastDate).add(1, 'days').format(CONSTANTS.format));
@@ -777,6 +777,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 						else if (data.action === 'update') {
 
 							updatedOrder = data.result;
+							updatedOrder.id = id;
 
 							var startIndex = _.findIndex(items, {periodId: updatedOrder.startPeriod, date: updatedOrder.startDate});
 
@@ -819,8 +820,6 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					if (!_.isEmpty(updatedOrder)) {
 
 						$scope.updateOrder({order: _.omit(order, ['startIndex', 'endIndex']), callback: function(data) {
-
-							console.log('schedule directive', data);
 
 							if (data.status === 'success') {
 
