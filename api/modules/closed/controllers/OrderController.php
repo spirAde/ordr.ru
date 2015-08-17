@@ -303,12 +303,12 @@ class OrderController extends ApiController
         Yii::info('Getting delete request, id = '.$id,'order');
         $model = $this->findModel($id);
 
-        /*if($model->bathhouse_id != yii::$app->user->identity->organization_id or ($model->manager_id == 0 and $model->user_id != 0))
+        if($model->bathhouse_id != yii::$app->user->identity->organization_id or ($model->manager_id == 0 and $model->user_id != 0))
         {
             Yii::info('Access error, is_user_order = '.(($model->manager_id == 0 and $model->user_id != 0) ? 'true' : 'false').
                         ', bath_error = '.(($model->bathhouse_id != yii::$app->user->identity->organization_id) ? 'true' : 'false'),'order');
             throw new UnauthorizedHttpException('Unauthorized request');
-        }*/
+        }
 
         $room_id        = $model->room_id;
         $start_date     = $model->start_date;
@@ -350,9 +350,9 @@ class OrderController extends ApiController
         }
     }
 
-    public function actionUpdate($id)
+    public function actionUpdate()
     {
-        $this->actionCreate($id);
+        $this->actionCreate(Yii::$app->request->get('id'));
     }
 
 }

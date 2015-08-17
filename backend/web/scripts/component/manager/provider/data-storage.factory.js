@@ -97,7 +97,7 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 
 	function updateOrder(order) {
 
-		return $http.put('http://api.ordr.ru/closed/orders', order)
+		return $http.put('http://api.ordr.ru/closed/orders/' + order.id, order)
 			.then(function(response) {
 
 				return response.data;

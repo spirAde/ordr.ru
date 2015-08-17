@@ -111,7 +111,6 @@ return [
                         'GET'                   => 'index',
                         'POST'                  => 'create',
                         'PUT <id:\d+>'          => 'update',
-                        'PATCH <id:\d+>'        => 'update',
                         'OPTIONS'               => 'options',
                         'OPTIONS <id:\d+>'      => 'options',
                         'DELETE <id:\d+>'       => 'delete',
