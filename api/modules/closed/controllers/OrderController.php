@@ -161,19 +161,17 @@ class OrderController extends ApiController
                 }
             }
 
-            if($is_active_date_filters and !empty($orders))
+            if($is_active_date_filters )
             {
                 unset(
                     $orders_sorted[date('Y-m-d',strtotime("-1 day",strtotime($date_filters['start'])))],
                     $orders_sorted[date('Y-m-d',strtotime("+1 day",strtotime($date_filters['end'])))]
                 );
             }
-            if(!empty($orders))
+            foreach ($dates_range as $date)
             {
-                foreach ($dates_range as $date) {
-                    if (!array_key_exists($date, $orders_sorted)) {
-                        $orders_sorted[$date] = [];
-                    }
+                if (!array_key_exists($date, $orders_sorted)) {
+                    $orders_sorted[$date] = [];
                 }
             }
 
@@ -188,6 +186,7 @@ class OrderController extends ApiController
 
     public function actionCreate($id = null)
     {
+
         if($id == null)
         {
             Yii::info('Getting create request','order');
