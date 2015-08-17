@@ -40,7 +40,7 @@ class OrderController extends ApiController
         $filter = yii::$app->request->get();
         $model = new BathhouseBooking();
 
-        $limit  = (isset($filter['limit'])) ? $filter['limit'] : 100;
+        $limit  = (isset($filter['limit'])) ? $filter['limit'] : 1000;
         $page   = (isset($filter['page'])) ? $filter['page'] : 1;
         $offset = $limit * $page - $limit;
 
@@ -104,8 +104,11 @@ class OrderController extends ApiController
             $query->orderBy(['bathhouse_booking.start_date' => SORT_ASC, 'bathhouse_booking.start_period' => SORT_ASC]);
             $orders = $query->indexBy('id')->asArray()->all();
 
-            $orders_sorted = [];
-            $dates_range = OrdrHelper::datesRange($date_filters['start'], $date_filters['end']);
+            $orders_sorted  = [];
+            $dates_range    = [];
+
+            if(isset($date_filters['start'], $date_filters['end']))
+                $dates_range = OrdrHelper::datesRange($date_filters['start'], $date_filters['end']);
 
             foreach($orders as $order)
             {
@@ -158,19 +161,19 @@ class OrderController extends ApiController
                 }
             }
 
-            if($is_active_date_filters)
+            if($is_active_date_filters and !empty($orders))
             {
                 unset(
                     $orders_sorted[date('Y-m-d',strtotime("-1 day",strtotime($date_filters['start'])))],
                     $orders_sorted[date('Y-m-d',strtotime("+1 day",strtotime($date_filters['end'])))]
                 );
             }
-
-            foreach($dates_range as $date)
+            if(!empty($orders))
             {
-                if (!array_key_exists($date, $orders_sorted))
-                {
-                    $orders_sorted[$date] = [];
+                foreach ($dates_range as $date) {
+                    if (!array_key_exists($date, $orders_sorted)) {
+                        $orders_sorted[$date] = [];
+                    }
                 }
             }
 
@@ -303,12 +306,12 @@ class OrderController extends ApiController
         Yii::info('Getting delete request, id = '.$id,'order');
         $model = $this->findModel($id);
 
-        /*if($model->bathhouse_id != yii::$app->user->identity->organization_id or ($model->manager_id == 0 and $model->user_id != 0))
+        if($model->bathhouse_id != yii::$app->user->identity->organization_id or ($model->manager_id == 0 and $model->user_id != 0))
         {
             Yii::info('Access error, is_user_order = '.(($model->manager_id == 0 and $model->user_id != 0) ? 'true' : 'false').
                         ', bath_error = '.(($model->bathhouse_id != yii::$app->user->identity->organization_id) ? 'true' : 'false'),'order');
             throw new UnauthorizedHttpException('Unauthorized request');
-        }*/
+        }
 
         $room_id        = $model->room_id;
         $start_date     = $model->start_date;
@@ -331,7 +334,7 @@ class OrderController extends ApiController
                 Yii::info('Reforming success. Operation successfully ended.','order');
                 $transaction->commit();
 
-                Yii::$app->getResponse()->setStatusCode(204);
+                Yii::$app->getResponse()->setStatusCode(201);
                 return [
                     'result' => 'success',
                     'data' => [],
