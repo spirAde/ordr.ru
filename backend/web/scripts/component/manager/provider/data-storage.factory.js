@@ -87,7 +87,7 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 		return $http.delete('http://api.ordr.ru/closed/orders/' + id)
 			.then(function(response) {
 
-				return response;
+				return response.data;
 			})
 			.catch(function(response) {
 

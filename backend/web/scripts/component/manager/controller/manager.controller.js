@@ -3,9 +3,9 @@
 var _ = require('lodash');
 var moment = require('moment');
 
-ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'toastr', 'localStorage', 'dataStorage', 'CONSTANTS'];
+ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'toastr', 'localStorage', 'dataStorage', 'socket', 'CONSTANTS'];
 
-function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStorage, dataStorage, CONSTANTS) {
+function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStorage, dataStorage, socket, CONSTANTS) {
 
 	$scope.bathhouse = {};
 	$scope.rooms = [];
@@ -314,6 +314,13 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 			error: 'Неудачное удаление заказа'
 		}
 	};
+
+
+	socket.emit('manager:init', localStorage.getData());
+
+	socket.on('daemon:smth', function(data) {
+		console.log(data);
+	});
 }
 
 module.exports = ManagerController;

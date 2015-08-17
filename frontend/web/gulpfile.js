@@ -18,6 +18,8 @@ var watchify = require('watchify');
 var browserify = require('browserify');
 var envify = require('envify/custom');
 var source = require('vinyl-source-stream');
+var imagemin = require('gulp-imagemin');
+var pngquant = require('imagemin-pngquant');
 
 var _ = require('lodash');
 
@@ -83,7 +85,11 @@ var tasks = {
 
 	images: function() {
 		return gulp.src('./images/**/*')
-			.pipe(changed('./build/images'))
+			.pipe(imagemin({
+				progressive: true,
+				svgoPlugins: [{removeViewBox: false}],
+				use: [pngquant()]
+			}))
 			.pipe(gulp.dest('./build/images'));
 	},
 
