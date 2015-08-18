@@ -19,6 +19,9 @@ var browserify = require('browserify');
 var envify = require('envify/custom');
 var source = require('vinyl-source-stream');
 var autoprefixer = require('gulp-autoprefixer');
+var imagemin = require('gulp-imagemin');
+var pngquant = require('imagemin-pngquant');
+var webp = require('gulp-webp');
 
 var _ = require('lodash');
 
@@ -36,7 +39,7 @@ var handleError = function(task) {
 var browserifyBundlerApplyLibs = function(bundler, includeLibs) {
 
 	try {
-		var packageManifest = require('./package.json');
+		var packageManifest = require('../../package.json');
 
 		var libs = packageManifest.controlFrontLibs || [];
 
@@ -89,6 +92,12 @@ var tasks = {
 	images: function() {
 		return gulp.src('./images/**/*')
 			.pipe(changed('./build/images'))
+			.pipe(gulp.dest('./build/images'));
+	},
+
+	imagesWebP: function() {
+		return gulp.src('./images/**/*')
+			.pipe(webp())
 			.pipe(gulp.dest('./build/images'));
 	},
 
@@ -189,27 +198,28 @@ gulp.task('clean', tasks.clean);
 gulp.task('styles', tasks.styles);
 gulp.task('fonts', tasks.fonts);
 gulp.task('images', tasks.images);
+gulp.task('imagesWebP', tasks.imagesWebP);
 gulp.task('browserify', tasks.browserify);
 gulp.task('browserify-libs', tasks.browserifyLibs);
 gulp.task('template', tasks.template);
 
 gulp.task('watch', ['clean'], function(callback) {
 
-	runSequence(['fonts', 'images', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
+	runSequence(['fonts', 'images', 'imagesWebP', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
 
-	gulp.watch('./backend/web/styles/*.css', ['reload-styles']);
+	gulp.watch('./styles/*.css', ['reload-styles']);
 
-	gulp.watch(['./backend/web/scripts/**/*.jsx', './backend/web/scripts/**/*.js', './backend/web/libs/**/*.js'], ['reload-js']);
+	gulp.watch(['./scripts/**/*.jsx', './scripts/**/*.js', './libs/**/*.js'], ['reload-js']);
 
-	gulp.watch('./backend/web/templates/**/*.html', ['reload-template']);
+	gulp.watch('./templates/**/*.html', ['reload-template']);
 
-	gulp.watch('./backend/web/images/*', ['reload-images']);
+	gulp.watch('./images/*', ['reload-images']);
 
 	gutil.log(gutil.colors.bgGreen('Watching for changes...'));
 });
 
 gulp.task('build', function(callback) {
-	runSequence('clean', ['fonts', 'images', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
+	runSequence('clean', ['fonts', 'images', 'imagesWebP', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
 });
 
 gulp.task('default', ['watch']);

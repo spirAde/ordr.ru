@@ -25,25 +25,20 @@ storage.getCities(function(error, data) {
 
     bathhouses = data;
 
-    start();
+    io.sockets.on('connection', function(socket) {
+
+      socket.on('manager:init', function(manager) {
+
+        managers.push({organizationId: manager.organizationId, socket: socket});
+      });
+
+      socket.emit('daemon:smth', {smth: 'smth'});
+
+      socket.on('disconnect', function() {
+
+      });
+    });
   });
 });
 
 server.listen(config.PORT);
-
-var start = function() {
-
-  io.sockets.on('connection', function(socket) {
-
-    socket.on('manager:init', function(manager) {
-
-      managers.push({organizationId: manager.organizationId, socket: socket});
-    });
-
-    socket.emit('daemon:smth', {smth: 'smth'});
-
-    socket.on('disconnect', function() {
-
-    });
-  });
-};

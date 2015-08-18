@@ -2,45 +2,43 @@
 
 var _ = require('lodash');
 
-HeaderController.$inject = ['CONSTANTS', '$scope', '$stateParams', '$location'];
+HeaderController.$inject = ['$scope', '$stateParams', '$location', 'CONSTANTS'];
 
-function HeaderController(CONSTANTS, $scope, $stateParams, $location) {
+function HeaderController($scope, $stateParams, $location, CONSTANTS) {
 
-	var vm = this;
-
-	vm.cities = _.zipObject(
+	$scope.cities = _.zipObject(
 		_.pluck(CONSTANTS.city, 'id'),
 		_.pluck(CONSTANTS.city, 'city')
 	);
 
-	vm.mode = $stateParams.mode;
+	$scope.mode = $stateParams.mode;
 
-	vm.order = 'popularity';
-	vm.reverse = false;
-	vm.opened = true;
+	$scope.order = 'popularity';
+	$scope.reverse = false;
+	$scope.opened = true;
 
-	vm.toggleMode = toggleMode;
-	vm.sortList = sortList;
+	$scope.toggleMode = toggleMode;
+	$scope.sortList = sortList;
 
 	function toggleMode(mode) {
 
-		vm.mode = mode;
+		$scope.mode = mode;
 
-		$location.search('mode', vm.mode);
+		$location.search('mode', $scope.mode);
 
 		$scope.$emit('header:toggleMode', mode); // ->list && map && filter && review
 	}
 
 	function sortList(order) {
 
-		if (vm.order === order) {
+		if ($scope.order === order) {
 
-			vm.reverse = !vm.reverse;
+			$scope.reverse = !$scope.reverse;
 		}
 		else {
 
-			vm.reverse = false;
-			vm.order = order;
+			$scope.reverse = false;
+			$scope.order = order;
 		}
 
 		$scope.$emit('header:sortList', order); // -> list

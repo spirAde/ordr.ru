@@ -7,6 +7,7 @@ var ngTouch = require('angular-touch');
 var moment = require('moment');
 
 require('../../../node_modules/moment/locale/ru.js');
+require('picturefill');
 
 var TemplatesModule = require('./common/templates.module');
 

@@ -27,8 +27,8 @@
 
     <?php $this->endBody() ?>
 
+    <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle-libs.js"></script>
     <script src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle.js"></script>
-    <script async src="<?php echo \Yii::$app->request->baseUrl; ?>/build/bundle-libs.js"></script>
     <script async src="<?php echo \Yii::$app->request->baseUrl; ?>/build/templates.js"></script>
 
 </body>
