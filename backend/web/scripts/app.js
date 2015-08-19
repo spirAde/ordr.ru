@@ -8,8 +8,7 @@ var ngDialog = require('ng-dialog');
 var toastr = require('angular-toastr');
 
 var moment = require('moment');
-
-require('../../../node_modules/moment/locale/ru.js');
+var ru = require('moment/locale/ru.js');
 
 var jwt = require('./common/provider/jwt.factory');
 var localStorage = require('./common/provider/localstorage.factory');
@@ -88,7 +87,6 @@ app.run(function($state, $location, $timeout, jwt, localStorage) {
 	$timeout(function() {
 		$state.go(path);
 	}, 0);
-
 });
 
 module.exports = app;

@@ -44,7 +44,6 @@ var browserifyBundlerApplyLibs = function(bundler, includeLibs) {
 		var libs = packageManifest.controlFrontLibs || [];
 
 		_.each(libs, function(lib) {
-
 			if (includeLibs) bundler = bundler.require(lib);
 			else bundler = bundler.external(lib);
 		});
@@ -58,9 +57,21 @@ var tasks = {
 		del(['build/**/*'], cb);
 	},
 
-	styles: function() {
-		return gulp.src('./styles/*.css')
+	criticalStyles: function() {
+		return gulp.src('./styles/critical.css')
 			.pipe(concat('bundle.css'))
+			.pipe(gulpif(production, autoprefixer({
+				browsers: ['last 2 versions'],
+				cascade: false
+			})))
+			.pipe(gulpif(production, minifyCSS()))
+			.pipe(gulp.dest('./build'));
+	},
+
+	uncriticalStyles: function() {
+
+		return gulp.src(['./styles/*.css', '!./styles/critical.css'])
+			.pipe(concat('bundle-uncritical.css'))
 			.pipe(gulpif(production, autoprefixer({
 				browsers: ['last 2 versions'],
 				cascade: false
@@ -177,7 +188,7 @@ gulp.task('browser-sync', function() {
 	});
 });
 
-gulp.task('reload-styles', ['styles'], function(){
+gulp.task('reload-styles', ['criticalStyles', 'uncriticalStyles'], function(){
 	browserSync.reload();
 });
 
@@ -195,7 +206,8 @@ gulp.task('reload-images', ['images'], function(){
 
 gulp.task('clean', tasks.clean);
 
-gulp.task('styles', tasks.styles);
+gulp.task('criticalStyles', tasks.criticalStyles);
+gulp.task('uncriticalStyles', tasks.uncriticalStyles);
 gulp.task('fonts', tasks.fonts);
 gulp.task('images', tasks.images);
 gulp.task('imagesWebP', tasks.imagesWebP);
@@ -205,7 +217,7 @@ gulp.task('template', tasks.template);
 
 gulp.task('watch', ['clean'], function(callback) {
 
-	runSequence(['fonts', 'images', 'imagesWebP', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
+	runSequence(['fonts', 'images', 'imagesWebP', 'template', 'criticalStyles', 'uncriticalStyles'], 'browserify', 'browserify-libs', callback);
 
 	gulp.watch('./styles/*.css', ['reload-styles']);
 
@@ -219,7 +231,7 @@ gulp.task('watch', ['clean'], function(callback) {
 });
 
 gulp.task('build', function(callback) {
-	runSequence('clean', ['fonts', 'images', 'imagesWebP', 'template', 'styles'], 'browserify', 'browserify-libs', callback);
+	runSequence('clean', ['fonts', 'images', 'imagesWebP', 'template', 'criticalStyles', 'uncriticalStyles'], 'browserify', 'browserify-libs', callback);
 });
 
 gulp.task('default', ['watch']);

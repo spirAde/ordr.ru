@@ -63,6 +63,7 @@
     "ng-dialog",
     "lodash",
     "moment",
+    "moment/locale/ru.js",
     "socket.io-client",
     "hamsterjs"
   ],

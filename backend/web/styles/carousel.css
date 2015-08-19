@@ -1,4 +1,4 @@
-/* 
+/*
  *  schedule Carousel - Animate Plugin
  */
 .schedule-carousel .animated {
@@ -37,7 +37,7 @@
   }
 }
 
-/* 
+/*
  * 	schedule Carousel - Auto Height Plugin
  */
 .schedule-height {
@@ -48,7 +48,7 @@
           transition: height 500ms ease-in-out;
 }
 
-/* 
+/*
  *  Core schedule Carousel CSS File
  */
 .schedule-carousel {
@@ -135,7 +135,7 @@
   display: block;
 }
 
-/* 
+/*
  * 	schedule Carousel - Lazy Load Plugin
  */
 .schedule-carousel .schedule-item .schedule-lazy {

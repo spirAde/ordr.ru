@@ -1,0 +1,332 @@
+
+/* Slide panels */
+.left-block {
+    overflow: hidden;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 85px 0 25px 0;
+    background-color: #FFFFFF;
+    width: 300px;
+    position: fixed;
+    left: -300px;
+    top: 0;
+    z-index: 5;
+    transition: all 0.3s ease 0s;
+}
+.left-block h2 {
+    font-size: 22px;
+    margin-bottom: 25px;
+    position: relative;
+    padding: 0 25px;
+}
+.left-block .close {
+    position: absolute;
+    right: 25px;
+    top: 0;
+    cursor: pointer;
+}
+.left-block .close:hover {
+    opacity: 0.7;
+}
+.left-block .close:before {
+    content: "b";
+}
+.left-block .item {
+    padding: 0 25px 20px 25px;
+    color: #80848F;
+}
+.left-block h3 {
+    font-family: "proxima_bold", Arial, sans-serif;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-top: 1px solid #DBDCDF;
+    padding-top: 20px;
+}
+.left-block p {
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.left-block h3.reserve {
+    color: #F4740C;
+}
+.left-block h3.reserve2 {
+    color: #7F8C9D;
+}
+.left-block h3.reserve3 {
+    color: #18B2AD;
+}
+
+.history.active, .noty.active {
+    left: 0;
+}
+.main.active {
+    padding-left: 320px;
+}
+
+.left-block .content {
+    position: relative;
+    height: 100%;
+}
+.scroll {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.bottom {
+    height: 30px;
+}
+
+/* Messages */
+.messages {
+    position: relative;
+    background-color: #F4F5F7;
+    line-height: 1.5;
+    padding: 20px 50px;
+}
+.messages.error {
+    background-color: #EDA6A7;
+    border-color: #7A302F;
+    color: #7A302F;
+}
+.messages.done {
+    background-color: #A9D38C;
+    border-color: #2F6848;
+    color: #2F6848;
+}
+
+/* Popup */
+.md-overlay {
+    background-color: #CCCCCC;
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.8);
+}
+.ngdialog-content {
+    position: relative;
+    transition: all 0.3s ease-in 0s;
+}
+.overlay-page {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    padding-top: 50px;
+}
+.md-title {
+    background-color: #4A5060;
+}
+.md-title h2 {
+    padding: 30px 40px;
+    color: #FFFFFF;
+}
+.ngdialog-content {
+    max-width: 600px;
+}
+.ngdialog-content .md-wrap {
+    padding: 0 40px 30px 40px;
+    background-color: #FFFFFF;
+    line-height: 1.5;
+}
+.ngdialog-content .ngdialog-close {
+    position: absolute;
+    color: #FFFFFF;
+    right: -24px;
+    top: -24px;
+    cursor: pointer;
+}
+.ngdialog-content .ngdialog-close:before {
+    content: "b";
+    font-size: 26px;
+    cursor: pointer;
+}
+.ngdialog-content .ngdialog-close:hover {
+    opacity: 1;
+}
+
+.ngdialog-content .form {
+    padding: 30px 40px 15px 40px;
+    background-color: #FFFFFF;
+}
+.ngdialog-content .field {
+    margin-bottom: 15px;
+}
+
+.buttons {
+    padding: 30px 40px;
+    background-color: #F4740C;
+}
+.buttons a {
+    border: 1px solid #FFFFFF;
+    padding: 10px 15px;
+    margin-right: 5px;
+    color: #FFFFFF;
+    display: inline-block;
+    font-family: "proxima_bold", Arial, sans-serif;
+}
+.buttons a:hover {
+    color: #F4740C;
+    background-color: #FFFFFF;
+}
+.buttons .dropdown {
+    position: relative;
+    display: inline-block;
+}
+.buttons .dropdown .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    display: none;
+    list-style: none;
+    width: 100%;
+    padding: 0;
+}
+.buttons .dropdown:hover .dropdown-menu {
+    display: block;
+}
+.buttons .dropdown button {
+    background: #F4740C;
+    font-size: 16px;
+    border: 1px solid #FFFFFF;
+    padding: 10px 15px;
+    margin: 0 5px 0 0;
+    color: #FFFFFF;
+    font-family: "proxima_bold", Arial, sans-serif;
+}
+.buttons .dropdown a {
+    display: block;
+    text-decoration: none;
+    background-color: #F4740C;
+    color: #FFFFFF;
+}
+.buttons .dropdown a:hover {
+    color: #F4740C;
+    background-color: #FFFFFF;
+}
+
+.body-overlay {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
+.form .field {
+    border: 1px solid #DADEE2;
+    margin-bottom: 15px;
+    position: relative;
+    padding: 0 10px;
+}
+.form .field input {
+    background: none;
+    border: none;
+    width: 100%;
+    font-size: 12px;
+    color: #6B7884;
+    padding: 15px 0;
+}
+.form .field.error {
+    border-color: #C0392B;
+    background-color: #E74C3C;
+    color: #FFFFFF;
+}
+.form .field.error input {
+    color: #FFFFFF;
+}
+
+.caption-select-box label:after, .options-wrapper li span:before {
+    position: relative;
+    font-family: "ordr-icons";
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    font-size: 13px;
+}
+.caption-select-box {
+    display: block;
+    padding: 10px 0;
+    font-family: "proxima_bold", Arial, sans-serif;
+}
+.caption-select-box label {
+    margin-top: -8px;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+}
+.caption-select-box label:after {
+    content: "d";
+}
+.options-wrapper {
+    background-color: #FFFFFF;
+    position: absolute;
+    left: 0;
+    top: 42px;
+    display: none;
+    width: 100%;
+}
+.options-wrapper.open {
+    display: block;
+    z-index: 10000;
+}
+.options-wrapper {
+    display: none;
+    z-index: 10000;
+}
+.options-wrapper li {
+    cursor: pointer;
+    padding: 10px 10px 10px 40px;
+    border-bottom: 1px solid rgba(112,117,129,0.1);
+    font-family: "proxima_bold", Arial, sans-serif;
+    position: relative;
+}
+.options-wrapper li:last-child {
+    border-bottom: none;
+}
+.options-wrapper li.disabled {
+    font-family: "proxima", Arial, sans-serif;
+    padding: 10px;
+}
+.options-wrapper li.disabled span {
+    display: none;
+}
+.options-wrapper label {
+    cursor: pointer;
+}
+.options-wrapper li.selected {
+    color: #F4740C;
+    transition: none;
+}
+.options-wrapper li span:first-child:before {
+    top: 10px;
+    content: "";
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    margin: 0 5px 0 0;
+    background-color: #FFFFFF;
+    border: 2px solid #BCC1C9;
+    border-radius: 2px;
+    position: absolute;
+    left: 10px;
+}
+.options-wrapper li.selected span:first-child:before {
+    content: "a";
+    border-color: #F4740C;
+    color: #F4740C;
+}
+.options-wrapper .option-cost {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    text-align: right;
+}
+
+.order-comment {
+    resize: none;
+    width: 100%;
+    height: 100px;
+}
+.result-text {
+    float: left;
+}
+.result-text p, .result-summ input {
+    padding: 10px 0;
+}
