@@ -102,15 +102,19 @@ class BathhouseBooking extends \yii\db\ActiveRecord
 
     public function checkOrderUnique()
     {
-        if(BathhouseBooking::findOne([
-                    'bathhouse_id'     => $this->bathhouse_id,
-                    'room_id'          => $this->room_id,
-                    'start_date'       => $this->start_date,
-                    'end_date'         => $this->end_date,
-                    'start_period'     => $this->start_period,
-                    'end_period'       => $this->end_period
-                ]) != null)
-            $this->addError('bathhouse_id', 'Order already exist');
+        if($this->id == null)
+        {
+            if (BathhouseBooking::findOne([
+                    'bathhouse_id' => $this->bathhouse_id,
+                    'room_id' => $this->room_id,
+                    'start_date' => $this->start_date,
+                    'end_date' => $this->end_date,
+                    'start_period' => $this->start_period,
+                    'end_period' => $this->end_period
+                ]) != null
+            )
+                $this->addError('bathhouse_id', 'Order already exist');
+        }
     }
 
     public function checkBathhouseRoom()

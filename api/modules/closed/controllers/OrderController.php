@@ -1,12 +1,11 @@
 <?php
 namespace api\modules\closed\controllers;
 
+use console\models\BathhouseSchedule;
 use Yii;
 use common\components\ApiHelpers;
-use common\components\ArrayHelper;
 use yii\helpers\Json;
 use common\components\OrdrHelper;
-use yii\helpers\Url;
 use api\modules\closed\models\BathhouseBooking;
 use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
@@ -161,16 +160,18 @@ class OrderController extends ApiController
                 }
             }
 
-            if($is_active_date_filters )
+            if($is_active_date_filters and !empty($orders))
             {
                 unset(
                     $orders_sorted[date('Y-m-d',strtotime("-1 day",strtotime($date_filters['start'])))],
                     $orders_sorted[date('Y-m-d',strtotime("+1 day",strtotime($date_filters['end'])))]
                 );
             }
+
             foreach ($dates_range as $date)
             {
-                if (!array_key_exists($date, $orders_sorted)) {
+                if (!array_key_exists($date, $orders_sorted))
+                {
                     $orders_sorted[$date] = [];
                 }
             }
@@ -186,7 +187,8 @@ class OrderController extends ApiController
 
     public function actionCreate($id = null)
     {
-
+        $dates_for_schedule = [];
+        $new_schedule       = [];
         if($id == null)
         {
             Yii::info('Getting create request','order');
@@ -196,6 +198,14 @@ class OrderController extends ApiController
         {
             Yii::info('Getting update request, id = '.$id,'order');
             $model = $this->findModel($id);
+            $dates_for_schedule = [$model->start_date => $model->start_date, $model->end_date => $model->end_date ];
+            $new_schedule = ApiHelpers::reformScheduleForDay(
+                $model->room_id,
+                $dates_for_schedule,
+                $model->room->bathhouseRoomSettings->min_duration,
+                $model->id,
+                true);
+            Yii::info('New temp schedule  = '.json_encode($new_schedule),'order');
         }
 
         $params = Yii::$app->getRequest()->getBodyParams();
@@ -233,7 +243,7 @@ class OrderController extends ApiController
         $min_duration = $model->room->bathhouseRoomSettings->min_duration;
 
         Yii::info('Checking time is free','order');
-        if(ApiHelpers::checkTimeIsFree($model, $min_duration))
+        if(ApiHelpers::checkTimeIsFree($model, $min_duration, $new_schedule))
         {
             Yii::info('Checking success, saving ...','order');
             $transaction = BathhouseBooking::getDb()->beginTransaction();
@@ -255,7 +265,11 @@ class OrderController extends ApiController
                 return $model;
             }
             Yii::info('Reforming schedule for day(days)','order');
-            if(ApiHelpers::reformScheduleForDay($model->room_id, $model->start_date, $model->end_date, $min_duration))
+
+            $dates_for_schedule[$model->start_date] = $model->start_date;
+            $dates_for_schedule[$model->end_date]   = $model->end_date;
+
+            if(ApiHelpers::reformScheduleForDay($model->room_id, $dates_for_schedule, $min_duration))
             {
                 $transaction->commit();
                 Yii::info('Reforming success. Operation successfully ended.','order');
@@ -296,7 +310,14 @@ class OrderController extends ApiController
         else
         {
             Yii::info('Checking fail.','order');
-            throw new BadRequestHttpException('Order time is busy');
+            return [
+                'result' => 'fail',
+                'data' => 'Order time is busy',
+                'name' => 'Data Validation Failed',
+                'code' => 0,
+                'status' => 422,
+                'type' => '',
+            ];
         }
     }
 
