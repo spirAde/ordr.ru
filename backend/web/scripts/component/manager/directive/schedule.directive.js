@@ -44,6 +44,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 		template: template.panel,
 		scope: {
 			orders: '=orders',
+			newOrder: '=newOrder',
 			roomId: '=roomId',
 			minDuration: '=minDuration',
 			currentDate: '=currentDate',
@@ -79,9 +80,20 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				endPeriod: undefined,
 
 				startIndex: undefined,
-				endIndex: undefined
+				endIndex: undefined,
+
+				isReserved: false,
+				createdByManager: true
 			};
 			var updatedOrder = {};
+
+			$scope.$watch('newOrder', function(newOrder) {
+
+				if (!_.isEmpty(newOrder)) {
+
+
+				}
+			});
 
 			$scope.$watch('orders', function(newVal, oldVal) {
 
@@ -108,13 +120,25 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 						_postCalculate();
 						_renderOrder(data);
 						_renderTime(newDates.length);
+
+						_check();
 					}
 				}
 			}, true);
 
 			$rootScope.$on('date-paginator:changeDate', function(event, data) {
 
+				if ($scope.roomId == 3 || $scope.roomId == 1) {
+
+					console.log($scope.roomId);
+					console.log(lastDate);
+					console.log(data.date);
+					console.log(moment(data.date).isAfter(lastDate));
+				}
+
 				if (moment(data.date).isAfter(lastDate)) {
+
+					console.log('roomId', $scope.roomId);
 
 					var startDate = moment(lastDate).add(1, 'days').format(CONSTANTS.format);
 					var endDate = moment(data.date).add(1, 'days').format(CONSTANTS.format);
@@ -655,6 +679,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					itemWidth: _.sum(needMergedItems, 'itemWidth'),
 					lessMinDuration: needMergedItems[0].lessMinDuration,
 					createdByManager: needMergedItems[0].createdByManager,
+					isReserved: false,
 					orderId: needMergedItems[0].orderId,
 					oneDay: needMergedItems[0].oneDay
 				};
@@ -675,9 +700,18 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 			/**
 			 * Merge items to one order
-			 * @param {Number} [orderId] - order id
+			 * @param {Object} [order] - order object
+			 * @param {Number|Null} [order.id] - order id || null
+			 * @param {String} [order.startDate] - start date of order
+			 * @param {String} [order.endDate] - end date of order
+			 * @param {Number} [order.startPeriod] - start period of order
+			 * @param {Number} [order.endPeriod] - end period of order
+			 * @param {Number} [order.startIndex] - start index of order
+			 * @param {Number} [order.endIndex] - end index of order
+			 * @param {Boolean} [order.createdByManager] - order created manager of not
+			 * @param {Boolean} [order.isReserved] - order is reserved
 			 */
-			function _mergeItems(orderId) {
+			function _mergeItems(order) {
 
 				var duration = order.endIndex - order.startIndex + 1;
 
@@ -687,8 +721,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					merge: duration,
 					itemWidth: (((parseInt(itemWidth * 1000) + parseInt(options.margin * 1000)) * duration) / 1000).toFixed(3),
 					lessMinDuration: false,
-					createdByManager: true,
-					orderId: orderId
+					createdByManager: order.createdByManager,
+					isReserved: order.isReserved || false,
+					orderId: order.id || null
 				};
 
 				_.forEach(_.range(order.startIndex, order.endIndex + 1), function() {
@@ -740,6 +775,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 							itemWidth: ((parseFloat(itemWidth * 1000) + parseInt(options.margin * 1000)) / 1000).toFixed(3),
 							lessMinDuration: false,
 							createdByManager: null,
+							isReserved: false,
 							orderId: null,
 							oneDay: null
 					  };
@@ -812,6 +848,8 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 				}
 				else if (!order.endDate && !order.endPeriod) {
 
+					var changedData;
+
 					order.endDate = item.date;
 					order.endPeriod = item.periodId + 3;
 
@@ -823,7 +861,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 							if (data.status === 'success') {
 
-								_mergeItems(data.result.id);
+								changedData = _.assign(order, {id: data.result.id});
+
+								_mergeItems(changedData);
 								_checkClosestItemsAfterMerge(order.startIndex);
 							}
 							else {
@@ -831,6 +871,8 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 								_resolveClosestItems(order.startIndex);
 
 								order = updatedOrder;
+
+								changedData = _.assign(order, {id: order.id});
 
 								_mergeItems(order.id);
 								_checkClosestItemsAfterMerge(order.startIndex);
@@ -847,7 +889,9 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 							if (data.status === 'success') {
 
-								_mergeItems(data.result.id);
+								changedData = _.assign(order, {id: data.result.id});
+
+								_mergeItems(changedData);
 								_checkClosestItemsAfterMerge(order.startIndex);
 							}
 							else {
@@ -876,7 +920,10 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					endPeriod: undefined,
 
 					startIndex: undefined,
-					endIndex: undefined
+					endIndex: undefined,
+
+					isReserved: false,
+					createdByManager: true
 				};
 			}
 
@@ -896,8 +943,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 					summ += Number(node.style.width.slice(0, -2));
 				});
 
-				console.log('summ elements', summ);
-				console.log('summ items', _.sum(items, 'itemWidth'));
+				console.log('check', $scope.roomId, summ, _.sum(items, 'itemWidth'));
 			}
 		}
 	}

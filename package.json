@@ -52,6 +52,7 @@
     "angular-leaflet-directive",
     "lodash",
     "moment",
+    "moment/locale/ru.js",
     "picturefill",
     "socket.io-client"
   ],

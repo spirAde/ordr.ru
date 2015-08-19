@@ -9,9 +9,10 @@ var _ = require('lodash');
 var server = require('http').createServer();
 var io = require('socket.io')(server);
 
-var managers = [];
 var bathhouses = [];
 var cities = [];
+
+var managers = [];
 
 storage.getCities(function(error, data) {
 
@@ -27,16 +28,7 @@ storage.getCities(function(error, data) {
 
     io.sockets.on('connection', function(socket) {
 
-      socket.on('manager:init', function(manager) {
-
-        managers.push({organizationId: manager.organizationId, socket: socket});
-      });
-
-      socket.emit('daemon:smth', {smth: 'smth'});
-
-      socket.on('disconnect', function() {
-
-      });
+      //
     });
   });
 });

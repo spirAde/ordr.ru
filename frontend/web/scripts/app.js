@@ -5,8 +5,8 @@ var uiRouter = require('angular-ui-router');
 var ngTouch = require('angular-touch');
 
 var moment = require('moment');
+var ru = require('moment/locale/ru.js');
 
-require('../../../node_modules/moment/locale/ru.js');
 require('picturefill');
 
 var TemplatesModule = require('./common/templates.module');
@@ -17,6 +17,7 @@ var BathhouseItemModule = require('./component/bathhouse-item');
 
 var httpInterceptor = require('./common/provider/http-interceptor.factory');
 var userStorage = require('./common/provider/user-storage.factory');
+var socket = require('./common/provider/socket.factory');
 
 var app = angular.module('app', [
   uiRouter,
@@ -31,6 +32,7 @@ var app = angular.module('app', [
 
 app.factory('httpInterceptor', httpInterceptor);
 app.factory('userStorage', userStorage);
+app.factory('socket', socket);
 
 var appConfig = require('./config.js');
 var appRoute = require('./route.js');

@@ -11,6 +11,8 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 	$scope.rooms = [];
 	$scope.orders = [];
 
+	$scope.newOrder = {}; // object to the order received through a socket
+
 	$scope.historyIsActive = false;
 
 	$scope.user = _.pick(localStorage.getData(), ['fullName', 'organizationName']);
@@ -71,7 +73,12 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 
 							toastr.success(toastrText.remove.success);
 
-							callback({status: 'success', action: 'remove', result: _.pick($scope.order, ['startDate', 'endDate', 'startPeriod', 'endPeriod', 'oneDay'])});
+							var data = _.pick($scope.order, ['startDate', 'endDate', 'startPeriod', 'endPeriod', 'oneDay']);
+
+							//TODO: check this
+							_.remove(_.flatten(_.toArray(room.orders)), {id: parseInt(orderId)});
+
+							callback({status: 'success', action: 'remove', result: data});
 						}
 						else {
 
@@ -94,17 +101,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 					}
 					else {
 
-						$scope.$parent.updateOrder(order, function(data) {
-
-							if (data.status === 'success') {
-
-								console.log('other success');
-							}
-							else {
-
-								console.log('other failed');
-							}
-						});
+						$scope.$parent.updateOrder(order);
 					}
 				};
 			}]
@@ -163,7 +160,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 									}));
 
 									room.orders[properties.endDate].push(_.assign(properties, {
-										startDate: properties.startDate,
+										startDate: properties.endDate,
 										startPeriod: _.first(_.keys(CONSTANTS.periods))
 									}));
 								}
@@ -209,6 +206,8 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 
 	function updateOrder(order, callback) {
 
+		callback = _.isFunction(callback) ? callback : function() {};
+
 		var room = _.find($scope.rooms, {id: order.roomId});
 
 		ngDialog.open({
@@ -218,6 +217,10 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 
 				$scope.order = _.assign(updatedOrder, order);
 				$scope.order.costPeriod = dataStorage.calculateOrderOfPeriods(room.prices, _.omit(order, ['roomId']));
+
+				console.log(updatedOrder);
+				console.log(order);
+				console.log($scope.order);
 
 				$scope.close = function() {
 
@@ -231,13 +234,28 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 					dataStorage.updateOrder($scope.order)
 						.then(function(response) {
 
-							toastr.success(toastrText.update.success);
+							if (response.status === 201) {
 
-							updatedOrder = {};
+								toastr.success(toastrText.update.success);
 
-							ngDialog.closeAll();
+								updatedOrder = {};
 
-							callback({status: 'success', result: $scope.order});
+								ngDialog.closeAll();
+
+								//TODO: add update for order for this room
+
+								callback({status: 'success', result: $scope.order});
+							}
+							else {
+
+								toastr.error(toastrText.update.error);
+
+								updatedOrder = {};
+
+								ngDialog.closeAll();
+
+								callback({status: 'error', result: null});
+							}
 						})
 						.catch(function(response) {
 
@@ -317,10 +335,6 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 
 
 	socket.emit('manager:init', localStorage.getData());
-
-	socket.on('daemon:smth', function(data) {
-		console.log(data);
-	});
 }
 
 module.exports = ManagerController;

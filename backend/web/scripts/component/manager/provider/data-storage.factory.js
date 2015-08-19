@@ -100,7 +100,7 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 		return $http.put('http://api.ordr.ru/closed/orders/' + order.id, order)
 			.then(function(response) {
 
-				return response.data;
+				return response;
 			})
 			.catch(function(response) {
 
@@ -135,7 +135,7 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 			_.forEach(dayPrices, function(pricePeriod, idx) {
 
 				if ((pricePeriod.period[0] <= dateOrders[0] && dateOrders[0] < pricePeriod.period[1]) ||
-					(pricePeriod.period[0] <= dateOrders[1] && dateOrders[1] < pricePeriod.period[1])) {
+					(pricePeriod.period[0] < dateOrders[1] && dateOrders[1] <= pricePeriod.period[1])) {
 
 					selectedIndexes.push(idx);
 				}
@@ -146,6 +146,8 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 
 			// in case the order covers more then 2 price-periods
 			selectedIndexes = _.range(minIndex, maxIndex).concat(maxIndex);
+
+			//console.log(selectedIndexes);
 
 			if (selectedIndexes.length === 1) {
 

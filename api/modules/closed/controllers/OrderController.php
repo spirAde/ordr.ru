@@ -104,10 +104,16 @@ class OrderController extends ApiController
             $orders = $query->indexBy('id')->asArray()->all();
 
             $orders_sorted  = [];
-            $dates_range    = [];
 
-            if(isset($date_filters['start'], $date_filters['end']))
+            if (isset($date_filters['start'], $date_filters['end']))
+            {
                 $dates_range = OrdrHelper::datesRange($date_filters['start'], $date_filters['end']);
+
+                foreach ($dates_range as $date)
+                {
+                    $orders_sorted[$date] = [];
+                }
+            }
 
             foreach($orders as $order)
             {
@@ -168,16 +174,7 @@ class OrderController extends ApiController
                 );
             }
 
-            foreach ($dates_range as $date)
-            {
-                if (!array_key_exists($date, $orders_sorted))
-                {
-                    $orders_sorted[$date] = [];
-                }
-            }
-
             return $orders_sorted;
-
         }
         catch (Exception $ex)
         {

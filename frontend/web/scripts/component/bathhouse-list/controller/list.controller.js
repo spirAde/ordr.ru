@@ -2,9 +2,9 @@
 
 var _ = require('lodash');
 
-ListController.$inject = ['$scope', '$rootScope', '$stateParams', '$timeout', 'dataStorage', 'userStorage', 'CONSTANTS'];
+ListController.$inject = ['$scope', '$rootScope', '$stateParams', '$timeout', 'dataStorage', 'userStorage', 'socket', 'CONSTANTS'];
 
-function ListController($scope, $rootScope, $stateParams, $timeout, dataStorage, userStorage, CONSTANTS) {
+function ListController($scope, $rootScope, $stateParams, $timeout, dataStorage, userStorage, socket, CONSTANTS) {
 
 	$scope.rooms = [];
 
@@ -22,10 +22,9 @@ function ListController($scope, $rootScope, $stateParams, $timeout, dataStorage,
 	$scope.createOrder = createOrder;
 	$scope.fullResetFilters = fullResetFilters;
 
+	//TODO: after add check for city
 	dataStorage.loadData(1).then(function(rooms) {
-
 		$scope.rooms = rooms;
-		console.log($scope.rooms);
 	});
 
 	function showFullDescription(id) {
