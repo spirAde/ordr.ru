@@ -1,6 +1,7 @@
 <?php
 namespace common\components;
 
+use api\modules\closed\models\BathhouseBooking;
 use console\models\BathhouseSchedule;
 use Yii;
 use yii\base\Exception;
@@ -19,15 +20,19 @@ class ApiHelpers
         return range(min($n),max($n),self::STEP);
     }
 
-    public static function checkTimeIsFree($model,$min_duration = self::STEP)
+    public static function checkTimeIsFree($model,$min_duration = self::STEP, $new_schedule = [])
     {
-
         $oneDay = $model->start_date === $model->end_date;
 
         $free_time_for_days =
             [
-                'start_date'    => BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->start_date]),
-                'end_date'      => ($oneDay) ? [] : BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->end_date])
+                'start_date'    => (array_key_exists($model->start_date,$new_schedule))
+                    ? ['schedule' => $new_schedule[$model->start_date]]
+                    : BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->start_date]),
+                'end_date'      => ($oneDay) ? []
+                    : ((array_key_exists($model->start_date,$new_schedule))
+                        ? ['schedule' => $new_schedule[$model->start_date]]
+                        : BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->end_date]))
             ];
 
         if ($oneDay)
@@ -43,12 +48,15 @@ class ApiHelpers
                     'end_date'      => range(self::FIRST_TIME_ID, $model->end_period, self::STEP)
                 ];
 
-        foreach($free_time_for_days as &$item) {
-            $item = ($item) ? json_decode($item->schedule) : [0 => [self::FIRST_TIME_ID, self::LAST_TIME_ID]];
-
+        foreach($free_time_for_days as &$item)
+        {
+            $item = ($item) ? json_decode($item['schedule']) : [0 => [self::FIRST_TIME_ID, self::LAST_TIME_ID]];
             foreach($item as $i => $subItem)
-                if((max($subItem) - min($subItem)) < $min_duration)
+            {
+                if ((max($subItem) - min($subItem)) < $min_duration)
                     unset($item[$i]);
+            }
+
 
             $item = ArrayHelper::flatten(array_map('self::createRange',$item));
         }
@@ -61,22 +69,25 @@ class ApiHelpers
         $result_start_end = array_diff($required_interval['end_date'],
             array_intersect($free_time_for_days['end_date'],$required_interval['end_date']));
 
+
         return (empty($result_start_day) && empty($result_start_end));
+
 
     }
 
-    public static function reformScheduleForDay($room_id, $start_date, $end_date, $min_duration = self::STEP)
+    public static function reformScheduleForDay($room_id, $dates, $min_duration = self::STEP, $exclude = null, $return = false)
     {
         Yii::info('Getting reforming schedule request','schedule');
-        $dates = [$start_date, ($end_date === $start_date) ? null : $end_date];
-        Yii::info('Reforming schedule for dates = '.Json::encode($dates).', room_id = '.$room_id,'schedule');
+        Yii::info('Reforming schedule for dates = '.Json::encode($dates).', room_id = '.$room_id.', min_duration = '.$min_duration,'schedule');
+        $return_array = [];
+
         foreach($dates as $date)
         {
             if($date == null)
                 continue;
 
             $curr_bookings = \api\modules\closed\models\BathhouseBooking::find()
-                ->select('start_period,end_period,start_date,end_date, room_id')
+                ->select('id, start_period,end_period,start_date,end_date, room_id')
                 ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
                     ':start_date' => $date,
                     ':end_date' => $date,
@@ -86,7 +97,7 @@ class ApiHelpers
                 ->all();
 
             $prev_booking = \api\modules\closed\models\BathhouseBooking::find()
-                ->select('start_period,end_period,start_date,end_date, room_id')
+                ->select('id, start_period,end_period,start_date,end_date, room_id')
                 ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
                     ':start_date' => date('Y-m-d', strtotime('-1 day', strtotime($date))),
                     ':end_date' => $date,
@@ -96,7 +107,7 @@ class ApiHelpers
                 ->one();
 
             $next_booking = \api\modules\closed\models\BathhouseBooking::find()
-                ->select('start_period,end_period,start_date,end_date, room_id')
+                ->select('id, start_period,end_period,start_date,end_date, room_id')
                 ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
                     ':start_date' => $date,
                     ':end_date' => date('Y-m-d', strtotime('+1 day', strtotime($date))),
@@ -109,14 +120,17 @@ class ApiHelpers
 
             foreach ($curr_bookings as $book_item)
             {
+                if($book_item->id !== $exclude)
                 $busy_periods[] = [$book_item->start_period, $book_item->end_period];
             }
 
-            if (!empty($prev_booking)) {
+            if (!empty($prev_booking) and $prev_booking->id !== $exclude)
+            {
                 array_unshift($busy_periods, [self::FIRST_TIME_ID, $prev_booking->end_period]);
             }
 
-            if (!empty($next_booking)) {
+            if (!empty($next_booking) and $next_booking->id !== $exclude)
+            {
                 $busy_periods[] = [$next_booking->start_period, self::LAST_TIME_ID];
             }
             Yii::info('For date = '.$date.', we get following busy periods = '.Json::encode($busy_periods),'schedule');
@@ -129,11 +143,16 @@ class ApiHelpers
             {
                 Yii::info('Saving schedule for date = '.$date,'schedule');
 
-                yii::$app->db->createCommand()
-                    ->update('bathhouse_schedule', [
-                        'schedule' => json_encode($free_period_for_date)],
-                        'date = "' . $date . '" AND room_id = ' . (int)$room_id)
-                    ->execute();
+                if($return)
+                    $return_array[$date] = json_encode($free_period_for_date);
+                else
+                {
+                    yii::$app->db->createCommand()
+                        ->update('bathhouse_schedule', [
+                            'schedule' => json_encode($free_period_for_date)],
+                            'date = "' . $date . '" AND room_id = ' . (int)$room_id)
+                        ->execute();
+                }
             }
             catch(Exception $e)
             {
@@ -142,7 +161,11 @@ class ApiHelpers
             }
         }
         Yii::info('Schedule successfully reforming','schedule');
-        return true;
+
+        if(!$return)
+            return true;
+        else
+            return $return_array;
     }
 
     // Возвращает свободные промежутки времени для записи, исходя из занятых периодов и
