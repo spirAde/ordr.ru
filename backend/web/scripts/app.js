@@ -64,10 +64,14 @@ app.run(function($state, $location, $timeout, jwt, localStorage) {
 
 	moment.locale('ru');
 
+	//localStorage.setToken('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJtYW5hZ2VyIiwidHlwZSI6ImJhdGgiLCJmdWxsTmFtZSI6Ilx1MDQxZlx1MDQzNVx1MDQ0Mlx1MDQ0M1x1MDQ0NVx1MDQzZVx1MDQzMlx1MDQzMCBcdTA0MWVcdTA0M2JcdTA0NGNcdTA0MzNcdTA0MzAiLCJwaG9uZSI6bnVsbCwib3JnYW5pemF0aW9uSWQiOjEsIm9yZ2FuaXphdGlvbk5hbWUiOiJcdTA0MWNcdTA0M2VcdTA0NDFcdTA0M2FcdTA0M2VcdTA0MzJcdTA0NDFcdTA0M2FcdTA0MzBcdTA0NGYgXHUwNDMxXHUwNDMwXHUwNDNkXHUwNDRmIiwiY2l0eUlkIjoxLCJ0b2tlbkxpZmV0aW1lIjoxNDQwMTcxNDgyfQ.k3uycse2YNyzOU4w3drL3ADsDmHga4QRKhmI-zZ3IU8');
+
 	var token = localStorage.getToken();
 	var path = 'login';
 
 	if (token) {
+
+		console.log(token);
 
 		if (!jwt.isTokenExpired(token)) {
 

@@ -91,7 +91,7 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 
 				if (!_.isEmpty(newOrder)) {
 
-
+					//orders from socket
 				}
 			});
 
@@ -120,25 +120,13 @@ function Schedule($rootScope, $document, $compile, CONSTANTS) {
 						_postCalculate();
 						_renderOrder(data);
 						_renderTime(newDates.length);
-
-						_check();
 					}
 				}
 			}, true);
 
 			$rootScope.$on('date-paginator:changeDate', function(event, data) {
 
-				if ($scope.roomId == 3 || $scope.roomId == 1) {
-
-					console.log($scope.roomId);
-					console.log(lastDate);
-					console.log(data.date);
-					console.log(moment(data.date).isAfter(lastDate));
-				}
-
 				if (moment(data.date).isAfter(lastDate)) {
-
-					console.log('roomId', $scope.roomId);
 
 					var startDate = moment(lastDate).add(1, 'days').format(CONSTANTS.format);
 					var endDate = moment(data.date).add(1, 'days').format(CONSTANTS.format);

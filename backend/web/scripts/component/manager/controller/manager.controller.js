@@ -3,9 +3,9 @@
 var _ = require('lodash');
 var moment = require('moment');
 
-ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'toastr', 'localStorage', 'dataStorage', 'socket', 'CONSTANTS'];
+ManagerController.$inject = ['$scope', '$state', '$timeout', 'ngDialog', 'toastr', 'localStorage', 'dataStorage', 'CONSTANTS'];
 
-function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStorage, dataStorage, socket, CONSTANTS) {
+function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStorage, dataStorage, CONSTANTS) {
 
 	$scope.bathhouse = {};
 	$scope.rooms = [];
@@ -334,7 +334,7 @@ function ManagerController($scope, $state, $timeout, ngDialog, toastr, localStor
 	};
 
 
-	socket.emit('manager:init', localStorage.getData());
+	//socket.emit('manager:init', localStorage.getData());
 }
 
 module.exports = ManagerController;
