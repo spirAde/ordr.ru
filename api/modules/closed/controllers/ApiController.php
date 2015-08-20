@@ -17,6 +17,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\VarDumper;
 use yii\web\BadRequestHttpException;
 use yii\web\UnauthorizedHttpException;
+use yii\web\NotFoundHttpException;
 
 class ApiController extends ActiveController
 {

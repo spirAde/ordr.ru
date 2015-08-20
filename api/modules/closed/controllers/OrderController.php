@@ -346,7 +346,8 @@ class OrderController extends ApiController
         else
         {
             Yii::info('Deleting success. Reforming schedule for day','order');
-            if(ApiHelpers::reformScheduleForDay($room_id, $start_date, $end_date, $min_duration))
+            $dates_for_schedule = [$start_date => $start_date, $end_date => $end_date];
+            if(ApiHelpers::reformScheduleForDay($room_id, $dates_for_schedule, $min_duration))
             {
                 Yii::info('Reforming success. Operation successfully ended.','order');
                 $transaction->commit();
