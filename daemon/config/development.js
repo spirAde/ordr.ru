@@ -5,7 +5,7 @@ var _ = require('lodash');
 var common = require('./common');
 
 module.exports = _.assign(common, {
-	HOST: 'ordr.ru',
+	HOST: 'ordr.local',
 	PORT: 3000,
 	DATABASE: {
 		HOST: 'localhost',

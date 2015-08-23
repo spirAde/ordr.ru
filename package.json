@@ -33,6 +33,7 @@
     "gulp-imagemin": "^2.3.0",
     "gulp-minify-css": "~1.0.0",
     "gulp-minify-html": "~1.0.2",
+    "gulp-remove-code": "^1.0.2",
     "gulp-sourcemaps": "~1.5.1",
     "gulp-uglify": "^1.1.0",
     "gulp-uncss-task": "^0.3.0",
@@ -66,6 +67,7 @@
     "moment",
     "moment/locale/ru.js",
     "socket.io-client",
+    "picturefill",
     "hamsterjs"
   ],
   "scripts": {

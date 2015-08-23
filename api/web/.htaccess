@@ -1,4 +1,4 @@
-SetEnvIf Origin "http(s)?://(www\.)?(control.ordr.ru|ordr.ru)$" AccessControlAllowOrigin=$0$1
+SetEnvIf Origin "http(s)?://(www\.)?(control.ordr.ru|ordr.ru|control.local|ordr.local)$" AccessControlAllowOrigin=$0$1
 Header add Access-Control-Allow-Origin %{AccessControlAllowOrigin}e env=AccessControlAllowOrigin
 
 Options +FollowSymLinks
@@ -12,3 +12,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 # otherwise forward it to index.php
 RewriteRule . index.php
+
+<IfModule mod_deflate.c>
+    SetOutputFilter DEFLATE
+    Header append Vary User-Agent
+</IfModule>

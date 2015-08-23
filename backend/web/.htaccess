@@ -14,3 +14,17 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 # в противном случае перенаправляем запрос через index.php
 RewriteRule . index.php
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 10 days"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType text/plain "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType application/x-icon "access plus 1 year"
+</IfModule>

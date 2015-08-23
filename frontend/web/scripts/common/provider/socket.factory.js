@@ -3,11 +3,18 @@
 var _ = require('lodash');
 var io = require('socket.io-client');
 
-socket.$inject = ['$rootScope'];
+socket.$inject = ['$rootScope', '$window'];
 
-function socket($rootScope) {
+function socket($rootScope, $window) {
 
-	var socket = io.connect('http://ordr.ru:3000');
+	var port = 3000;
+
+	var socket = io.connect($window.location.hostname + ':' + port,
+    reconnect: true,
+    reconnectionDelay: 500,
+    reconnectionDelayMax: 2000,
+    reconnectionAttempts: Infinity
+	});
 
 	return {
 		on: on,

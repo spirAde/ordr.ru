@@ -3,25 +3,34 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var del = require('del');
-var uglify = require('gulp-uglify');
 var gulpif = require('gulp-if');
-var concat = require('gulp-concat');
-var minifyCSS = require('gulp-minify-css');
-var sourcemaps = require('gulp-sourcemaps');
+var browserSync = require('browser-sync');
 var runSequence = require('run-sequence');
 var changed = require('gulp-changed');
-var minifyHtml = require('gulp-minify-html');
-var templateCache = require('gulp-angular-templatecache');
+
+// javascript
+var uglify = require('gulp-uglify');
 var buffer = require('vinyl-buffer');
-var browserSync = require('browser-sync');
+var concat = require('gulp-concat');
+var sourcemaps = require('gulp-sourcemaps');
+var source = require('vinyl-source-stream');
 var watchify = require('watchify');
 var browserify = require('browserify');
 var envify = require('envify/custom');
-var source = require('vinyl-source-stream');
+var removeCode = require('gulp-remove-code');
+
+// css
+var minifyCSS = require('gulp-minify-css');
 var autoprefixer = require('gulp-autoprefixer');
+
+//images
 var imagemin = require('gulp-imagemin');
 var pngquant = require('imagemin-pngquant');
 var webp = require('gulp-webp');
+
+//html
+var minifyHtml = require('gulp-minify-html');
+var templateCache = require('gulp-angular-templatecache');
 
 var _ = require('lodash');
 
@@ -70,12 +79,19 @@ var tasks = {
 
 	uncriticalStyles: function() {
 
-		return gulp.src(['./styles/*.css', '!./styles/critical.css'])
+		return gulp.src(['./styles/*.css', '!./styles/critical.css', '!./styles/fonts.css'])
 			.pipe(concat('bundle-uncritical.css'))
 			.pipe(gulpif(production, autoprefixer({
 				browsers: ['last 2 versions'],
 				cascade: false
 			})))
+			.pipe(gulpif(production, minifyCSS()))
+			.pipe(gulp.dest('./build'));
+	},
+
+	fontsStyles: function() {
+		return gulp.src(['./styles/fonts.css'])
+			.pipe(concat('fonts.css'))
 			.pipe(gulpif(production, minifyCSS()))
 			.pipe(gulp.dest('./build'));
 	},
@@ -141,8 +157,9 @@ var tasks = {
 				.pipe(source('bundle.js'))
 				.pipe(buffer())
 				.pipe(gulpif(debug, sourcemaps.init({loadMaps: true})))
-				.pipe(gulpif(!debug, uglify({mangle: false})))
-				.pipe(concat('bundle.js'))
+					.pipe(gulpif(!debug, uglify({mangle: false})))
+					.pipe(gulpif(!debug, removeCode({production: true})))
+					.pipe(concat('bundle.js'))
 				.pipe(gulpif(debug, sourcemaps.write('./', {debug: true})))
 				.pipe(gulp.dest('build/'));
 		};
@@ -188,7 +205,7 @@ gulp.task('browser-sync', function() {
 	});
 });
 
-gulp.task('reload-styles', ['criticalStyles', 'uncriticalStyles'], function(){
+gulp.task('reload-styles', ['criticalStyles', 'uncriticalStyles', 'fontsStyles'], function(){
 	browserSync.reload();
 });
 
@@ -208,6 +225,7 @@ gulp.task('clean', tasks.clean);
 
 gulp.task('criticalStyles', tasks.criticalStyles);
 gulp.task('uncriticalStyles', tasks.uncriticalStyles);
+gulp.task('fontsStyles', tasks.fontsStyles);
 gulp.task('fonts', tasks.fonts);
 gulp.task('images', tasks.images);
 gulp.task('imagesWebP', tasks.imagesWebP);
@@ -217,7 +235,7 @@ gulp.task('template', tasks.template);
 
 gulp.task('watch', ['clean'], function(callback) {
 
-	runSequence(['fonts', 'images', 'imagesWebP', 'template', 'criticalStyles', 'uncriticalStyles'], 'browserify', 'browserify-libs', callback);
+	runSequence(['fonts', 'images', 'imagesWebP', 'template', 'criticalStyles', 'uncriticalStyles', 'fontsStyles'], 'browserify', 'browserify-libs', callback);
 
 	gulp.watch('./styles/*.css', ['reload-styles']);
 
@@ -231,7 +249,7 @@ gulp.task('watch', ['clean'], function(callback) {
 });
 
 gulp.task('build', function(callback) {
-	runSequence('clean', ['fonts', 'images', 'imagesWebP', 'template', 'criticalStyles', 'uncriticalStyles'], 'browserify', 'browserify-libs', callback);
+	runSequence('clean', ['fonts', 'images', 'imagesWebP', 'template', 'criticalStyles', 'uncriticalStyles', 'fontsStyles'], 'browserify', 'browserify-libs', callback);
 });
 
 gulp.task('default', ['watch']);
