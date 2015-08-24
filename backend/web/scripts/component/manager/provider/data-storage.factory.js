@@ -56,7 +56,7 @@ function dataStorage($http, $q, localStorage, CONSTANTS) {
 
 	function loadOrders(id, startDate, endDate) {
 
-		endDate = endDate || moment(startDate).add(1, 'days').format(CONSTANTS.format);
+		endDate = endDate || moment(startDate).add(2, 'days').format(CONSTANTS.format);
 
 		return $http.get('http://api.ordr.ru/closed/orders?limit=1000&room_id=' + id + '&start=' + startDate + '&end=' + endDate)
 			.then(function(response) {

@@ -3,7 +3,6 @@
 var angular = require('angular');
 var uiRouter = require('angular-ui-router');
 var ngTouch = require('angular-touch');
-var ngAnimate = require('angular-animate');
 var ngDialog = require('ng-dialog');
 var toastr = require('angular-toastr');
 
@@ -25,7 +24,6 @@ var ManagerModule = require('./component/manager');
 var app = angular.module('controlApp', [
 	uiRouter,
 	ngTouch,
-	ngAnimate,
 	ngDialog,
 	toastr,
 
