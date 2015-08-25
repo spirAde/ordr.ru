@@ -19,80 +19,79 @@ class FilterIndexAction extends IndexAction
         $this->prepareDataProvider = function($action)
         {
             $filter = yii::$app->request->get();
-            $modelClass = $this->modelClass;
-            $model = new $this->modelClass();
-
             $limit = (isset($filter['limit'])) ? $filter['limit'] : 10;
-            $page = (isset($filter['page'])) ? $filter['page'] : 1;
-            $offset = $limit * $page - $limit;
 
+            $modelClass = $this->modelClass;
+            $cache_key = md5(json_encode($filter).$modelClass);
 
-            foreach ($filter as $key => $value)
+            $result = Yii::$app->cache->get($cache_key);
+
+            if($result === false)
             {
-                $separator = '=';
-                if($value === '')
-                {
-                    foreach($this->separators as $separator_item)
-                        if (stripos($key, $separator_item) !== false)
-                        {
-                            unset($filter[$key]);
-                            $separator = $separator_item;
-                            list($key, $value) = explode($separator, $key);
+                $model = new $this->modelClass();
 
-                            break;
-                        }
-                }
+                $page = (isset($filter['page'])) ? $filter['page'] : 1;
+                $offset = $limit * $page - $limit;
 
-                if(in_array($key, $this->pattern))
-                {
-                    unset($filter[$key]);
-                    continue;
-                }
 
-                if (!$model->hasAttribute(ApiHelpers::decamelize($key)))
-                {
-                    throw new HttpException(404, 'Invalid query param:' . $key);
-                }
-                elseif(ApiHelpers::decamelize($key) != $key)
-                {
-                    unset($filter[$key]);
-                    $filter[ApiHelpers::decamelize($key)] = [
-                        'value'     => $value,
-                        'separator' => $separator
+                foreach ($filter as $key => $value) {
+                    $separator = '=';
+                    if ($value === '') {
+                        foreach ($this->separators as $separator_item)
+                            if (stripos($key, $separator_item) !== false) {
+                                unset($filter[$key]);
+                                $separator = $separator_item;
+                                list($key, $value) = explode($separator, $key);
+
+                                break;
+                            }
+                    }
+
+                    if (in_array($key, $this->pattern)) {
+                        unset($filter[$key]);
+                        continue;
+                    }
+
+                    if (!$model->hasAttribute(ApiHelpers::decamelize($key))) {
+                        throw new HttpException(404, 'Invalid query param:' . $key);
+                    } elseif (ApiHelpers::decamelize($key) != $key) {
+                        unset($filter[$key]);
+                        $filter[ApiHelpers::decamelize($key)] = [
+                            'value' => $value,
+                            'separator' => $separator
                         ];
+                    } else {
+                        $filter[$key] = [
+                            'value' => $value,
+                            'separator' => $separator
+                        ];
+                    }
                 }
-                else
-                {
-                    $filter[$key] = [
-                        'value'     => $value,
-                        'separator' => $separator
-                    ];
+                try {
+
+                    $query = $modelClass::find();
+                    foreach ($filter as $key => $item)
+                        $query->andWhere($key . $item['separator'] . $item['value']);
+
+                    $query->limit = $limit;
+                    $query->offset = $offset;
+
+                    if (yii::$app->controller->module->id == 'closed')
+                        $query->andWhere('bathhouse_id = :bathhouse_id', [':bathhouse_id' => yii::$app->user->identity->organization_id]);
+
+                    $result = $query->all();
+                    Yii::$app->cache->set($cache_key,$result,Yii::$app->params['cache_duration']);
+
+                } catch (Exception $ex) {
+                    throw new HttpException(500, 'Internal server error');
                 }
             }
-            try
-            {
-
-                $query = $modelClass::find();
-                foreach($filter as $key => $item)
-                    $query->andWhere($key . $item['separator'] . $item['value']);
-
-                $query->limit = $limit;
-                $query->offset = $offset;
-
-                if(yii::$app->controller->module->id == 'closed')
-                    $query->andWhere('bathhouse_id = :bathhouse_id', [':bathhouse_id' => yii::$app->user->identity->organization_id]);
-                return new ArrayDataProvider([
-                    'allModels' => $query->all(),
-                    'pagination' => [
-                        'pageSize' => $limit,
-                    ],
-                ]);
-
-            }
-            catch (Exception $ex)
-            {
-                throw new HttpException(500, 'Internal server error');
-            }
+            return new ArrayDataProvider([
+                'allModels' => $result,
+                'pagination' => [
+                    'pageSize' => $limit,
+                ],
+            ]);
 
         };
         return parent::run();

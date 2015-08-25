@@ -1,7 +1,6 @@
 <?php
 namespace api\modules\closed\controllers;
 
-use console\models\BathhouseSchedule;
 use Yii;
 use common\components\ApiHelpers;
 use yii\helpers\Json;
@@ -37,119 +36,87 @@ class OrderController extends ApiController
     public function actionIndex()
     {
         $filter = yii::$app->request->get();
-        $model = new BathhouseBooking();
+        $cache_key = md5(json_encode($filter));
+        $orders_sorted = Yii::$app->cache->get($cache_key);
 
-        $limit  = (isset($filter['limit'])) ? $filter['limit'] : 1000;
-        $page   = (isset($filter['page'])) ? $filter['page'] : 1;
-        $offset = $limit * $page - $limit;
-
-        $date_filters = [];
-        foreach ($filter as $key => $value)
+        if ($orders_sorted === false)
         {
-            if(in_array($key, $this->pattern))
-            {
-                unset($filter[$key]);
-                continue;
-            }
+            $model = new BathhouseBooking();
 
-            if($key === 'start' or $key === 'end')
-            {
+            $limit = (isset($filter['limit'])) ? $filter['limit'] : 1000;
+            $page = (isset($filter['page'])) ? $filter['page'] : 1;
+            $offset = $limit * $page - $limit;
 
-                unset($filter[$key]);
-                $date_filters[$key] = $value;
-                continue;
-            }
-
-            if (!$model->hasAttribute(ApiHelpers::decamelize($key)))
-            {
-                throw new HttpException(404, 'Invalid query param: ' . $key);
-            }
-            elseif(ApiHelpers::decamelize($key) != $key)
-            {
-                unset($filter[$key]);
-                $filter[ApiHelpers::decamelize($key)] = $value;
-            }
-            else
-            {
-                $filter[$key] = $value;
-            }
-
-        }
-        try
-        {
-
-            $query = $model::find();
-
-            $query->andWhere('bathhouse_id = :bathhouse_id', [':bathhouse_id' => yii::$app->user->identity->organization_id]);
-
-            foreach($filter as $key => $item)
-                $query->andWhere($key . '=' . $item);
-            $is_active_date_filters = (!empty($date_filters) and is_array($date_filters) and isset($date_filters['end']) !== false and strtotime($date_filters['end']) !== false);
-            if($is_active_date_filters)
-            {
-                if(!isset($date_filters['start']) or strtotime($date_filters['start']) === false)
-                    $date_filters['start'] = date('Y-m-d');
-
-                $query->andWhere('start_date BETWEEN STR_TO_DATE(:start, "%Y-%m-%d")
-                            AND STR_TO_DATE(:end, "%Y-%m-%d")',
-                    [
-                    ':start'    => date('Y-m-d',strtotime("-1 day",strtotime($date_filters['start']))),
-                    ':end'      => date('Y-m-d',strtotime("+1 day",strtotime($date_filters['end']))),
-                    ]
-                );
-            }
-            $query->limit = $limit;
-            $query->offset = $offset;
-            $query->orderBy(['bathhouse_booking.start_date' => SORT_ASC, 'bathhouse_booking.start_period' => SORT_ASC]);
-            $orders = $query->indexBy('id')->asArray()->all();
-
-            $orders_sorted  = [];
-
-            if (isset($date_filters['start'], $date_filters['end']))
-            {
-                $dates_range = OrdrHelper::datesRange($date_filters['start'], $date_filters['end']);
-
-                foreach ($dates_range as $date)
-                {
-                    $orders_sorted[$date] = [];
+            $date_filters = [];
+            foreach ($filter as $key => $value) {
+                if (in_array($key, $this->pattern)) {
+                    unset($filter[$key]);
+                    continue;
                 }
+
+                if ($key === 'start' or $key === 'end') {
+                    unset($filter[$key]);
+                    $date_filters[$key] = $value;
+                    continue;
+                }
+
+                if (!$model->hasAttribute(ApiHelpers::decamelize($key))) {
+                    throw new HttpException(404, 'Invalid query param: ' . $key);
+                } elseif (ApiHelpers::decamelize($key) != $key) {
+                    unset($filter[$key]);
+                    $filter[ApiHelpers::decamelize($key)] = $value;
+                } else {
+                    $filter[$key] = $value;
+                }
+
             }
-
-            foreach($orders as $order)
+            try
             {
-                $oneDay = $order['start_date'] === $order['end_date'];
+                $query = $model::find();
 
-                $orders_sorted[$order['start_date']][] = [
-                    'id'                => (int)$order['id'],
-                    'startDate'         => $order['start_date'],
-                    'endDate'           => ($oneDay) ? $order['end_date'] : $order['start_date'],
-                    'startPeriod'       => (int)$order['start_period'],
-                    'endPeriod'         => ($oneDay) ? (int)$order['end_period'] : (int)OrdrHelper::LAST_TIME_ID,
-                    'services'          => json_decode($order['services']),
-                    'guests'            => (int)$order['guests'],
-                    'comment'           => $order['comment'],
-                    'costPeriod'        => (float)$order['cost_period'],
-                    'costServices'      => (float)$order['cost_services'],
-                    'costGuests'        => (float)$order['cost_guests'],
-                    'total'             => (float)$order['total'],
-                    'statusId'          => (int)$order['status_id'],
-                    'roomId'            => (int)$order['room_id'],
-                    'bathhouseId'       => (int)$order['bathhouse_id'],
-                    'oneDay'            => (boolean)$oneDay,
-                    'createdByManager'    => (boolean)($order['manager_id'] > 0)
-                ];
-                if(!$oneDay)
+                $query->andWhere('bathhouse_id = :bathhouse_id', [':bathhouse_id' => yii::$app->user->identity->organization_id]);
+
+                foreach ($filter as $key => $item)
+                    $query->andWhere($key . '=' . $item);
+                $is_active_date_filters = (!empty($date_filters) and is_array($date_filters) and isset($date_filters['end']) !== false and strtotime($date_filters['end']) !== false);
+                if ($is_active_date_filters) {
+                    if (!isset($date_filters['start']) or strtotime($date_filters['start']) === false)
+                        $date_filters['start'] = date('Y-m-d');
+
+                    $query->andWhere('start_date BETWEEN STR_TO_DATE(:start, "%Y-%m-%d")
+                            AND STR_TO_DATE(:end, "%Y-%m-%d")',
+                        [
+                            ':start' => date('Y-m-d', strtotime("-1 day", strtotime($date_filters['start']))),
+                            ':end' => date('Y-m-d', strtotime("+1 day", strtotime($date_filters['end']))),
+                        ]
+                    );
+                }
+                $query->limit = $limit;
+                $query->offset = $offset;
+                $query->orderBy(['bathhouse_booking.start_date' => SORT_ASC, 'bathhouse_booking.start_period' => SORT_ASC]);
+                $orders = $query->indexBy('id')->asArray()->all();
+
+                $orders_sorted = [];
+
+                if (isset($date_filters['start'], $date_filters['end'])) {
+                    $dates_range = OrdrHelper::datesRange($date_filters['start'], $date_filters['end']);
+
+                    foreach ($dates_range as $date)
+                    {
+                        $orders_sorted[$date] = [];
+                    }
+                }
+
+                foreach ($orders as $order)
                 {
-                    //исключаем появление переходящей заявки с ($date_filters['end'] + 1) дня
-                    if($is_active_date_filters AND $order['start_date'] == date('Y-m-d',strtotime("+1 day",strtotime($date_filters['end']))))
-                        continue;
+                    $oneDay = $order['start_date'] === $order['end_date'];
 
-                    $orders_sorted[$order['end_date']][] = [
+                    $orders_sorted[$order['start_date']][] = [
                         'id'            => (int)$order['id'],
-                        'startDate'     => $order['end_date'],
-                        'endDate'       => $order['end_date'],
-                        'startPeriod'   => (int)OrdrHelper::FIRST_TIME_ID,
-                        'endPeriod'     => (int)$order['end_period'],
+                        'startDate'     => $order['start_date'],
+                        'endDate'       => ($oneDay) ? $order['end_date'] : $order['start_date'],
+                        'startPeriod'   => (int)$order['start_period'],
+                        'endPeriod'     => ($oneDay) ? (int)$order['end_period'] : (int)OrdrHelper::LAST_TIME_ID,
                         'services'      => json_decode($order['services']),
                         'guests'        => (int)$order['guests'],
                         'comment'       => $order['comment'],
@@ -161,25 +128,53 @@ class OrderController extends ApiController
                         'roomId'        => (int)$order['room_id'],
                         'bathhouseId'   => (int)$order['bathhouse_id'],
                         'oneDay'        => (boolean)$oneDay,
-                        'createdByManager'=> (boolean)($order['manager_id'] > 0)
+                        'createdByManager' => (boolean)($order['manager_id'] > 0)
                     ];
+                    if (!$oneDay)
+                    {
+                        //исключаем появление переходящей заявки с ($date_filters['end'] + 1) дня
+                        if ($is_active_date_filters AND $order['start_date'] == date('Y-m-d', strtotime("+1 day", strtotime($date_filters['end']))))
+                            continue;
+
+                        $orders_sorted[$order['end_date']][] = [
+                            'id' => (int)$order['id'],
+                            'startDate' => $order['end_date'],
+                            'endDate' => $order['end_date'],
+                            'startPeriod' => (int)OrdrHelper::FIRST_TIME_ID,
+                            'endPeriod' => (int)$order['end_period'],
+                            'services' => json_decode($order['services']),
+                            'guests' => (int)$order['guests'],
+                            'comment' => $order['comment'],
+                            'costPeriod' => (float)$order['cost_period'],
+                            'costServices' => (float)$order['cost_services'],
+                            'costGuests' => (float)$order['cost_guests'],
+                            'total' => (float)$order['total'],
+                            'statusId' => (int)$order['status_id'],
+                            'roomId' => (int)$order['room_id'],
+                            'bathhouseId' => (int)$order['bathhouse_id'],
+                            'oneDay' => (boolean)$oneDay,
+                            'createdByManager' => (boolean)($order['manager_id'] > 0)
+                        ];
+                    }
                 }
-            }
 
-            if($is_active_date_filters and !empty($orders))
+                if ($is_active_date_filters and !empty($orders))
+                {
+                    unset(
+                        $orders_sorted[date('Y-m-d', strtotime("-1 day", strtotime($date_filters['start'])))],
+                        $orders_sorted[date('Y-m-d', strtotime("+1 day", strtotime($date_filters['end'])))]
+                    );
+                }
+                Yii::$app->cache->set($cache_key, $orders_sorted, Yii::$app->params['cache_duration']);
+            }
+            catch (Exception $ex)
             {
-                unset(
-                    $orders_sorted[date('Y-m-d',strtotime("-1 day",strtotime($date_filters['start'])))],
-                    $orders_sorted[date('Y-m-d',strtotime("+1 day",strtotime($date_filters['end'])))]
-                );
+                throw new HttpException(500, 'Internal server error');
             }
+        }
+        return $orders_sorted;
 
-            return $orders_sorted;
-        }
-        catch (Exception $ex)
-        {
-            throw new HttpException(500, 'Internal server error');
-        }
+
     }
 
     public function actionCreate($id = null)

@@ -1,8 +1,9 @@
 <?php
 namespace common\components;
 
-use api\modules\closed\models\BathhouseBooking;
-use console\models\BathhouseSchedule;
+use common\models\Bathhouse;
+use common\models\BathhouseBooking;
+use common\models\BathhouseSchedule;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
@@ -28,11 +29,11 @@ class ApiHelpers
             [
                 'start_date'    => (array_key_exists($model->start_date,$new_schedule))
                     ? ['schedule' => $new_schedule[$model->start_date]]
-                    : BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->start_date]),
+                    : BathhouseSchedule::getScheduleForDate($model->room_id, $model->start_date),
                 'end_date'      => ($oneDay) ? []
                     : ((array_key_exists($model->start_date,$new_schedule))
                         ? ['schedule' => $new_schedule[$model->start_date]]
-                        : BathhouseSchedule::findOne(['room_id' => $model->room_id, 'date' => $model->end_date]))
+                        : BathhouseSchedule::getScheduleForDate($model->room_id, $model->end_date))
             ];
 
         if ($oneDay)
@@ -63,6 +64,7 @@ class ApiHelpers
 
         //сначала ищем пересечения свободного времени и требуемого для каждого дня,
         //елси полностью пересекаются то array_diff вернет пустой массив
+
         $result_start_day = array_diff($required_interval['start_date'],
             array_intersect($free_time_for_days['start_date'],$required_interval['start_date']));
 
@@ -73,6 +75,27 @@ class ApiHelpers
         return (empty($result_start_day) && empty($result_start_end));
 
 
+    }
+
+    public static function getBusyPeriodsFromBookings($bookings, $current_date, $exclude)
+    {
+        $busy_periods = [];
+
+        foreach ($bookings as $book_item)
+        {
+            if($book_item->id !== $exclude)
+            {
+                if($book_item->start_date == $book_item->end_date)
+                    $busy_periods[] = [$book_item->start_period, $book_item->end_period];
+                elseif($book_item->start_date == date('Y-m-d', strtotime('-1 day', strtotime($current_date))))
+                    array_unshift($busy_periods, [self::FIRST_TIME_ID, $book_item->end_period]);
+                elseif($book_item->end_date == date('Y-m-d', strtotime('+1 day', strtotime($current_date))))
+                    $busy_periods[] = [$book_item->start_period, self::LAST_TIME_ID];
+            }
+
+        }
+
+        return $busy_periods;
     }
 
     public static function reformScheduleForDay($room_id, $dates, $min_duration = self::STEP, $exclude = null, $return = false)
@@ -86,53 +109,10 @@ class ApiHelpers
             if($date == null)
                 continue;
 
-            $curr_bookings = \api\modules\closed\models\BathhouseBooking::find()
-                ->select('id, start_period,end_period,start_date,end_date, room_id')
-                ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
-                    ':start_date' => $date,
-                    ':end_date' => $date,
-                    ':room_id' => (int)$room_id,
-                ])
-                ->orderBy('start_period')
-                ->all();
+            $bookings = BathhouseBooking::getAllBookingsForDate($room_id, $date);
 
-            $prev_booking = \api\modules\closed\models\BathhouseBooking::find()
-                ->select('id, start_period,end_period,start_date,end_date, room_id')
-                ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
-                    ':start_date' => date('Y-m-d', strtotime('-1 day', strtotime($date))),
-                    ':end_date' => $date,
-                    ':room_id' => (int)$room_id,
-                ])
-                ->orderBy('start_period')
-                ->one();
+            $busy_periods = self::getBusyPeriodsFromBookings($bookings, $date, $exclude);
 
-            $next_booking = \api\modules\closed\models\BathhouseBooking::find()
-                ->select('id, start_period,end_period,start_date,end_date, room_id')
-                ->where('(start_date = :start_date AND end_date = :end_date) AND room_id = :room_id', [
-                    ':start_date' => $date,
-                    ':end_date' => date('Y-m-d', strtotime('+1 day', strtotime($date))),
-                    ':room_id' => (int)$room_id,
-                ])
-                ->orderBy('start_period')
-                ->one();
-
-            $busy_periods = [];
-
-            foreach ($curr_bookings as $book_item)
-            {
-                if($book_item->id !== $exclude)
-                $busy_periods[] = [$book_item->start_period, $book_item->end_period];
-            }
-
-            if (!empty($prev_booking) and $prev_booking->id !== $exclude)
-            {
-                array_unshift($busy_periods, [self::FIRST_TIME_ID, $prev_booking->end_period]);
-            }
-
-            if (!empty($next_booking) and $next_booking->id !== $exclude)
-            {
-                $busy_periods[] = [$next_booking->start_period, self::LAST_TIME_ID];
-            }
             Yii::info('For date = '.$date.', we get following busy periods = '.Json::encode($busy_periods),'schedule');
 
             $free_period_for_date = ApiHelpers::getFreeTime($busy_periods, $min_duration);
@@ -146,13 +126,7 @@ class ApiHelpers
                 if($return)
                     $return_array[$date] = json_encode($free_period_for_date);
                 else
-                {
-                    yii::$app->db->createCommand()
-                        ->update('bathhouse_schedule', [
-                            'schedule' => json_encode($free_period_for_date)],
-                            'date = "' . $date . '" AND room_id = ' . (int)$room_id)
-                        ->execute();
-                }
+                    BathhouseSchedule::saveScheduleForDate((int)$room_id, $date, $free_period_for_date);
             }
             catch(Exception $e)
             {
@@ -286,157 +260,6 @@ class ApiHelpers
         return $result;
     }
 
-    // Поиск свободного времени для комнаты, исходя из выбранного пользователем времени и свободных часов
-    // Предыдущая версия
-    /*public static function search_free_time($free_periods_dates = array(), $selected_period = array(), $shift_time = 0, $time_format = false)
-    {
-        $result = array();
-        $selected_periods = array();
-
-        $count_id_in_hour = 6;
-
-        if (!empty($shift_time))
-        {
-            $shift_times = range($count_id_in_hour, $shift_time * $count_id_in_hour, $count_id_in_hour);
-
-            $selected_periods[] = $selected_period;
-
-            foreach ($shift_times as $shift)
-            {
-                $selected_periods[] = array($selected_period[0] - $shift, $selected_period[1] - $shift);
-                $selected_periods[] = array($selected_period[0] + $shift, $selected_period[1] + $shift);
-            }
-        }
-        else
-        {
-            $selected_periods[] = $selected_period;
-        }
-
-        // Убираем дни у которых нету ниодного свободного промежутка в дате
-        $free_periods_dates = array_filter($free_periods_dates);
-
-        if (empty($free_periods_dates)) return false;
-
-        $first_date = array_shift(array_keys($free_periods_dates));
-
-        // Пустой selected_period может быть только, если поиск происходил по названию бани, и пользователя сразу кидает
-        // на страницу деталей бани
-        if (!empty($selected_period))
-        {
-            // Речь идет о заявке днем
-            if ($selected_period[1] > $selected_period[0])
-            {
-                $tmp = array();
-
-                // Фильтруем на случай, если из-за смещения по времени выпадает другой день
-                $selected_periods = array_filter($selected_periods, 'self::one_day_filter');
-
-                foreach ($selected_periods as $interval)
-                {
-                    $intervals = self::one_day_search($free_periods_dates, $interval);
-                    if (!empty($intervals)) $tmp = array_merge($tmp, $intervals[$first_date]);
-                }
-
-                $result[$first_date] = $tmp;
-            }
-            // Ночная заявка, то есть задействуются 2 даты
-            elseif ($selected_period[1] <= $selected_period[0])
-            {
-                $time_periods = array(self::FIRST_TIME_ID, self::LAST_TIME_ID);
-
-                $last_date = end(array_keys($free_periods_dates));
-
-                // Фильтруем на случай, если из-за смещения по времени выбранный пользователем период
-                // перешел в категорию однодневной заявки
-                $two_days_periods = array_filter($selected_periods, 'self::two_day_filter');
-
-                // Находим промежутки, которые перешли в категорию однодневной заявки
-                $one_day_periods = array_diff_key($selected_periods, $two_days_periods);
-
-                foreach ($two_days_periods as $interval)
-                {
-                    // Переопределяем selected_period под вид ((t1, последний time_id),(первый time_id, t2))
-                    // Добавляем флаг is_night, чтобы пояснить что заявка охватывает 2 даты
-                    $new_selected_period = array(
-                        0 => array($interval[0], $time_periods[1], 'is_night' => true),
-                        1 => array($time_periods[0], $interval[1], 'is_night' => true),
-                    );
-
-                    foreach ($free_periods_dates as $date => $periods)
-                    {
-                        if ($date !== $last_date)
-                        {
-                            $next_day = date('Y-m-d', strtotime('+1 day', strtotime($date)));
-
-                            // Последний свободный период текущего дня и первый период следующего дня
-                            $last_period = end($periods);
-                            $first_period = $free_periods_dates[$next_day][0];
-
-                            // Проверяем, чтобы заявка умещалась в каждом из 2х дней
-                            if (($last_period[0] <= $new_selected_period[0][0] && $new_selected_period[0][1] == $last_period[1]) &&
-                                ($first_period[0] == $new_selected_period[1][0] && $new_selected_period[1][1] <= $first_period[1]))
-                            {
-//                                ($first_period[1] - $new_selected_period[1][1]) >= $count_id_in_hour  ?
-//                                    $new_selected_period[1]['extension_to'] = true : $new_selected_period[1]['extension_to'] = false;
-                                $result[$date][] = $new_selected_period[0];
-                                $result[$next_day][] = $new_selected_period[1];
-                            }
-                        }
-                    }
-                }
-
-                // Чистим полученные данные, ибо из-за смещения времени, периоды могут иметь отрицательные конечные
-                // точки, или наоборот больше максимального time_id и тп
-                // В конце обрабатываем полученные отрезки как однодневные заявки и упаковываем в result
-                foreach ($one_day_periods as $idx => $one_day_period)
-                {
-                    $tmp = array();
-                    $free_periods = array();
-
-                    if ($one_day_period[0] >= self::LAST_TIME_ID)
-                    {
-                        $one_day_periods[$idx][0] -= self::LAST_TIME_ID;
-                        $tmp[$last_date] = $free_periods_dates[$last_date];
-                        $free_periods = self::one_day_search($tmp, $one_day_periods[$idx]);
-                        $current_day = $last_date;
-                    }
-                    elseif ($one_day_period[1] <= self::FIRST_TIME_ID)
-                    {
-                        $one_day_periods[$idx][1] += self::LAST_TIME_ID;
-                        $tmp[$first_date] = $free_periods_dates[$first_date];
-                        $free_periods = self::one_day_search($tmp, $one_day_periods[$idx]);
-                        $current_day = $first_date;
-                    }
-
-                    if (!empty($free_periods) && !empty($result[$current_day])) {
-                        $result[$current_day] = array_merge($result[$current_day], $free_periods[$current_day]);
-                    }
-                }
-
-            }
-        }
-        else
-        {
-            $result = $free_periods_dates;
-        }
-
-        // Если нету свободных интервалов
-        if (empty($result)) return false;
-
-        if ($time_format)
-        {
-            foreach ($result as $date => $periods)
-            {
-                foreach ($periods as $idx => $period)
-                {
-                    $result[$date][$idx] = array_map('self::get_time', $period);
-                }
-            }
-        }
-
-        return $result;
-    }*/
-
     // Подсчет стоимости заявки исходя из дня недели, времени и цен
     public static function getSumBathOrder($days_time_order, $periods_price)
     {
@@ -532,28 +355,6 @@ class ApiHelpers
         elseif (intval($minute) >= 30 && intval($minute) <= 59) return date('H', strtotime('+1 hours', strtotime($time))) . ':00';
     }
 
-    // Проверяет вписывается время заявки в свободное время или нет
-    /*public static function checkFreeTime($free_periods, $order)
-    {
-        $check = [];
-
-        if (sizeof($free_periods) === 1) {
-            $periods_arr = self::readFreeTime($free_periods[0]['free_time']);
-
-            foreach ($periods_arr as $period) {
-                if ($period[0] <= $start_period && $end_period <= $period[1]) $check[] = $period;
-            }
-        }
-        else {
-            $start_date_free_periods = self::readFreeTime($free_periods[0]['free_time']);
-            $end_date_free_periods = self::readFreeTime($free_periods[1]['free_time']);
-
-            VarDumper::dump($start_date_free_periods);
-            VarDumper::dump($end_date_free_periods);
-        }
-
-        return empty($check) ? false : true;
-    }*/
 
     // Раскладывает свободные интервалы времени на определенные интервалы
     // step - по какие интервалы времени разбивать сутки(дефолтно 3 = 30мин)
@@ -623,7 +424,8 @@ class ApiHelpers
         return $dates;
     }
 
-    public static function decamelize($word) {
+    public static function decamelize($word)
+    {
         return $word = preg_replace_callback(
             "/(^|[a-z])([A-Z])/",
             function($m)
@@ -634,7 +436,8 @@ class ApiHelpers
         );   
     }
 
-    public static function camelize($word) {
+    public static function camelize($word)
+    {
         return $word = preg_replace_callback(
             "/(^|_)([a-z])/",
             function($m)
