@@ -42,6 +42,16 @@ return [
         'errorHandler' => [
             'errorAction' => 'main/error',
         ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'enableStrictParsing' => true,
+            'showScriptName' => false,
+            'rules' => [
+                '/'             => 'site/index',
+                'manager'       => 'site/manager'
+                // end closed api routes
+            ],
+        ]
         
     ],
     'params' => $params,

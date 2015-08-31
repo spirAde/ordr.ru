@@ -12,7 +12,18 @@ class SiteController extends Controller
 
     public function actionIndex()
     {
-        return $this->render('//layouts/main');
+        $preload = '';
+        return $this->render('//layouts/main', array(
+            'preload' => $preload
+        ));
+    }
+
+    public function actionManager()
+    {
+        $preload = '';
+        return $this->render('//layouts/main', array(
+            'preload' => $preload
+        ));
     }
 
 }

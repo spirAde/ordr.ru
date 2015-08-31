@@ -22,25 +22,6 @@ return [
         ]
     ],
     'components' => [
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
-            'keyPrefix' => 'ordr',
-        ],
- /*       'cache' => [
-            'class' => 'yii\caching\MemCache',
-            'servers' => [
-                [
-                    'host' => 'server1',
-                    'port' => 11211,
-                    'weight' => 100,
-                ],
-                [
-                    'host' => 'server2',
-                    'port' => 11211,
-                    'weight' => 50,
-                ],
-            ],
-        ],*/
         'response' => [
             'class' => 'yii\web\Response',
             'format' => yii\web\Response::FORMAT_JSON,

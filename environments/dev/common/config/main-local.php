@@ -16,5 +16,8 @@ return [
             // for the mailer to send real emails.
             'useFileTransport' => true,
         ],
+        'cache' => [
+            'class' => 'yii\caching\DummyCache',
+        ],
     ],
 ];

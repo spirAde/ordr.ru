@@ -20,7 +20,7 @@
         loadCSS('build/bundle-uncritical.css');
         loadCSS('build/fonts.css');
     </script>
-
+    <script>var _PRELOAD = <?php echo $preload?>;</script>
     <noscript><link href="build/bundle.css" rel="stylesheet"></noscript>
     <noscript><link href="build/bundle-uncritical.css" rel="stylesheet"></noscript>
     <noscript><link href="build/fonts.css" rel="stylesheet"></noscript>
